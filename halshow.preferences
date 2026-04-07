@@ -1,0 +1,21 @@
+# Halshow settings
+# This file is generated automatically.
+wm geometry . 1309x867+2293+95
+placeFrames 0.3
+set ::ratio 0.3
+set ::old_w_leftf 160
+set ::watchlist {
+    pin+mb2hal.digirail-temp-ch1.00.int
+    pin+mb2hal.digirail-temp-ch1.00.float
+    pin+scale.0.out
+    pin+scale.0.in
+    sig+digirail-ch1-raw
+    sig+digirail-ch1-temp
+}
+set ::workmode watchhal
+set ::watchInterval 100
+set ::col1_width 100
+set ::ffmts 
+set ::ifmts 
+set ::alwaysOnTop 0
+set ::autoSaveWatchlist 1

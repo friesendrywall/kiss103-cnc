@@ -1,0 +1,41 @@
+# KISS Heater PID control
+# pid.h set up in upper hal
+
+# 5s thread
+loadrt threads name1=htr-thread period1=5000000000
+
+loadrt limit1 count=1
+loadrt comp count=1
+loadrt siggen num_chan=1
+
+addf pid.h.do-pid-calcs  htr-thread
+addf siggen.0.update     servo-thread
+addf comp.0              servo-thread
+addf limit1.0            htr-thread
+
+setp pid.h.Pgain      0.033
+setp pid.h.Igain      0.002
+setp pid.h.Dgain      0.000
+setp pid.h.maxoutput  1.0
+setp pid.h.maxerrorI 15.0
+setp pid.h.command   75.0
+setp pid.h.enable     1
+
+net heater-setpoint => pid.h.command
+
+setp siggen.0.frequency 0.2
+setp siggen.0.amplitude 0.5
+setp siggen.0.offset    0.5
+
+setp limit1.0.min 0.1
+setp limit1.0.max 1.0
+
+# PID IN
+net pid-out pid.h.output limit1.0.in
+# LIMIT
+net limit-out limit1.0.out comp.0.in1
+# COMP
+net pwm-slow-compare siggen.0.triangle comp.0.in0
+net pwm-out comp.0.out
+
+

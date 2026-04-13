@@ -1,0 +1,80 @@
+component kiss_heat_slide "KISS Heat Slide control";
+pin in  bit retracted_sensor;
+pin in  bit in_position_sensor;
+pin in  bit lift_down_sensor;
+pin in  bit lift_up;
+pin in  bit enable;
+pin out bit slide_out;
+pin out bit lift_up_out;
+
+pin out bit slide_in_position;
+pin out bit error;
+
+option period no;
+
+variable int   slideState;
+variable float slideTime;
+function _;
+license "GPL";
+author "Erik Friesen";
+;;
+
+enum { SLIDE_RETRACTED, SLIDE_MOVING, SLIDE_IN_POSITION};
+
+FUNCTION(_) {
+  if (retracted_sensor && in_position_sensor) {
+    rtapi_print_msg(RTAPI_MSG_ERR, "Heater slide sensor error\n");
+    error = 1;
+  }
+  if (error) {
+    slide_out = 0;
+    lift_up_out = 0;
+    slide_in_position = 0;
+    if (enable == 0 && retracted_sensor && in_position_sensor) {
+      error = 0;
+    }
+  } else if (lift_up) {
+    lift_up_out = 1;
+  } else if (enable) {
+    lift_up_out = 0;
+    if (slideState == SLIDE_RETRACTED) {
+      slide_out = 1;
+      slideState = SLIDE_MOVING;
+      slideTime = 0;
+    } else if (slideState == SLIDE_MOVING) {
+      if (in_position_sensor && lift_down_sensor) {
+        slideState = SLIDE_IN_POSITION;
+      } else {
+        slideTime += fperiod;
+        if (slideTime > 15.0) {
+          rtapi_print_msg(RTAPI_MSG_ERR, "Heater slide out error\n");
+          error = 1;
+          slide_out = 0;
+        }
+      }
+    } else /* SLIDE_IN_POSITION*/ {
+      slideTime = 0;
+      slide_in_position = 1;
+      if (!in_position_sensor || !lift_down_sensor) {
+        rtapi_print_msg(RTAPI_MSG_ERR, "Heater out of position\n");
+        error = 1;
+        slide_out = 0;
+        slide_in_position = 0;
+      }
+    }
+  } else {
+    lift_up_out = 0;
+    slide_out = 0;
+    slide_in_position = 0;
+    if (slideState == SLIDE_MOVING) {
+      if (retracted_sensor && lift_down_sensor) {
+        slideState = SLIDE_RETRACTED;
+      }
+    } else if (slideState == SLIDE_IN_POSITION) {
+      slideTime = 0;
+      slideState = SLIDE_MOVING;
+    } else /* SLIDE_RETRACTED*/ {
+
+    }
+  }
+}

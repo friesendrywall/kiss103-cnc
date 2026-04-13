@@ -9,6 +9,6 @@ setp scale.0.gain 0.1
 
 net digirail-ch1-raw mb2hal.digirail-temp-ch1.00.float => scale.0.in
 
-# Scaled outputs (actual Â°C)
-# scale.0.out = Channel 1 temperature in Â°C
+# Scaled outputs (actual °C)
+# scale.0.out = Channel 1 temperature in °C
 net digirail-ch1-temp scale.0.out

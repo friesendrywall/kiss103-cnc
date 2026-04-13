@@ -1,0 +1,106 @@
+component kiss_heater "KISS Heater controller";
+param rw float temp_allowance;
+param rw float pwm_period;
+param rw float min_cycle;
+
+pin in float pidP;
+pin in float pidI;
+pin in float pidD;
+pin in float iMax;
+pin in float iMin;
+
+pin in  bit   slide_in_position;
+pin in  bit   enable;
+pin out float command;
+/* active_01 always on */
+pin in bit   active_02;
+pin in bit   active_03;
+pin in bit   active_04;
+pin in bit   active_05;
+pin in bit   active_06;
+pin in float in_temperature;
+pin in float setpoint;
+
+pin out bit ssr_out_01;
+pin out bit ssr_out_02;
+pin out bit ssr_out_03;
+pin out bit ssr_out_04;
+pin out bit ssr_out_05;
+pin out bit ssr_out_06;
+pin out bit ssr_ena;
+
+pin out bit at_temp;
+option period no;
+
+variable float currPeriod;
+variable float limit;
+variable int   loadPeriod;
+variable float iState;
+variable float dState;
+function _;
+license "GPL";
+author "Erik Friesen";
+;;
+
+FUNCTION(_) {
+  if (enable && slide_in_position) {
+    ssr_out_01 = 1;
+    ssr_out_02 = active_02;
+    ssr_out_03 = active_03;
+    ssr_out_04 = active_04;
+    ssr_out_05 = active_05;
+    ssr_out_06 = active_06;
+    if (in_temperature + temp_allowance >= setpoint) {
+      at_temp = 1;
+    } else {
+      at_temp = 0;
+    }
+    if (loadPeriod) {
+      // Calculate PID
+      float pTerm, dTerm, iTerm, error;
+      error = setpoint - in_temperature;
+      pTerm = pidP * error;
+      iState += error;
+      if (iState > iMax) {
+        iState = iMax;
+      } else if (iState < iMin) {
+        iState = iMin;
+      }
+      iTerm = pidI * iState;
+      dTerm = pidD * (dState - in_temperature);
+      dState = in_temperature;
+      command = (pTerm + dTerm + iTerm);
+
+      loadPeriod = 0;
+      // Limit
+      if (command * pwm_period < (min_cycle / 2.0f)) {
+        limit = 0;
+      } else if (command * pwm_period < min_cycle) {
+        limit = min_cycle / pwm_period;
+      } else {
+        limit = command;
+      }
+    }
+    // PWM
+    ssr_ena = limit > (min_cycle / 2) && (pwm_period * limit) >= currPeriod;
+    currPeriod += fperiod;
+    if (currPeriod + (fperiod / 10) >= pwm_period) {
+      currPeriod -= pwm_period;
+      loadPeriod = 1;
+    }
+    //
+  } else {
+    limit = 0;
+    iState = 0;
+    dState = in_temperature;
+    currPeriod = 0;
+    loadPeriod = 1;
+    ssr_ena = 0;
+    ssr_out_01 = 0;
+    ssr_out_02 = 0;
+    ssr_out_03 = 0;
+    ssr_out_04 = 0;
+    ssr_out_05 = 0;
+    ssr_out_06 = 0;
+  }
+}

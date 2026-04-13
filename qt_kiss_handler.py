@@ -4,6 +4,7 @@
 import sys
 import os
 import linuxcnc
+import subprocess
 
 from PyQt5 import QtCore, QtWidgets
 
@@ -82,6 +83,9 @@ class HandlerClass:
         self.w.gcodegraphics.setBackgroundColor(QColor(245, 244, 240))  # #f5f4f0
         self.w.gcodegraphics.setFeedColor(QColor(0, 85, 255, 255))      # #0055ff, alpha must be >0
         self.w.gcodegraphics.setRapidColor(QColor(0, 170, 255, 255))    # #00aaff
+
+        self.w.open_ladder.clicked.connect(self.open_classicladder)
+
 
     def processed_key_event__(self, receiver, event, is_pressed, key, code, shift, cntrl):
         # when typing in MDI, we don't want keybinding to call functions
@@ -179,6 +183,12 @@ class HandlerClass:
     #######################
     # callbacks from form #
     #######################
+
+    def open_classicladder(self):
+        try:
+            subprocess.Popen(['classicladder'])
+        except Exception as e:
+            print(f"ClassicLadder failed to open: {e}")
 
     #####################
     # general functions #

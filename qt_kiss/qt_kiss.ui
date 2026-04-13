@@ -22,7 +22,7 @@
    </property>
    <layout class="QVBoxLayout" name="verticalLayout" stretch="7,0">
     <item>
-     <layout class="QHBoxLayout" name="layout_top" stretch="2,2,3">
+     <layout class="QHBoxLayout" name="layout_top" stretch="2,0,3">
       <property name="sizeConstraint">
        <enum>QLayout::SetMaximumSize</enum>
       </property>
@@ -105,7 +105,7 @@
          <enum>QTabWidget::Rounded</enum>
         </property>
         <property name="currentIndex">
-         <number>0</number>
+         <number>3</number>
         </property>
         <property name="iconSize">
          <size>
@@ -744,10 +744,10 @@
          <widget class="QSplitter" name="splitter">
           <property name="geometry">
            <rect>
-            <x>70</x>
-            <y>30</y>
+            <x>20</x>
+            <y>20</y>
             <width>100</width>
-            <height>25</height>
+            <height>41</height>
            </rect>
           </property>
           <property name="orientation">
@@ -932,8 +932,8 @@
          <widget class="ActionButton" name="qss_reload">
           <property name="geometry">
            <rect>
-            <x>80</x>
-            <y>110</y>
+            <x>20</x>
+            <y>150</y>
             <width>131</width>
             <height>51</height>
            </rect>
@@ -1104,6 +1104,19 @@
           </property>
           <property name="alt_textTemplate" stdset="0">
            <string>%1.2f mm</string>
+          </property>
+         </widget>
+         <widget class="ActionButton" name="open_ladder">
+          <property name="geometry">
+           <rect>
+            <x>20</x>
+            <y>90</y>
+            <width>161</width>
+            <height>41</height>
+           </rect>
+          </property>
+          <property name="text">
+           <string>Ladder</string>
           </property>
          </widget>
         </widget>

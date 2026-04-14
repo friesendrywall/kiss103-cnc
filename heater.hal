@@ -19,52 +19,12 @@ setp kiss-heater.0.iMin -10
 setp kiss-heater.0.iMax 10
 setp kiss-heater.0.temp-allowance 3.0
 
-net heater_output kiss-heater.0.ssr-ena hm2_7i76e.0.7i76.0.0.output-01
+net heater-ena   kiss-heater.0.ssr-ena    hm2_7i76e.0.7i84.0.1.output-00
+net heater-out-1 kiss-heater.0.ssr-out-01 hm2_7i76e.0.7i84.0.1.output-01
+net heater-out-2 kiss-heater.0.ssr-out-02 hm2_7i76e.0.7i84.0.1.output-02
+net heater-out-3 kiss-heater.0.ssr-out-03 hm2_7i76e.0.7i84.0.1.output-03
+net heater-out-4 kiss-heater.0.ssr-out-04 hm2_7i76e.0.7i84.0.1.output-04
+net heater-out-5 kiss-heater.0.ssr-out-05 hm2_7i76e.0.7i84.0.1.output-05
+net heater-out-6 kiss-heater.0.ssr-out-06 hm2_7i76e.0.7i84.0.1.output-06
 
-loadrt limit1 names=limit1.htr
-loadrt comp count=1
-loadrt siggen num_chan=1
-
-addf pid.htr.do-pid-calcs  htr-thread
-addf siggen.0.update     servo-thread
-addf comp.0              servo-thread
-addf limit1.htr          htr-thread
-
-setp pid.htr.Pgain      0.033
-setp pid.htr.Igain      0.002
-setp pid.htr.Dgain      0.000
-setp pid.htr.maxoutput  1.0
-setp pid.htr.maxerrorI 15.0
-setp pid.htr.command   75.0
-setp pid.htr.enable     1
-
-net heater-setpoint => pid.htr.command
-
-setp siggen.0.frequency 0.2
-setp siggen.0.amplitude 0.5
-setp siggen.0.offset    0.5
-
-setp limit1.htr.min 0.1
-setp limit1.htr.max 1.0
-
-# PID IN
-net pid-out pid.htr.output limit1.htr.in
-# LIMIT
-net limit-out limit1.htr.out comp.0.in1
-# COMP
-net pwm-slow-compare siggen.0.triangle comp.0.in0
-net pwm-out comp.0.out
-
-
-loadrt pwmgen output_type=0
-addf pwmgen.update servo-thread
-addf pwmgen.make-pulses servo-thread
-
-setp pwmgen.0.pwm-freq 0.5
-setp pwmgen.0.scale 1.0
-setp pwmgen.0.min-dc 0.125
-setp pwmgen.0.max-dc 1.00
-setp pwmgen.0.enable 1
-
-
-
+net slide-in-position kiss-heater.0.slide-in-position hm2_7i76e.0.7i76.0.0.input-00

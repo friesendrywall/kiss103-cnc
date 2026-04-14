@@ -2,13 +2,13 @@
 loadusr -W mb2hal config=/home/kiss/linuxcnc/configs/KISS103-MESA/digirail.cfg
 
 # Optional: scale if values are in tenths of a degree (divide by 10)
-loadrt scale count=1
-addf scale.0 servo-thread
+loadrt scale names=scale.preheat-temp
+addf scale.preheat-temp servo-thread
 
-setp scale.0.gain 0.1
+setp scale.preheat-temp.gain 0.1
 
-net digirail-ch1-raw mb2hal.digirail-temp-ch1.00.float => scale.0.in
+net digirail-ch1-raw mb2hal.digirail-temp-ch1.00.float => scale.preheat-temp.in
 
-# Scaled outputs (actual °C)
-# scale.0.out = Channel 1 temperature in °C
-net digirail-ch1-temp scale.0.out
+# Scaled outputs (actual ï¿½C)
+# scale.0.out = Channel 1 temperature in ï¿½C
+# net digirail-ch1-temp scale.0.out

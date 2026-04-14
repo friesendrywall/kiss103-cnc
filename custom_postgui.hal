@@ -2,3 +2,16 @@
 # This file will not be overwritten when you run PNCconf again
 
 net preheat2 kiss-heater.0.active-02 qt_kiss.preheat2
+net preheat3 kiss-heater.0.active-03 qt_kiss.preheat3
+net preheat4 kiss-heater.0.active-04 qt_kiss.preheat4
+net preheat5 kiss-heater.0.active-05 qt_kiss.preheat5
+net preheat6 kiss-heater.0.active-06 qt_kiss.preheat6
+net preheat-setpoint kiss-heater.0.setpoint qt_kiss.preheat_setpoint-f
+net preheater-temp scale.preheat-temp.out qt_kiss.preheat_temp
+
+# qt_kiss.heat_cmd
+# qt_kiss.lift_cmd
+# qt_kiss.preheat_ready
+# kiss-heater.0.at-temp
+
+net slide-in-position => qt_kiss.slide_in

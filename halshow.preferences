@@ -1,24 +1,42 @@
 # Halshow settings
 # This file is generated automatically.
-wm geometry . 1309x867+2069+46
+wm geometry . 1309x867+306+114
 placeFrames 0.3
 set ::ratio 0.3
 set ::old_w_leftf 160
 set ::watchlist {
-    sig+digirail-ch1-temp
-    pin+pid.h.command
-    pin+pid.h.output
-    pin+pid.h.enable
-    pin+siggen.0.update.time
-    pin+siggen.0.frequency
-    pin+siggen.0.amplitude
-    pin+siggen.0.reset
-    pin+siggen.0.square
-    pin+siggen.0.triangle
-    pin+comp.0.out
-    pin+comp.0.in1
-    pin+limit1.0.in
-    pin+limit1.0.out
+    param+kiss-heater.0.min-cycle
+    param+kiss-heater.0.temp-allowance
+    param+kiss-heater.0.pwm-period
+    param+kiss-heater.0.tmax
+    param+kiss-heater.0.tmax-increased
+    pin+kiss-heater.0.command
+    pin+kiss-heater.0.ssr-ena
+    pin+kiss-heater.0.setpoint
+    pin+kiss-heater.0.slide-in-position
+    pin+kiss-heater.0.enable
+    pin+kiss-heater.0.at-temp
+    pin+kiss-heater.0.iMax
+    pin+kiss-heater.0.iMin
+    pin+kiss-heater.0.pidI
+    pin+kiss-heater.0.pidD
+    pin+kiss-heater.0.pidP
+    pin+kiss-heater.0.in-temperature
+    pin+qt_kiss.preheat2
+    pin+qt_kiss.preheat_temp
+    pin+qt_kiss.preheat_ready
+    pin+qt_kiss.lift_cmd
+    pin+qt_kiss.heat_cmd
+    pin+kiss-heat-slide.0.in-position-sensor
+    pin+hm2_7i76e.0.7i84.0.1.output-00
+    pin+hm2_7i76e.0.7i76.0.0.input-00
+    pin+qt_kiss.AT_TEMP
+    pin+qt_kiss.N2OK
+    pin+qt_kiss.slide_in
+    pin+motion.digital-in-00
+    pin+motion.digital-out-00
+    pin+qt_kiss.preheat_setpoint-f
+    pin+qt_kiss.ds-set-value
 }
 set ::workmode watchhal
 set ::watchInterval 100

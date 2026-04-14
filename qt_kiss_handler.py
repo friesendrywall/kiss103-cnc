@@ -17,6 +17,8 @@ from qtvcp.lib.keybindings import Keylookup
 from qtvcp.core import Status, Action
 from PyQt5.QtCore import QFileSystemWatcher
 from PyQt5.QtGui import QColor
+from qtvcp.core import Qhal
+QHAL = Qhal()
 
 # Set up logging
 from qtvcp import logger
@@ -85,7 +87,11 @@ class HandlerClass:
         self.w.gcodegraphics.setRapidColor(QColor(0, 170, 255, 255))    # #00aaff
 
         self.w.open_ladder.clicked.connect(self.open_classicladder)
+        self.pin_setpoint_set = QHAL.newpin('preheat-set-value', QHAL.HAL_FLOAT, QHAL.HAL_IN)
+        self.pin_setpoint_set.value_changed.connect(self.update_ph_setpoint)
 
+    def update_ph_setpoint(self, value):
+        self.w.preheat_setpoint.setValue(value)
 
     def processed_key_event__(self, receiver, event, is_pressed, key, code, shift, cntrl):
         # when typing in MDI, we don't want keybinding to call functions
@@ -98,6 +104,7 @@ class HandlerClass:
             # then check if it's one we want the keypress events to go to
             flag = False
             receiver2 = receiver
+            from PyQt5.QtWidgets import QDoubleSpinBox, QSpinBox, QLineEdit, QAbstractSpinBox
             while receiver2 is not None and not flag:
                 if isinstance(receiver2, QtWidgets.QDialog):
                     flag = True
@@ -112,6 +119,9 @@ class HandlerClass:
                     flag = True
                     break
                 if isinstance(receiver2, ORIGIN_OFFSET):
+                    flag = True
+                    break
+                if isinstance(receiver2, (QDoubleSpinBox, QSpinBox, QLineEdit, QAbstractSpinBox)):
                     flag = True
                     break
                 receiver2 = receiver2.parent()

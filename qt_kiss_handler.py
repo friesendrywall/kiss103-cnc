@@ -87,11 +87,25 @@ class HandlerClass:
         self.w.gcodegraphics.setRapidColor(QColor(0, 170, 255, 255))    # #00aaff
 
         self.w.open_ladder.clicked.connect(self.open_classicladder)
+        # External spin edit calls
+        # preheater setpoint
         self.pin_setpoint_set = QHAL.newpin('preheat-set-value', QHAL.HAL_FLOAT, QHAL.HAL_IN)
         self.pin_setpoint_set.value_changed.connect(self.update_ph_setpoint)
+        # preheater setpoint
+        self.pin_djdot_set = QHAL.newpin('dj-dot-set-value', QHAL.HAL_FLOAT, QHAL.HAL_IN)
+        self.pin_djdot_set.value_changed.connect(self.update_djdot)
+        # preheater setpoint
+        self.pin_djfreq_set = QHAL.newpin('dj-freq-set-value', QHAL.HAL_FLOAT, QHAL.HAL_IN)
+        self.pin_djfreq_set.value_changed.connect(self.update_djfreq)
 
     def update_ph_setpoint(self, value):
         self.w.preheat_setpoint.setValue(value)
+
+    def update_djdot(self, value):
+        self.w.dj_dotsize.setValue(value)
+
+    def update_djfreq(self, value):
+        self.w.dj_freq.setValue(value)
 
     def processed_key_event__(self, receiver, event, is_pressed, key, code, shift, cntrl):
         # when typing in MDI, we don't want keybinding to call functions

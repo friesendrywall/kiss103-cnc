@@ -1,0 +1,62 @@
+component kiss_pump "KISS Pump controller";
+param rw float pulses_per_rev;
+
+pin in unsigned n2_delay;
+pin in float    accel; // rpm per second per second
+pin in bit      n2_signal;
+pin in bit      pump_run;
+pin in bit      stop;
+pin in float    rpm;
+
+pin out float velocity; // To stepgen
+pin out bit   at_speed;
+pin out bit   stopped;
+
+variable int n2_tmr;
+function _;
+license "GPL";
+author "Erik Friesen";
+;;
+
+
+FUNCTION(_) {
+  float target_velocity;
+  if (n2_signal) {
+    if (n2_tmr < n2_delay) {
+      n2_tmr++;
+      velocity = 0;
+      return;
+    }
+    if (pump_run && !stop) {
+      target_velocity = pulses_per_rev * rpm / 60;
+    } else {
+      target_velocity = 0;
+    }
+    if (velocity < target_velocity) {
+      float max_accel = (accel * pulses_per_rev / 60.0) * fperiod;
+      if (target_velocity - velocity > max_accel) {
+        velocity += max_accel;
+      } else {
+        velocity = target_velocity;
+      }
+    } else if (velocity > target_velocity) {
+      float max_decel = (accel * pulses_per_rev / 60.0) * fperiod * 2;
+      if (velocity - target_velocity > max_decel) {
+        velocity -= max_decel;
+      } else {
+        velocity = target_velocity;
+      }
+    }
+    stopped = velocity == 0;
+    if (velocity == 0) {
+      at_speed = 0;
+    } else if (velocity == target_velocity) {
+      at_speed = 1;
+    }
+  } else {
+    velocity = 0;
+    n2_tmr = 0;
+    at_speed = 0;
+    stopped = 1;
+  }
+}

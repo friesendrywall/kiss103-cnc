@@ -4,11 +4,11 @@
 # 50mS thread
 loadrt threads name1=htr-thread period1=50000000
 loadrt pid names=pid.htr
-
+loadrt or2 names=or2.htr
+loadrt kiss_heater
 loadrt kiss_heat_slide
 addf kiss-heat-slide.0 htr-thread
-
-loadrt kiss_heater
+addf or2.htr htr-thread
 addf kiss-heater.0 htr-thread
 setp kiss-heater.0.pwm-period 1.5
 setp kiss-heater.0.min-cycle 0.250
@@ -28,3 +28,7 @@ net heater-out-5 kiss-heater.0.ssr-out-05 hm2_7i76e.0.7i84.0.1.output-05
 net heater-out-6 kiss-heater.0.ssr-out-06 hm2_7i76e.0.7i84.0.1.output-06
 
 net slide-in-position kiss-heater.0.slide-in-position hm2_7i76e.0.7i76.0.0.input-00
+
+net heater-enable or2.htr.out kiss-heat-slide.0.enable kiss-heater.0.enable
+
+# TODO net heater-mcontrol or2.htr.in0 somewhere

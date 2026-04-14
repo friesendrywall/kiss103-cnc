@@ -11,6 +11,7 @@ pin in float iMin;
 
 pin in  bit   slide_in_position;
 pin in  bit   enable;
+pin in  bit   manual_ena;
 pin out float command;
 /* active_01 always on */
 pin in bit   active_02;

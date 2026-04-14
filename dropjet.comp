@@ -1,16 +1,19 @@
 component dropjet "Dropjet controller";
-pin in  unsigned pulse_width;
-pin in  unsigned pulse_hz;
-pin in  bit      single;
-pin in  bit      single_trigger;
-pin in  bit      multi;
-pin in  bit      purge;
-pin out bit      dj_pin;
+pin in  float dot_size;
+pin in  float pulse_hz;
+pin in  bit   manual_single;
+pin in  bit   single;
+pin in  bit   single_trigger;
+pin in  bit   multi;
+pin in  bit   manual_multi;
+pin in  bit   purge;
+pin out bit   dj_pin;
 
 variable uint  last_trigger;
 variable float et;
 variable float tmr;
 variable int   last_multi;
+variable int   manual_single_active;
 option period no;
 function _;
 license "GPL";
@@ -18,10 +21,13 @@ author "Erik Friesen";
 ;;
 
 FUNCTION(_) {
-
+  unsigned int pulse_width = (dot_size + 2.1F);
+  if (pulse_width > 50) {
+    pulse_width = 0;
+  }
   if (purge) {
     dj_pin = 1;
-  } else if (single) {
+  } else if (single && pulse_hz > 0.1F) {
     et += fperiod;
     if (last_trigger != single_trigger && pulse_width > 0) {
       last_trigger = single_trigger;
@@ -34,8 +40,8 @@ FUNCTION(_) {
         dj_pin = 0;
       }
     }
-  } else if (multi && pulse_hz > 0) {
-    float per = 1.0f / (float)pulse_hz;
+  } else if ((manual_multi || multi) && pulse_hz > 0.1F) {
+    float per = 1.0f / pulse_hz;
     if (!last_multi) {
       tmr = per; // pre-load so first cycle fires immediately
       last_multi = 1;
@@ -53,6 +59,19 @@ FUNCTION(_) {
         dj_pin = 0;
       }
     }
+  } else if (manual_single && pulse_hz > 0.1F) {
+    et += fperiod;
+    if (!manual_single_active && pulse_width > 0) {
+      manual_single_active = 1;
+      dj_pin = 1;
+      et = 0;
+    }
+    if (dj_pin) {
+      if ((et * 1000) >= pulse_width) {
+        et = 0;
+        dj_pin = 0;
+      }
+    }
   } else {
     if (last_trigger != single_trigger) {
       last_trigger = single_trigger;
@@ -62,5 +81,6 @@ FUNCTION(_) {
       dj_pin = 0;
     }
     last_multi = 0;
+    manual_single_active = 0;
   }
 }

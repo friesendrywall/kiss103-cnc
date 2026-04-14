@@ -1,0 +1,18 @@
+#!/bin/bash
+# M160 P<value> — sets the Dropjet size
+# Usage in G-code: M160 P1
+# Valid range: 1 to 25 (integers only)
+
+# Force to integer by truncating any decimal
+VALUE=$(printf "%.0f" $1)
+
+# Clamp to range 25-125
+if [ "$VALUE" -lt 1 ]; then
+    VALUE=1
+fi
+if [ "$VALUE" -gt 25 ]; then
+    VALUE=25
+fi
+
+halcmd setp qt_kiss.dj-dot-set-value $VALUE
+exit 0

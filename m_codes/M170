@@ -1,0 +1,18 @@
+#!/bin/bash
+# M170 P<value> — sets the Dropjet frequency
+# Usage in G-code: M170 P1
+# Valid range: 1 to 100 (integers only)
+
+# Force to integer by truncating any decimal
+VALUE=$(printf "%.0f" $1)
+
+# Clamp to range 25-125
+if [ "$VALUE" -lt 1 ]; then
+    VALUE=1
+fi
+if [ "$VALUE" -gt 100 ]; then
+    VALUE=25
+fi
+
+halcmd setp qt_kiss.dj-freq-set-value $VALUE
+exit 0

@@ -1,42 +1,32 @@
 # Halshow settings
 # This file is generated automatically.
-wm geometry . 1309x867+306+114
+wm geometry . 1309x867+448+59
 placeFrames 0.3
 set ::ratio 0.3
 set ::old_w_leftf 160
 set ::watchlist {
-    param+kiss-heater.0.min-cycle
-    param+kiss-heater.0.temp-allowance
-    param+kiss-heater.0.pwm-period
-    param+kiss-heater.0.tmax
-    param+kiss-heater.0.tmax-increased
-    pin+kiss-heater.0.command
-    pin+kiss-heater.0.ssr-ena
-    pin+kiss-heater.0.setpoint
-    pin+kiss-heater.0.slide-in-position
-    pin+kiss-heater.0.enable
-    pin+kiss-heater.0.at-temp
-    pin+kiss-heater.0.iMax
-    pin+kiss-heater.0.iMin
-    pin+kiss-heater.0.pidI
-    pin+kiss-heater.0.pidD
-    pin+kiss-heater.0.pidP
-    pin+kiss-heater.0.in-temperature
-    pin+qt_kiss.preheat2
-    pin+qt_kiss.preheat_temp
-    pin+qt_kiss.preheat_ready
-    pin+qt_kiss.lift_cmd
-    pin+qt_kiss.heat_cmd
-    pin+kiss-heat-slide.0.in-position-sensor
-    pin+hm2_7i76e.0.7i84.0.1.output-00
-    pin+hm2_7i76e.0.7i76.0.0.input-00
-    pin+qt_kiss.AT_TEMP
-    pin+qt_kiss.N2OK
-    pin+qt_kiss.slide_in
-    pin+motion.digital-in-00
-    pin+motion.digital-out-00
-    pin+qt_kiss.preheat_setpoint-f
-    pin+qt_kiss.ds-set-value
+    pin+kiss-pump.0.accel
+    pin+kiss-pump.0.n2-delay
+    pin+kiss-pump.0.n2-signal
+    pin+kiss-pump.0.pump-run
+    pin+kiss-pump.0.rpm
+    pin+kiss-pump.0.stop
+    pin+kiss-pump.0.time
+    pin+kiss-pump.0.velocity
+    pin+hm2_7i76e.0.stepgen.03.control-type
+    pin+hm2_7i76e.0.stepgen.03.counts
+    pin+hm2_7i76e.0.stepgen.03.dbg_err_at_match
+    pin+hm2_7i76e.0.stepgen.03.dbg_ff_vel
+    pin+hm2_7i76e.0.stepgen.03.dbg_pos_minus_prev_cmd
+    pin+hm2_7i76e.0.stepgen.03.dbg_s_to_match
+    pin+hm2_7i76e.0.stepgen.03.dbg_step_rate
+    pin+hm2_7i76e.0.stepgen.03.dbg_vel_error
+    pin+hm2_7i76e.0.stepgen.03.enable
+    pin+hm2_7i76e.0.stepgen.03.position-cmd
+    pin+hm2_7i76e.0.stepgen.03.position-fb
+    pin+hm2_7i76e.0.stepgen.03.position-reset
+    pin+hm2_7i76e.0.stepgen.03.velocity-cmd
+    pin+hm2_7i76e.0.stepgen.03.velocity-fb
 }
 set ::workmode watchhal
 set ::watchInterval 100

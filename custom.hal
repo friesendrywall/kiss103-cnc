@@ -1,2 +1,39 @@
 # Include your custom HAL commands here
 # This file will not be overwritten when you run PNCconf again
+
+# Dropjet setup
+loadrt dropjet
+addf dropjet.0 servo-thread
+net dj_output dropjet.0.dj-pin hm2_7i76e.0.7i76.0.0.output-00
+
+#flux setup
+loadrt or2 names=or2.flux-on,or2.flux-up
+addf or2.flux-on servo-thread
+addf or2.flux-up servo-thread
+
+# TODO net motion.digital-out-XX => or2.flux-up.in0
+# TODO net motion.digital-out-XX => or2.flux-on.in0
+# TODO net flux-up-out   PIN?? => or2.flux-up.out
+# TODO net flux-out      PIN?? => or2.flux-on.out
+
+# Pump setup
+loadrt kiss_pump
+addf kiss-pump.0 servo-thread
+setp kiss-pump.0.pulses-per-rev 2000
+setp kiss-pump.0.accel 1000
+# 7i76 setup
+setp   hm2_7i76e.0.stepgen.03.dirsetup        10000
+setp   hm2_7i76e.0.stepgen.03.dirhold         10000
+setp   hm2_7i76e.0.stepgen.03.steplen         5000
+setp   hm2_7i76e.0.stepgen.03.stepspace       5000
+setp   hm2_7i76e.0.stepgen.03.position-scale  1.0
+setp   hm2_7i76e.0.stepgen.03.step_type       0
+setp   hm2_7i76e.0.stepgen.03.control-type    1
+setp   hm2_7i76e.0.stepgen.03.maxaccel        0
+setp   hm2_7i76e.0.stepgen.03.maxvel          0
+
+net machine-is-on =>  hm2_7i76e.0.stepgen.03.enable
+net pump-velocity kiss-pump.0.velocity => hm2_7i76e.0.stepgen.03.velocity-cmd
+
+# net spindle-vel-cmd-rps     =>  hm2_7i76e.0.stepgen.03.velocity-cmd
+# net spindle-vel-fb-rps         <=  hm2_7i76e.0.stepgen.03.velocity-fb

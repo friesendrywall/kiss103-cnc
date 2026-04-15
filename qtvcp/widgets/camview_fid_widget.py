@@ -116,8 +116,10 @@ class CamFidView(QtWidgets.QWidget, _HalWidgetBase):
         self.hal_pin_fid_read     = self.HAL_GCOMP_.newpin(n + '.fid_read',     hal.HAL_BIT,   hal.HAL_IN)
         self.hal_pin_fid_size     = self.HAL_GCOMP_.newpin(n + '.fid_size',     hal.HAL_FLOAT, hal.HAL_IN)
         self.hal_pin_fid_shape    = self.HAL_GCOMP_.newpin(n + '.fid_shape',    hal.HAL_FLOAT, hal.HAL_IN)
-        self.hal_pin_fid_search   = self.HAL_GCOMP_.newpin(n + '.fid_search',   hal.HAL_FLOAT, hal.HAL_IN)
-        self.hal_pin_pix_per_inch = self.HAL_GCOMP_.newpin(n + '.pix_per_inch', hal.HAL_FLOAT, hal.HAL_IN)
+        self.hal_pin_fid_search     = self.HAL_GCOMP_.newpin(n + '.fid_search',     hal.HAL_FLOAT, hal.HAL_IN)
+        self.hal_pin_fid_tol        = self.HAL_GCOMP_.newpin(n + '.fid_tol',        hal.HAL_FLOAT, hal.HAL_IN)
+        self.hal_pin_pix_per_inch   = self.HAL_GCOMP_.newpin(n + '.pix_per_inch',   hal.HAL_FLOAT, hal.HAL_IN)
+        self.hal_pin_pix_per_inch_y = self.HAL_GCOMP_.newpin(n + '.pix_per_inch_y', hal.HAL_FLOAT, hal.HAL_IN)
 
         # --- Fiducial output pins ---
         self.hal_pin_fid_found    = self.HAL_GCOMP_.newpin(n + '.fid_found',    hal.HAL_BIT,   hal.HAL_OUT)
@@ -220,10 +222,12 @@ class CamFidView(QtWidgets.QWidget, _HalWidgetBase):
                 self._fid_state     = _FID_FOUND
                 self._fid_found_pos = (fx, fy, fr)
                 fh, fw = frame.shape[:2]
-                ppi = self.hal_pin_pix_per_inch.get()
-                if ppi > 0:
-                    self.hal_pin_offset_x.set( (fx - fw / 2.0) / ppi)
-                    self.hal_pin_offset_y.set(-(fy - fh / 2.0) / ppi)
+                ppi_x = self.hal_pin_pix_per_inch.get()
+                ppi_y = self._ppi_y()
+                if ppi_x > 0:
+                    self.hal_pin_offset_x.set( (fx - fw / 2.0) / ppi_x)
+                if ppi_y > 0:
+                    self.hal_pin_offset_y.set(-(fy - fh / 2.0) / ppi_y)
                 self.hal_pin_fid_found.set(True)
                 self.hal_pin_fid_error.set(False)
             elif time.time() - self._fid_search_t0 > _FID_TIMEOUT:
@@ -236,27 +240,35 @@ class CamFidView(QtWidgets.QWidget, _HalWidgetBase):
     #  Detection helpers                                                   #
     # ------------------------------------------------------------------ #
 
+    def _ppi_y(self):
+        """Return effective Y pixels-per-inch; falls back to X value when pin is 0."""
+        v = self.hal_pin_pix_per_inch_y.get()
+        return v if v > 0 else self.hal_pin_pix_per_inch.get()
+
     def _detect_fiducial(self, frame):
         """Return (found, x, y, r) in frame pixels, all ints."""
-        ppi        = self.hal_pin_pix_per_inch.get()
+        ppi_x      = self.hal_pin_pix_per_inch.get()
+        ppi_y      = self._ppi_y()
         fid_size   = self.hal_pin_fid_size.get()
         fid_search = self.hal_pin_fid_search.get()
         fid_shape  = self.hal_pin_fid_shape.get()
+        fid_tol    = max(0.0, self.hal_pin_fid_tol.get()) / 100.0  # % → fraction
 
-        if ppi <= 0 or fid_size <= 0 or fid_search <= 0:
+        if ppi_x <= 0 or fid_size <= 0 or fid_search <= 0:
             return False, 0, 0, 0
 
-        fid_size_px  = fid_size  * ppi
-        search_px    = fid_search * ppi
+        # Search ROI: square in physical space, possibly rectangular in frame pixels
+        fid_size_px  = fid_size  * ppi_x          # use X ppi for circle/square radius
+        half_x = int(fid_search * ppi_x / 2)
+        half_y = int(fid_search * ppi_y / 2)
 
         fh, fw = frame.shape[:2]
         fcx, fcy = fw // 2, fh // 2
-        half = int(search_px / 2)
 
-        x1 = max(0, fcx - half)
-        y1 = max(0, fcy - half)
-        x2 = min(fw, fcx + half)
-        y2 = min(fh, fcy + half)
+        x1 = max(0, fcx - half_x)
+        y1 = max(0, fcy - half_y)
+        x2 = min(fw, fcx + half_x)
+        y2 = min(fh, fcy + half_y)
 
         if x2 <= x1 or y2 <= y1:
             return False, 0, 0, 0
@@ -264,17 +276,19 @@ class CamFidView(QtWidgets.QWidget, _HalWidgetBase):
         roi = frame[y1:y2, x1:x2]
 
         if fid_shape < 0.5:
-            return self._detect_circle(roi, fid_size_px, x1, y1)
+            return self._detect_circle(roi, fid_size_px, fid_tol, x1, y1)
         else:
-            return self._detect_square(roi, fid_size_px, x1, y1)
+            return self._detect_square(roi, fid_size_px, fid_tol, x1, y1)
 
-    def _detect_circle(self, roi, fid_size_px, x1, y1):
+    def _detect_circle(self, roi, fid_size_px, tol, x1, y1):
         gray = CV.cvtColor(roi, CV.COLOR_BGR2GRAY)
         gray = CV.GaussianBlur(gray, (5, 5), 0)
 
         r     = fid_size_px / 2.0
-        min_r = max(1, int(r * 0.7))
-        max_r = max(2, int(r * 1.3))
+        # Use tolerance for HoughCircles radius band; fall back to ±30% if tol is 0
+        band  = tol if tol > 0 else 0.30
+        min_r = max(1, int(r * (1.0 - band)))
+        max_r = max(2, int(r * (1.0 + band)))
 
         circles = CV.HoughCircles(gray, CV.HOUGH_GRADIENT, dp=1,
                                    minDist=int(max(1, r * 1.5)),
@@ -287,9 +301,15 @@ class CamFidView(QtWidgets.QWidget, _HalWidgetBase):
         roi_cy = roi.shape[0] / 2.0
         best = min(circles[0],
                    key=lambda c: (c[0] - roi_cx) ** 2 + (c[1] - roi_cy) ** 2)
-        return True, int(x1 + best[0]), int(y1 + best[1]), int(best[2])
 
-    def _detect_square(self, roi, fid_size_px, x1, y1):
+        # Reject if found radius is outside tolerance band
+        found_r = best[2]
+        if abs(found_r - r) > r * band:
+            return False, 0, 0, 0
+
+        return True, int(x1 + best[0]), int(y1 + best[1]), int(found_r)
+
+    def _detect_square(self, roi, fid_size_px, tol, x1, y1):
         gray    = CV.cvtColor(roi, CV.COLOR_BGR2GRAY)
         blurred = CV.GaussianBlur(gray, (5, 5), 0)
         _, thresh = CV.threshold(blurred, 0, 255,
@@ -300,12 +320,15 @@ class CamFidView(QtWidgets.QWidget, _HalWidgetBase):
         roi_cx      = roi.shape[1] / 2.0
         roi_cy      = roi.shape[0] / 2.0
         area_target = fid_size_px ** 2
+        band        = tol if tol > 0 else 0.30
         best        = None
         best_dist   = float('inf')
 
         for cnt in contours:
             area = CV.contourArea(cnt)
-            if area < area_target * 0.4 or area > area_target * 1.6:
+            if area < area_target * (1.0 - band) ** 2:
+                continue
+            if area > area_target * (1.0 + band) ** 2:
                 continue
             peri  = CV.arcLength(cnt, True)
             approx = CV.approxPolyDP(cnt, 0.04 * peri, True)
@@ -467,6 +490,7 @@ class CamFidView(QtWidgets.QWidget, _HalWidgetBase):
         h = size.height() // 2
         pen0 = QPen(self.cross_pointer_color, self._crossLineWidth, QtCore.Qt.SolidLine)
         pen  = QPen(self.cross_color,         self._crossLineWidth, QtCore.Qt.SolidLine)
+        gp.save()
         gp.translate(w, h)
         gp.setPen(pen0)
         gp.drawLine(0, 0 - self._crossGap, 0, -h)
@@ -474,6 +498,7 @@ class CamFidView(QtWidgets.QWidget, _HalWidgetBase):
         gp.drawLine(-w, 0, 0 - self._crossGap, 0)
         gp.drawLine(0 + self._crossGap, 0, w, 0)
         gp.drawLine(0, 0 + self._crossGap, 0, h)
+        gp.restore()
 
     def drawFidOverlay(self, qp):
         """Draw fiducial overlays: search area, ghost/result fiducial."""
@@ -489,12 +514,13 @@ class CamFidView(QtWidgets.QWidget, _HalWidgetBase):
         if not fid_show and not fid_read:
             return
 
-        ppi        = self.hal_pin_pix_per_inch.get()
+        ppi_x      = self.hal_pin_pix_per_inch.get()
+        ppi_y      = self._ppi_y()
         fid_size   = self.hal_pin_fid_size.get()
         fid_search = self.hal_pin_fid_search.get()
         fid_shape  = self.hal_pin_fid_shape.get()
 
-        if ppi <= 0:
+        if ppi_x <= 0 or ppi_y <= 0:
             return
 
         fh, fw = self._frame_shape
@@ -514,8 +540,8 @@ class CamFidView(QtWidgets.QWidget, _HalWidgetBase):
 
         # --- Search area rectangle (green) ---
         if fid_search > 0:
-            half_wx = fid_search * ppi * sx / 2.0
-            half_wy = fid_search * ppi * sy / 2.0
+            half_wx = fid_search * ppi_x * sx / 2.0
+            half_wy = fid_search * ppi_y * sy / 2.0
             qp.setPen(QPen(QtCore.Qt.green, 2, QtCore.Qt.SolidLine))
             qp.drawRect(int(wcx - half_wx), int(wcy - half_wy),
                         int(half_wx * 2),   int(half_wy * 2))
@@ -524,8 +550,8 @@ class CamFidView(QtWidgets.QWidget, _HalWidgetBase):
         if fid_size <= 0:
             return
 
-        r_wx = fid_size * ppi * sx / 2.0   # expected half-size in widget pixels
-        r_wy = fid_size * ppi * sy / 2.0
+        r_wx = fid_size * ppi_x * sx / 2.0   # expected half-size in widget pixels X
+        r_wy = fid_size * ppi_y * sy / 2.0   # expected half-size in widget pixels Y
 
         if fid_read and self._fid_state == _FID_FOUND and self._fid_found_pos is not None:
             # Yellow outline at actual detected position/size
@@ -556,6 +582,27 @@ class CamFidView(QtWidgets.QWidget, _HalWidgetBase):
             else:
                 qp.drawRect(int(wcx - r_wx), int(wcy - r_wy),
                             int(r_wx * 2),   int(r_wy * 2))
+
+        # --- Offset readout (lower-left, green) when found ---
+        if fid_read and self._fid_state == _FID_FOUND:
+            ox = self.hal_pin_offset_x.get()
+            oy = self.hal_pin_offset_y.get()
+            line1 = 'X: {:+.4f}"'.format(ox)
+            line2 = 'Y: {:+.4f}"'.format(oy)
+            font = QFont('monospace', 10)
+            font.setBold(True)
+            qp.setFont(font)
+            fm   = qp.fontMetrics()
+            lh   = fm.height()
+            margin = 6
+            # Draw each line from the bottom up
+            for i, txt in enumerate((line2, line1)):
+                y = wh - margin - i * lh
+                x = margin
+                qp.setPen(QtCore.Qt.black)
+                qp.drawText(x + 1, y + 1, txt)   # shadow for readability
+                qp.setPen(QtCore.Qt.green)
+                qp.drawText(x, y, txt)
 
     # ------------------------------------------------------------------ #
     #  Public helpers                                                       #

@@ -117,7 +117,7 @@ class CamFidView(QtWidgets.QWidget, _HalWidgetBase):
         self.hal_pin_fid_show     = self.HAL_GCOMP_.newpin(n + '.fid_show',     hal.HAL_BIT,   hal.HAL_IN)
         self.hal_pin_fid_read     = self.HAL_GCOMP_.newpin(n + '.fid_read',     hal.HAL_BIT,   hal.HAL_IN)
         self.hal_pin_fid_size     = self.HAL_GCOMP_.newpin(n + '.fid_size',     hal.HAL_FLOAT, hal.HAL_IN)
-        self.hal_pin_fid_shape    = self.HAL_GCOMP_.newpin(n + '.fid_shape',    hal.HAL_FLOAT, hal.HAL_IN)
+        self.hal_pin_fid_square   = self.HAL_GCOMP_.newpin(n + '.fid_square',    hal.HAL_BIT, hal.HAL_IN)
         self.hal_pin_fid_search     = self.HAL_GCOMP_.newpin(n + '.fid_search',     hal.HAL_FLOAT, hal.HAL_IN)
         self.hal_pin_fid_tol        = self.HAL_GCOMP_.newpin(n + '.fid_tol',        hal.HAL_FLOAT, hal.HAL_IN)
         self.hal_pin_pix_per_inch   = self.HAL_GCOMP_.newpin(n + '.pix_per_inch',   hal.HAL_FLOAT, hal.HAL_IN)
@@ -253,7 +253,7 @@ class CamFidView(QtWidgets.QWidget, _HalWidgetBase):
         ppi_y      = self._ppi_y()
         fid_size   = self.hal_pin_fid_size.get()
         fid_search = self.hal_pin_fid_search.get()
-        fid_shape  = self.hal_pin_fid_shape.get()
+        fid_square  = self.hal_pin_fid_square.get()
         fid_tol    = max(0.0, self.hal_pin_fid_tol.get()) / 100.0  # % → fraction
 
         if ppi_x <= 0 or fid_size <= 0 or fid_search <= 0:
@@ -277,7 +277,7 @@ class CamFidView(QtWidgets.QWidget, _HalWidgetBase):
 
         roi = frame[y1:y2, x1:x2]
 
-        if fid_shape < 0.5:
+        if fid_square == 0:
             return self._detect_circle(roi, fid_size_px, fid_tol, x1, y1)
         else:
             return self._detect_square(roi, fid_size_px, fid_tol, x1, y1)
@@ -545,7 +545,7 @@ class CamFidView(QtWidgets.QWidget, _HalWidgetBase):
         ppi_y      = self._ppi_y()
         fid_size   = self.hal_pin_fid_size.get()
         fid_search = self.hal_pin_fid_search.get()
-        fid_shape  = self.hal_pin_fid_shape.get()
+        fid_square  = self.hal_pin_fid_square.get()
 
         if ppi_x <= 0 or ppi_y <= 0:
             return
@@ -561,11 +561,6 @@ class CamFidView(QtWidgets.QWidget, _HalWidgetBase):
         # frame and widget share the same aspect ratio).
         sx = iw / float(fw)
         sy = ih / float(fh)
-        qp.drawText(50, 50, '1: {:.4f}"'.format(iw))
-        qp.drawText(50, 100, '2: {:.4f}"'.format(fw))
-        qp.drawText(50, 150, '3: {:.4f}"'.format(fh))
-        qp.drawText(50, 200, '4: {:.4f}"'.format(sx))
-        qp.drawText(50, 250, '5: {:.4f}"'.format(sy))
         # Image-rect centre in widget coordinates
         wcx = ir_x + iw / 2.0
         wcy = ir_y + ih / 2.0
@@ -594,7 +589,7 @@ class CamFidView(QtWidgets.QWidget, _HalWidgetBase):
             wy = ir_y + fy * sy
             wr = fr * sx
             qp.setPen(QPen(QtCore.Qt.yellow, 2, QtCore.Qt.SolidLine))
-            if fid_shape < 0.5:
+            if fid_square == 0:
                 qp.drawEllipse(QtCore.QPointF(wx, wy), wr, wr)
             else:
                 qp.drawRect(int(wx - wr), int(wy - wr), int(wr * 2), int(wr * 2))
@@ -611,7 +606,7 @@ class CamFidView(QtWidgets.QWidget, _HalWidgetBase):
         elif fid_read:
             # Red: actively searching or timed-out error — show expected size at centre
             qp.setPen(QPen(QtCore.Qt.red, 2, QtCore.Qt.SolidLine))
-            if fid_shape < 0.5:
+            if fid_square == 0:
                 qp.drawEllipse(QtCore.QPointF(wcx, wcy), r_wx, r_wy)
             else:
                 qp.drawRect(int(wcx - r_wx), int(wcy - r_wy),
@@ -620,7 +615,7 @@ class CamFidView(QtWidgets.QWidget, _HalWidgetBase):
         else:
             # fid_show only (no active read): white dashed ghost at centre
             qp.setPen(QPen(QtCore.Qt.white, 1, QtCore.Qt.DashLine))
-            if fid_shape < 0.5:
+            if fid_square == 0:
                 qp.drawEllipse(QtCore.QPointF(wcx, wcy), r_wx, r_wy)
             else:
                 qp.drawRect(int(wcx - r_wx), int(wcy - r_wy),

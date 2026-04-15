@@ -41,7 +41,16 @@ net pump-at-speed  kiss-pump.0.at-speed   => qt_kiss.pump_at_speed
 setp qt_kiss.camfidview.pix_per_inch   1038                                 
 setp qt_kiss.camfidview.fid_search     0.25                                    
 setp qt_kiss.camfidview.fid_size       0.05 
-setp qt_kiss.camfidview.fid_show       1
+# setp qt_kiss.camfidview.fid_show       1
 
+net fid-error qt_kiss.camfidview.fid_error => qt_kiss.fid_error
+net fid-search qt_kiss.camfidview.fid_search => qt_kiss.fid_area-f
+net fid-square qt_kiss.camfidview.fid_square => qt_kiss.fid_is_square
+net fid-size qt_kiss.camfidview.fid_size => qt_kiss.fid_size-f 
+net fid-tolerance qt_kiss.camfidview.fid_tol => qt_kiss.fid_tolerance-f
+net fid-show-outline qt_kiss.camfidview.fid_show => qt_kiss.fid_show_outline
 
-
+net fid-find qt_kiss.fid_find => qt_kiss.camfidview.fid_read
+net fid-found qt_kiss.camfidview.fid_found => qt_kiss.fid_found
+net fid-offset-x qt_kiss.camfidview.offset_x => qt_kiss.fid_offset_x
+net fid-offset-y qt_kiss.camfidview.offset_y => qt_kiss.fid_offset_y

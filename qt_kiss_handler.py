@@ -113,7 +113,15 @@ class HandlerClass:
         self.pin_fid_tolerance = QHAL.newpin('fid-tolerance', QHAL.HAL_FLOAT, QHAL.HAL_IN)
         self.pin_fid_tolerance.value_changed.connect(self.update_fid_tolerance)
 
-        self.w.fid_find.clicked.connect(self.update_fid_find_out)
+        # Reverse connections: widget change → keep handler HAL_IN pins current
+        self.w.preheat_setpoint.valueChanged.connect(lambda v: self.hal.__setitem__('preheat-set-value', v))
+        self.w.dj_dotsize.valueChanged.connect(      lambda v: self.hal.__setitem__('dj-dot-set-value',  v))
+        self.w.dj_freq.valueChanged.connect(         lambda v: self.hal.__setitem__('dj-freq-set-value', v))
+        self.w.fid_find.toggled.connect(             lambda v: self.hal.__setitem__('fid-find-m500',    v))
+        self.w.fid_is_square.toggled.connect(        lambda v: self.hal.__setitem__('fid-is-square',     v))
+        self.w.fid_size.valueChanged.connect(        lambda v: self.hal.__setitem__('fid-size',          v))
+        self.w.fid_area.valueChanged.connect(        lambda v: self.hal.__setitem__('fid-area',          v))
+        self.w.fid_tolerance.valueChanged.connect(   lambda v: self.hal.__setitem__('fid-tolerance',     v))
 
     def update_ph_setpoint(self, value):
         self.w.preheat_setpoint.setValue(value)
@@ -126,9 +134,6 @@ class HandlerClass:
 
     def update_fid_find(self, value):
         self.w.fid_find.setChecked(value)
-
-    def update_fid_find_out(self):
-        self.hal["fid-find-m500"] = self.w.fid_find.isChecked()
 
     def update_fid_is_square(self, value):
         self.w.fid_is_square.setChecked(value)

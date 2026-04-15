@@ -92,6 +92,9 @@ class CamFidView(QtWidgets.QWidget, _HalWidgetBase):
         self.pix = None
         self.stopped = False
 
+        # Letterboxed image rect (set each paintEvent)
+        self._image_rect     = None
+
         # Fiducial detection state
         self._fid_state      = _FID_IDLE
         self._fid_read_prev  = False
@@ -451,11 +454,36 @@ class CamFidView(QtWidgets.QWidget, _HalWidgetBase):
         new_size.scale(event.size(), QtCore.Qt.KeepAspectRatio)
         self.resize(new_size)
 
+    def _compute_image_rect(self):
+        """Return the largest rect centred in the widget that preserves the camera aspect ratio."""
+        if self._frame_shape is None:
+            return self.rect()
+        fh, fw = self._frame_shape
+        if fh == 0 or fw == 0:
+            return self.rect()
+        ww, wh = self.width(), self.height()
+        if wh == 0:
+            return self.rect()
+        frame_ar  = fw / float(fh)
+        widget_ar = ww / float(wh)
+        if widget_ar > frame_ar:
+            # Widget wider than frame → pillarbox (black bars left/right)
+            new_h = wh
+            new_w = int(round(wh * frame_ar))
+        else:
+            # Widget taller than frame → letterbox (black bars top/bottom)
+            new_w = ww
+            new_h = int(round(ww / frame_ar))
+        x_off = (ww - new_w) // 2
+        y_off = (wh - new_h) // 2
+        return QtCore.QRect(x_off, y_off, new_w, new_h)
+
     def paintEvent(self, event):
         qp = QPainter()
         qp.begin(self)
         if self.pix:
-            qp.drawImage(self.rect(), self.pix)
+            self._image_rect = self._compute_image_rect()
+            qp.drawImage(self._image_rect, self.pix)
         self.drawText(event, qp)
         if self._showCircle:
             self.drawCircle(event, qp)
@@ -524,17 +552,22 @@ class CamFidView(QtWidgets.QWidget, _HalWidgetBase):
             return
 
         fh, fw = self._frame_shape
-        ww, wh = self.width(), self.height()
-        if fh == 0 or fw == 0 or ww == 0 or wh == 0:
+        if self._image_rect is None:
+            return
+        ir = self._image_rect
+        iw, ih = ir.width(), ir.height()
+        if fh == 0 or fw == 0 or iw == 0 or ih == 0:
             return
 
-        # Frame pixel → widget pixel scale factors
-        sx = ww / float(fw)
-        sy = wh / float(fh)
+        # Frame pixel → image-rect pixel scale.
+        # Because _image_rect preserves the camera aspect ratio, sx == sy,
+        # which guarantees circles are round and squares are square.
+        sx = iw / float(fw)
+        sy = ih / float(fh)
 
-        # Widget-space frame centre
-        wcx = ww / 2.0
-        wcy = wh / 2.0
+        # Centre of the image rect in widget coords
+        wcx = ir.x() + iw / 2.0
+        wcy = ir.y() + ih / 2.0
 
         qp.setBrush(QtCore.Qt.NoBrush)
 
@@ -556,9 +589,9 @@ class CamFidView(QtWidgets.QWidget, _HalWidgetBase):
         if fid_read and self._fid_state == _FID_FOUND and self._fid_found_pos is not None:
             # Yellow outline at actual detected position/size
             fx, fy, fr = self._fid_found_pos
-            wx = fx * sx
-            wy = fy * sy
-            wr = fr * sx   # use X scale for radius (symmetric)
+            wx = ir.x() + fx * sx
+            wy = ir.y() + fy * sy
+            wr = fr * sx   # sx == sy after letterboxing, so radius is symmetric
             qp.setPen(QPen(QtCore.Qt.yellow, 2, QtCore.Qt.SolidLine))
             if fid_shape < 0.5:
                 qp.drawEllipse(QtCore.QPointF(wx, wy), wr, wr)
@@ -595,10 +628,10 @@ class CamFidView(QtWidgets.QWidget, _HalWidgetBase):
             fm   = qp.fontMetrics()
             lh   = fm.height()
             margin = 6
-            # Draw each line from the bottom up
+            # Draw each line from the bottom-left of the image rect upward
             for i, txt in enumerate((line2, line1)):
-                y = wh - margin - i * lh
-                x = margin
+                y = ir.bottom() - margin - i * lh
+                x = ir.x() + margin
                 qp.setPen(QtCore.Qt.black)
                 qp.drawText(x + 1, y + 1, txt)   # shadow for readability
                 qp.setPen(QtCore.Qt.green)

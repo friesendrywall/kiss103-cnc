@@ -66,6 +66,8 @@ class CamFidView(QtWidgets.QWidget, _HalWidgetBase):
         self.grabbed = None
         self.frame = None
         self._camNum = 0
+        self._captureW = 640
+        self._captureH = 480
         self.diameter = 20
         self.scale = 1
         self.scaleX = 1.0
@@ -434,6 +436,10 @@ class CamFidView(QtWidgets.QWidget, _HalWidgetBase):
                     p = self.video.list_ports()[1]
                     self.text = 'Error with video {}\nAvailable ports:\n{}'.format(self._camNum, p)
                 else:
+                    if self._captureW > 0:
+                        self.video.stream.set(CV.CAP_PROP_FRAME_WIDTH,  self._captureW)
+                    if self._captureH > 0:
+                        self.video.stream.set(CV.CAP_PROP_FRAME_HEIGHT, self._captureH)
                     self.video.start()
             except Exception as e:
                 LOG.error('Video capture error: {}'.format(e))
@@ -500,6 +506,27 @@ class CamFidView(QtWidgets.QWidget, _HalWidgetBase):
         gp.drawLine(0, 0 + self._crossGap, 0, h)
         gp.restore()
 
+    def _compute_image_rect(self):
+        """Return the QRect within the widget where the frame is drawn,
+        maintaining the frame's native aspect ratio (letterboxed if needed)."""
+        ww, wh = self.width(), self.height()
+        if self._frame_shape is None:
+            return QtCore.QRect(0, 0, ww, wh)
+        fh, fw = self._frame_shape
+        if fh == 0 or fw == 0:
+            return QtCore.QRect(0, 0, ww, wh)
+        if ww * fh <= wh * fw:
+            # width-constrained
+            dw = ww
+            dh = int(ww * fh / fw)
+        else:
+            # height-constrained
+            dh = wh
+            dw = int(wh * fw / fh)
+        x = (ww - dw) // 2
+        y = (wh - dh) // 2
+        return QtCore.QRect(x, y, dw, dh)
+
     def drawFidOverlay(self, qp):
         """Draw fiducial overlays: search area, ghost/result fiducial."""
         # Guard: pins not yet created (called before _hal_init)
@@ -524,20 +551,24 @@ class CamFidView(QtWidgets.QWidget, _HalWidgetBase):
             return
 
         fh, fw = self._frame_shape
-        ww, wh = self.width(), self.height()
-        if fh == 0 or fw == 0 or ww == 0 or wh == 0:
+        ir = self._compute_image_rect()
+        iw, ih = ir.width(), ir.height()
+        ir_x, ir_y = float(ir.x()), float(ir.y())
+        if fh == 0 or fw == 0 or iw == 0 or ih == 0:
             return
-        
-        # Frame pixel → widget pixel scale.
-        # resizeEvent keeps the widget at _aspectRatioW:_aspectRatioH (set in
-        # Designer to 4:3), so when the camera is also 4:3, sx == sy and all
-        # shapes are rendered without distortion.
-        sx = ww / float(fw)
-        sy = wh / float(fh)
 
-        # Widget centre
-        wcx = ww / 2.0
-        wcy = wh / 2.0
+        # Frame pixel → image-rect pixel scale (guaranteed sx==sy when
+        # frame and widget share the same aspect ratio).
+        sx = iw / float(fw)
+        sy = ih / float(fh)
+        qp.drawText(50, 50, '1: {:.4f}"'.format(iw))
+        qp.drawText(50, 100, '2: {:.4f}"'.format(fw))
+        qp.drawText(50, 150, '3: {:.4f}"'.format(fh))
+        qp.drawText(50, 200, '4: {:.4f}"'.format(sx))
+        qp.drawText(50, 250, '5: {:.4f}"'.format(sy))
+        # Image-rect centre in widget coordinates
+        wcx = ir_x + iw / 2.0
+        wcy = ir_y + ih / 2.0
 
         qp.setBrush(QtCore.Qt.NoBrush)
 
@@ -548,21 +579,19 @@ class CamFidView(QtWidgets.QWidget, _HalWidgetBase):
             qp.setPen(QPen(QtCore.Qt.green, 2, QtCore.Qt.SolidLine))
             qp.drawRect(int(wcx - half_wx), int(wcy - half_wy),
                         int(half_wx * 2),   int(half_wy * 2))
-            qp.drawText(40, 50, 'X: {:+.4f}"'.format(sx))
-            qp.drawText(40, 100, 'Y: {:+.4f}"'.format(sy))
 
         # --- Fiducial shape indicator ---
         if fid_size <= 0:
             return
 
-        r_wx = fid_size * ppi_x * sx / 2.0   # expected half-size in widget pixels X
-        r_wy = fid_size * ppi_y * sy / 2.0   # expected half-size in widget pixels Y
+        r_wx = fid_size * ppi_x * sx / 2.0   # expected half-size in image-rect pixels X
+        r_wy = fid_size * ppi_y * sy / 2.0   # expected half-size in image-rect pixels Y
 
         if fid_read and self._fid_state == _FID_FOUND and self._fid_found_pos is not None:
             # Yellow outline at actual detected position/size
             fx, fy, fr = self._fid_found_pos
-            wx = fx * sx
-            wy = fy * sy
+            wx = ir_x + fx * sx
+            wy = ir_y + fy * sy
             wr = fr * sx
             qp.setPen(QPen(QtCore.Qt.yellow, 2, QtCore.Qt.SolidLine))
             if fid_shape < 0.5:
@@ -599,12 +628,12 @@ class CamFidView(QtWidgets.QWidget, _HalWidgetBase):
 
         # --- Offset / size readout (lower-left, green) when found ---
         if fid_read and self._fid_state == _FID_FOUND and self._fid_found_pos is not None:
-            ox  = self.hal_pin_offset_x.get()
-            oy  = self.hal_pin_offset_y.get()
+            off_x = self.hal_pin_offset_x.get()
+            off_y = self.hal_pin_offset_y.get()
             _, _, fr = self._fid_found_pos
             dia_in  = (fr * 2) / ppi_x if ppi_x > 0 else 0.0
-            line1 = 'X: {:+.4f}"'.format(ox)
-            line2 = 'Y: {:+.4f}"'.format(oy)
+            line1 = 'X: {:+.4f}"'.format(off_x)
+            line2 = 'Y: {:+.4f}"'.format(off_y)
             line3 = 'D: {:.4f}"'.format(dia_in)
             font = QFont('monospace', 10)
             font.setBold(True)
@@ -614,8 +643,8 @@ class CamFidView(QtWidgets.QWidget, _HalWidgetBase):
             margin = 6
             # Draw lines bottom-up: D, Y, X
             for i, txt in enumerate((line3, line2, line1)):
-                y = wh - margin - i * lh
-                x = margin
+                y = int(ir_y + ih) - margin - i * lh
+                x = int(ir_x) + margin
                 qp.setPen(QtCore.Qt.black)
                 qp.drawText(x + 1, y + 1, txt)   # shadow for readability
                 qp.setPen(QtCore.Qt.green)
@@ -652,6 +681,20 @@ class CamFidView(QtWidgets.QWidget, _HalWidgetBase):
         return self._camNum
     def reset_camnum(self):
         self._camNum = 0
+
+    def set_capture_w(self, value):
+        self._captureW = max(0, value)
+    def get_capture_w(self):
+        return self._captureW
+    def reset_capture_w(self):
+        self._captureW = 640
+
+    def set_capture_h(self, value):
+        self._captureH = max(0, value)
+    def get_capture_h(self):
+        return self._captureH
+    def reset_capture_h(self):
+        self._captureH = 480
 
     def set_aspect_w(self, value):
         self._aspectRatioW = max(1, value)
@@ -703,6 +746,8 @@ class CamFidView(QtWidgets.QWidget, _HalWidgetBase):
 
     # designer will show these properties in this order:
     camera_number       = QtCore.pyqtProperty(int,  get_camnum,           set_camnum,           reset_camnum)
+    capture_width       = QtCore.pyqtProperty(int,  get_capture_w,        set_capture_w,        reset_capture_w)
+    capture_height      = QtCore.pyqtProperty(int,  get_capture_h,        set_capture_h,        reset_capture_h)
     aspect_ratio_width  = QtCore.pyqtProperty(int,  get_aspect_w,         set_aspect_w,         reset_aspect_w)
     aspect_ratio_height = QtCore.pyqtProperty(int,  get_aspect_h,         set_aspect_h,         reset_aspect_h)
     show_crosshair      = QtCore.pyqtProperty(bool, get_show_crosshair,   set_show_crosshair,   reset_show_crosshair)

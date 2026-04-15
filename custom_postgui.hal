@@ -38,5 +38,10 @@ net n2-pump-enable qt_kiss.n2_enable => kiss-pump.0.n2-signal # TODO out to IO
 net pump-run qt_kiss.pump_run   => kiss-pump.0.pump-run
 net pump-at-speed  kiss-pump.0.at-speed   => qt_kiss.pump_at_speed
 
+setp qt_kiss.camfidview.pix_per_inch   1038                                 
+setp qt_kiss.camfidview.fid_search     0.25                                    
+setp qt_kiss.camfidview.fid_size       0.05 
+setp qt_kiss.camfidview.fid_show       1
+
 
 

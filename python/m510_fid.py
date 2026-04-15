@@ -5,11 +5,14 @@ M510 detects a PCB fiducial at the current camera position and stores the
 WCS machine position plus the pixel-derived inch offset in named parameters.
 
 G-code usage:
-    M510 N<1|2> D<diameter_in>             ; circle fiducial
-    M510 N<1|2> S<side_length_in>          ; square fiducial
-    Optional: T<tolerance_%>  A<search_area_in>
+    M510 Q<1|2> D<diameter_in>             ; circle fiducial
+    M510 Q<1|2> S<side_length_in>          ; square fiducial
+    Optional: E<tolerance_%>  P<search_area_in>
 
-    N = fiducial number (1 or 2)
+    Q = fiducial number (1 or 2)
+    E = size tolerance in percent (default 10)
+    P = search area half-width in inches
+    N, A, T cannot be used (reserved G-code words)
     D = expected circle diameter in inches (mutually exclusive with S)
     S = expected square side length in inches (mutually exclusive with D)
     T = size tolerance in percent (default 10)
@@ -79,19 +82,18 @@ def m510_fid(self, **words):
     """M510 handler: detect fiducial, store WCS position + camera offset."""
     try:
         # ---- Parse word parameters ----------------------------------------
-        n_word = words.get('n', None)
-        d_word = words.get('d', None)   # circle diameter
-        s_word = words.get('s', None)   # square size
-        t_word = words.get('t', 10.0)  # tolerance percent, default 10%
-        # a_word (search area) is accepted but reserved for future cropping use
-        # a_word = words.get('a', None)
+        q_word = words.get('q', None)
+        d_word = words.get('d', None)    # circle diameter
+        s_word = words.get('s', None)    # square size
+        e_word = words.get('e', 10.0)   # tolerance percent, default 10%
+        p_word = words.get('p', None)    # search area half-width in inches
 
-        if n_word is None:
-            sys.stderr.write("M510 ERROR: N word (fiducial number 1 or 2) is required.\n")
+        if q_word is None:
+            sys.stderr.write("M510 ERROR: Q word (fiducial number 1 or 2) is required.\n")
             self.params['_fid_fail'] = 1.0
             return INTERP_ERROR
 
-        fid_num = int(round(float(n_word)))
+        fid_num = int(round(float(q_word)))
         if fid_num not in (1, 2):
             sys.stderr.write("M510 ERROR: N must be 1 or 2, got {}\n".format(fid_num))
             self.params['_fid_fail'] = 1.0
@@ -102,7 +104,8 @@ def m510_fid(self, **words):
             self.params['_fid_fail'] = 1.0
             return INTERP_ERROR
 
-        tolerance_pct = float(t_word) if t_word is not None else 10.0
+        tolerance_pct = float(e_word) if e_word is not None else 10.0
+        search_area   = float(p_word) if p_word is not None else None
 
         prefix = '_fid{}_'.format(fid_num)
 
@@ -120,12 +123,12 @@ def m510_fid(self, **words):
         # ---- Detect fiducial -----------------------------------------------
         if d_word is not None:
             diameter_in = float(d_word)
-            print("M510: Detecting circle fiducial N{}, diameter={:.4f}\" tol=±{:.0f}%".format(
+            print("M510: Detecting circle fiducial Q{}, diameter={:.4f}\" tol=±{:.0f}%".format(
                 fid_num, diameter_in, tolerance_pct))
             result = detect_fiducial_circle(frame, diameter_in, tolerance_pct)
         else:
             size_in = float(s_word)
-            print("M510: Detecting square fiducial N{}, size={:.4f}\" tol=±{:.0f}%".format(
+            print("M510: Detecting square fiducial Q{}, size={:.4f}\" tol=±{:.0f}%".format(
                 fid_num, size_in, tolerance_pct))
             result = detect_fiducial_square(frame, size_in, tolerance_pct)
 

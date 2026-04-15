@@ -94,18 +94,18 @@ Jog the camera over the fiducial, then call M510. The current WCS position
 is stored together with the pixel-derived inch offset from frame center.
 
 ```gcode
-M510 N<1|2> D<diameter>                  ; circle fiducial
-M510 N<1|2> S<side_length>               ; square fiducial
-; optional: T<tolerance_%>  A<search_area_in>
+M510 Q<1|2> D<diameter>                  ; circle fiducial
+M510 Q<1|2> S<side_length>               ; square fiducial
+; optional: E<tolerance_%>  P<search_area_in>
 ```
 
 | Word | Required | Default | Description |
 |---|---|---|---|
-| `N` | Yes | — | Fiducial number: `1` or `2` |
+| `Q` | Yes | — | Fiducial number: `1` or `2` |
 | `D` | One of D/S | — | Expected circle diameter, inches |
 | `S` | One of D/S | — | Expected square side length, inches |
-| `T` | No | `10` | Size tolerance in percent (e.g. `T10` = ±10%) |
-| `A` | No | — | Search area half-width, inches (reserved) |
+| `E` | No | `10` | Size tolerance in percent (e.g. `E15` = ±15%) |
+| `P` | No | — | Search area half-width, inches |
 
 **Parameters written** (substitute `2` for second fiducial):
 
@@ -124,8 +124,8 @@ after each successful detection.
 
 **Example:**
 ```gcode
-M510 N1 D0.039 T15 A0.5
-M510 N2 D0.039 T15 A0.5
+M510 Q1 D0.039 E15 P0.5
+M510 Q2 D0.039 E15 P0.5
 ```
 
 ---
@@ -167,14 +167,14 @@ G10 L2 P0 X[#<_calc_x_offset>] Y[#<_calc_y_offset>]
 M500                                      ; clear previous state
 
 G0 X1.500 Y0.750                          ; move to nominal fid 1 position
-M510 N1 D0.039 T15 A0.5                  ; detect fid 1
+M510 Q1 D0.039 E15 P0.5                  ; detect fid 1
 O100 if [#<_fid_fail> EQ 1.0]
     (DEBUG, Fiducial 1 not found - aborting)
     M2
 O100 endif
 
 G0 X5.500 Y0.750                          ; move to nominal fid 2 position
-M510 N2 D0.039 T15 A0.5                  ; detect fid 2
+M510 Q2 D0.039 E15 P0.5                  ; detect fid 2
 O101 if [#<_fid_fail> EQ 1.0]
     (DEBUG, Fiducial 2 not found - aborting)
     M2

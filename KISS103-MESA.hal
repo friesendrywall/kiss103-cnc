@@ -330,7 +330,7 @@ net tool-prepare-loopback   iocontrol.0.tool-prepare      =>  iocontrol.0.tool-p
 
 # Load Classicladder without GUI (can reload LADDER GUI in AXIS GUI
 
-loadusr classicladder --nogui custom.clp
+# loadusr classicladder --nogui custom.clp
 
 
 

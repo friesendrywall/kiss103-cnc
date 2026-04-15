@@ -21,7 +21,7 @@ import _thread as Thread
 import hal
 
 from PyQt5 import QtWidgets, QtCore
-from PyQt5.QtGui import QColor, QFont, QPainter, QPen, QImage, QBrush
+from PyQt5.QtGui import QColor, QFont, QPainter, QPen, QImage
 
 from qtvcp.widgets.widget_baseclass import _HalWidgetBase
 from qtvcp import logger
@@ -83,17 +83,6 @@ class CamFidView(QtWidgets.QWidget, _HalWidgetBase):
         self.pix = None
         self.stopped = False
 
-        # Fiducial overlay state (populated by HAL pin monitoring in nextFrameSlot)
-        self._fid1_overlay = None   # None or dict with detection data
-        self._fid2_overlay = None
-        self._fid1_found_prev = False
-        self._fid2_found_prev = False
-        self._overlay_timer = QtCore.QTimer(self)
-        self._overlay_timer.setSingleShot(True)
-        self._overlay_timer.timeout.connect(self._clearOverlay)
-        self._OVERLAY_TIMEOUT_MS = 5000   # overlay persists 5 seconds after detection
-        self._halcomp = None              # set up in _hal_init
-
         # trap so can run script directly to test
         try:
             if INFO.PROGRAM_PREFIX is not None:
@@ -104,21 +93,6 @@ class CamFidView(QtWidgets.QWidget, _HalWidgetBase):
     def _hal_init(self):
         if LIB_GOOD:
             STATUS.connect('periodic', self.nextFrameSlot)
-        # Create a HAL component so M510/M500 can write detection results
-        # that the widget reads to draw the overlay.
-        try:
-            self._halcomp = hal.component('camfidview')
-            for fid in ('fid1', 'fid2'):
-                self._halcomp.newpin('{}-found'.format(fid),     hal.HAL_BIT,   hal.HAL_IN)
-                self._halcomp.newpin('{}-cx-px'.format(fid),     hal.HAL_FLOAT, hal.HAL_IN)
-                self._halcomp.newpin('{}-cy-px'.format(fid),     hal.HAL_FLOAT, hal.HAL_IN)
-                self._halcomp.newpin('{}-radius-px'.format(fid), hal.HAL_FLOAT, hal.HAL_IN)
-                self._halcomp.newpin('{}-x-offset'.format(fid),  hal.HAL_FLOAT, hal.HAL_IN)
-                self._halcomp.newpin('{}-y-offset'.format(fid),  hal.HAL_FLOAT, hal.HAL_IN)
-            self._halcomp.ready()
-        except Exception as e:
-            LOG.error('CamFidView: HAL component init failed: {}'.format(e))
-            self._halcomp = None
 
     ##################################
     # no button scroll = circle diameter
@@ -175,48 +149,7 @@ class CamFidView(QtWidgets.QWidget, _HalWidgetBase):
         # make a Q image
         self.pix = self.makeImage(frame, self._qImageFormat)
 
-        # Poll HAL pins for fiducial detection results (rising-edge trigger)
-        self._checkFidHalPins()
-
         # repaint the window
-        self.update()
-
-    def _checkFidHalPins(self):
-        """Check HAL input pins for new fiducial detection data.
-
-        On a False→True rising edge of the found pin, latch the overlay data
-        and start the auto-clear timer.
-        """
-        if not self._halcomp:
-            return
-        for fid_num, prev_attr, overlay_attr in (
-                (1, '_fid1_found_prev', '_fid1_overlay'),
-                (2, '_fid2_found_prev', '_fid2_overlay')):
-            try:
-                found = bool(self._halcomp['fid{}-found'.format(fid_num)])
-            except Exception:
-                continue
-            prev = getattr(self, prev_attr)
-            if found and not prev:
-                # Rising edge: latch detection data and (re)start overlay timer
-                try:
-                    setattr(self, overlay_attr, {
-                        'fid_num':   fid_num,
-                        'cx_px':     float(self._halcomp['fid{}-cx-px'.format(fid_num)]),
-                        'cy_px':     float(self._halcomp['fid{}-cy-px'.format(fid_num)]),
-                        'radius_px': float(self._halcomp['fid{}-radius-px'.format(fid_num)]),
-                        'x_offset':  float(self._halcomp['fid{}-x-offset'.format(fid_num)]),
-                        'y_offset':  float(self._halcomp['fid{}-y-offset'.format(fid_num)]),
-                    })
-                    self._overlay_timer.start(self._OVERLAY_TIMEOUT_MS)
-                except Exception as e:
-                    LOG.error('CamFidView: error reading HAL overlay data: {}'.format(e))
-            setattr(self, prev_attr, found)
-
-    def _clearOverlay(self):
-        """Called by overlay timer expiry to remove the detection overlay."""
-        self._fid1_overlay = None
-        self._fid2_overlay = None
         self.update()
 
     def convertToRGB(self, img):
@@ -323,61 +256,7 @@ class CamFidView(QtWidgets.QWidget, _HalWidgetBase):
             self.drawCircle(event, qp)
         if self._showCrosshair:
             self.drawCrossHair(event, qp)
-        # Fiducial detection overlays (shown for 5s after M510)
-        if self._fid1_overlay:
-            self.drawFidOverlay(qp, self._fid1_overlay)
-        if self._fid2_overlay:
-            self.drawFidOverlay(qp, self._fid2_overlay)
         qp.end()
-
-    def drawFidOverlay(self, qp, data):
-        """Draw detected fiducial circle and offset label over the camera image.
-
-        data keys: fid_num, cx_px, cy_px, radius_px, x_offset, y_offset
-        Pixel coordinates are in camera-frame space (e.g. 640×480) and are
-        scaled to the current widget display size.
-        """
-        w = self.size().width()
-        h = self.size().height()
-        # Camera frame reference dimensions (default 640×480; matches vision_constants)
-        fw, fh = 640, 480
-        sx = w / float(fw)
-        sy = h / float(fh)
-        scale_avg = (sx + sy) / 2.0
-
-        cx = int(data['cx_px'] * sx)
-        cy = int(data['cy_px'] * sy)
-        r  = max(4, int(data['radius_px'] * scale_avg))
-
-        # Detected circle — green outline
-        pen = QPen(QtCore.Qt.green, 2, QtCore.Qt.SolidLine)
-        qp.setPen(pen)
-        qp.setBrush(QtCore.Qt.NoBrush)
-        qp.drawEllipse(QtCore.QPoint(cx, cy), r, r)
-
-        # Center dot — solid green filled circle
-        qp.setBrush(QBrush(QtCore.Qt.green))
-        qp.drawEllipse(QtCore.QPoint(cx, cy), 3, 3)
-
-        # Offset label — positioned just above/right of the circle
-        label = 'FID{}: X{:+.4f}" Y{:+.4f}"'.format(
-            data['fid_num'], data['x_offset'], data['y_offset'])
-        qp.setPen(QPen(QtCore.Qt.green))
-        qp.setFont(QFont('monospace', 9))
-        text_x = cx + r + 4
-        text_y = cy - 4
-        # Keep label inside widget bounds
-        fm = qp.fontMetrics()
-        text_w = fm.horizontalAdvance(label)
-        if text_x + text_w > w:
-            text_x = cx - r - text_w - 4
-        if text_y < 12:
-            text_y = cy + r + 14
-        # Semi-transparent background rectangle for readability
-        bg_rect = QtCore.QRect(text_x - 2, text_y - fm.ascent() - 1,
-                               text_w + 4, fm.height() + 2)
-        qp.fillRect(bg_rect, QColor(0, 0, 0, 140))
-        qp.drawText(text_x, text_y, label)
 
     def drawText(self, event, qp):
         qp.setPen(self.text_color)

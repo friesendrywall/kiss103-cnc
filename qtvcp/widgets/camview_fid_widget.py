@@ -126,6 +126,7 @@ class CamFidView(QtWidgets.QWidget, _HalWidgetBase):
         # --- Fiducial output pins ---
         self.hal_pin_fid_found    = self.HAL_GCOMP_.newpin(n + '.fid_found',    hal.HAL_BIT,   hal.HAL_OUT)
         self.hal_pin_fid_error    = self.HAL_GCOMP_.newpin(n + '.fid_error',    hal.HAL_BIT,   hal.HAL_OUT)
+        self.hal_pin_search_done  = self.HAL_GCOMP_.newpin(n + '.search_done',  hal.HAL_BIT,   hal.HAL_OUT)
         self.hal_pin_offset_x     = self.HAL_GCOMP_.newpin(n + '.offset_x',     hal.HAL_FLOAT, hal.HAL_OUT)
         self.hal_pin_offset_y     = self.HAL_GCOMP_.newpin(n + '.offset_y',     hal.HAL_FLOAT, hal.HAL_OUT)
 
@@ -213,6 +214,7 @@ class CamFidView(QtWidgets.QWidget, _HalWidgetBase):
             self._fid_found_pos = None
             self.hal_pin_fid_found.set(False)
             self.hal_pin_fid_error.set(False)
+            self.hal_pin_search_done.set(False)
             self.hal_pin_offset_x.set(0.0)
             self.hal_pin_offset_y.set(0.0)
 
@@ -232,11 +234,13 @@ class CamFidView(QtWidgets.QWidget, _HalWidgetBase):
                     self.hal_pin_offset_y.set(-(fy - fh / 2.0) / ppi_y)
                 self.hal_pin_fid_found.set(True)
                 self.hal_pin_fid_error.set(False)
+                self.hal_pin_search_done.set(True)
             elif time.time() - self._fid_search_t0 > _FID_TIMEOUT:
                 self._fid_state     = _FID_ERROR
                 self._fid_found_pos = None
                 self.hal_pin_fid_found.set(False)
                 self.hal_pin_fid_error.set(True)
+                self.hal_pin_search_done.set(True)
 
     # ------------------------------------------------------------------ #
     #  Detection helpers                                                   #

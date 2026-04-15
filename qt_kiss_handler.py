@@ -100,6 +100,17 @@ class HandlerClass:
         # preheater setpoint
         self.pin_djfreq_set = QHAL.newpin('dj-freq-set-value', QHAL.HAL_FLOAT, QHAL.HAL_IN)
         self.pin_djfreq_set.value_changed.connect(self.update_djfreq)
+        # Fiducial parameter pins
+        self.pin_fid_find      = QHAL.newpin('fid-find-sw',      QHAL.HAL_BIT,   QHAL.HAL_IN)
+        self.pin_fid_find.value_changed.connect(self.update_fid_find)
+        self.pin_fid_is_square = QHAL.newpin('fid-is-square', QHAL.HAL_BIT,   QHAL.HAL_IN)
+        self.pin_fid_is_square.value_changed.connect(self.update_fid_is_square)
+        self.pin_fid_size      = QHAL.newpin('fid-size',      QHAL.HAL_FLOAT, QHAL.HAL_IN)
+        self.pin_fid_size.value_changed.connect(self.update_fid_size)
+        self.pin_fid_area      = QHAL.newpin('fid-area',      QHAL.HAL_FLOAT, QHAL.HAL_IN)
+        self.pin_fid_area.value_changed.connect(self.update_fid_area)
+        self.pin_fid_tolerance = QHAL.newpin('fid-tolerance', QHAL.HAL_FLOAT, QHAL.HAL_IN)
+        self.pin_fid_tolerance.value_changed.connect(self.update_fid_tolerance)
 
     def update_ph_setpoint(self, value):
         self.w.preheat_setpoint.setValue(value)
@@ -109,6 +120,21 @@ class HandlerClass:
 
     def update_djfreq(self, value):
         self.w.dj_freq.setValue(value)
+
+    def update_fid_find(self, value):
+        self.w.fid_find.setChecked(value)
+
+    def update_fid_is_square(self, value):
+        self.w.fid_is_square.setChecked(value)
+
+    def update_fid_size(self, value):
+        self.w.fid_size.setValue(value)
+
+    def update_fid_area(self, value):
+        self.w.fid_area.setValue(value)
+
+    def update_fid_tolerance(self, value):
+        self.w.fid_tolerance.setValue(value)
 
     def processed_key_event__(self, receiver, event, is_pressed, key, code, shift, cntrl):
         # when typing in MDI, we don't want keybinding to call functions

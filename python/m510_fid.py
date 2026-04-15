@@ -44,9 +44,6 @@ _MCODES = os.path.join(os.path.dirname(_HERE), 'm_codes')
 if _MCODES not in sys.path:
     sys.path.insert(0, _MCODES)
 
-from fid_detect import capture_frame, detect_fiducial_circle, detect_fiducial_square
-
-
 def _halcmd_setp(pin, value):
     """Write a value to a HAL pin via halcmd. Silent on failure."""
     try:
@@ -113,6 +110,7 @@ def m510_fid(self, **words):
         wcs_x, wcs_y = _get_wcs_position()
 
         # ---- Capture camera frame ------------------------------------------
+        from fid_detect import capture_frame, detect_fiducial_circle, detect_fiducial_square
         frame = capture_frame()
         if frame is None:
             sys.stderr.write("M510 ERROR: Camera capture failed.\n")

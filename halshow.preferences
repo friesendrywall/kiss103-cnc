@@ -1,22 +1,26 @@
 # Halshow settings
 # This file is generated automatically.
-wm geometry . 1309x867+422+58
+wm geometry . 1309x867+299+88
 placeFrames 0.3
 set ::ratio 0.3
 set ::old_w_leftf 160
 set ::watchlist {
-    pin+camfidview.fid1-cx-px
-    pin+camfidview.fid1-cy-px
-    pin+camfidview.fid1-found
-    pin+camfidview.fid1-radius-px
-    pin+camfidview.fid1-x-offset
-    pin+camfidview.fid1-y-offset
-    pin+camfidview.fid2-cx-px
-    pin+camfidview.fid2-cy-px
-    pin+camfidview.fid2-found
-    pin+camfidview.fid2-radius-px
-    pin+camfidview.fid2-x-offset
-    pin+camfidview.fid2-y-offset
+    pin+qt_kiss.camfidview.fid_search
+    pin+qt_kiss.camfidview.fid_error
+    pin+qt_kiss.camfidview.fid_found
+    pin+qt_kiss.camfidview.fid_read
+    pin+qt_kiss.camfidview.fid_show
+    pin+qt_kiss.camfidview.fid_size
+    pin+qt_kiss.camfidview.offset_x
+    pin+qt_kiss.camfidview.offset_y
+    pin+qt_kiss.camfidview.pix_per_inch
+    pin+qt_kiss.camfidview.fid_tol
+    pin+qt_kiss.camfidview.fid_square
+    pin+qt_kiss.camfidview.pix_per_inch_y
+    pin+qt_kiss.fid_found
+    pin+qt_kiss.camfidview.search_done
+    pin+qt_kiss.fid_find
+    pin+qt_kiss.fid-find-sw
 }
 set ::workmode watchhal
 set ::watchInterval 100

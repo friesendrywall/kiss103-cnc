@@ -6,6 +6,9 @@ import os
 import linuxcnc
 import subprocess
 
+sys.path.insert(0, '/home/kiss/linuxcnc/configs/KISS103-MESA/qtvcp/plugins')
+sys.path.insert(0, '/home/kiss/linuxcnc/configs/KISS103-MESA/qtvcp/widgets')
+
 from PyQt5 import QtCore, QtWidgets
 
 from qtvcp.widgets.mdi_line import MDILine as MDI_WIDGET

@@ -1,32 +1,22 @@
 # Halshow settings
 # This file is generated automatically.
-wm geometry . 1309x867+448+59
+wm geometry . 1309x867+2046+51
 placeFrames 0.3
 set ::ratio 0.3
 set ::old_w_leftf 160
 set ::watchlist {
-    pin+kiss-pump.0.accel
-    pin+kiss-pump.0.n2-delay
-    pin+kiss-pump.0.n2-signal
-    pin+kiss-pump.0.pump-run
-    pin+kiss-pump.0.rpm
-    pin+kiss-pump.0.stop
-    pin+kiss-pump.0.time
-    pin+kiss-pump.0.velocity
-    pin+hm2_7i76e.0.stepgen.03.control-type
-    pin+hm2_7i76e.0.stepgen.03.counts
-    pin+hm2_7i76e.0.stepgen.03.dbg_err_at_match
-    pin+hm2_7i76e.0.stepgen.03.dbg_ff_vel
-    pin+hm2_7i76e.0.stepgen.03.dbg_pos_minus_prev_cmd
-    pin+hm2_7i76e.0.stepgen.03.dbg_s_to_match
-    pin+hm2_7i76e.0.stepgen.03.dbg_step_rate
-    pin+hm2_7i76e.0.stepgen.03.dbg_vel_error
-    pin+hm2_7i76e.0.stepgen.03.enable
-    pin+hm2_7i76e.0.stepgen.03.position-cmd
-    pin+hm2_7i76e.0.stepgen.03.position-fb
-    pin+hm2_7i76e.0.stepgen.03.position-reset
-    pin+hm2_7i76e.0.stepgen.03.velocity-cmd
-    pin+hm2_7i76e.0.stepgen.03.velocity-fb
+    pin+camfidview.fid1-cx-px
+    pin+camfidview.fid1-cy-px
+    pin+camfidview.fid1-found
+    pin+camfidview.fid1-radius-px
+    pin+camfidview.fid1-x-offset
+    pin+camfidview.fid1-y-offset
+    pin+camfidview.fid2-cx-px
+    pin+camfidview.fid2-cy-px
+    pin+camfidview.fid2-found
+    pin+camfidview.fid2-radius-px
+    pin+camfidview.fid2-x-offset
+    pin+camfidview.fid2-y-offset
 }
 set ::workmode watchhal
 set ::watchInterval 100

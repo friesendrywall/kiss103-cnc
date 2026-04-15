@@ -1361,7 +1361,7 @@
          </attribute>
          <layout class="QHBoxLayout" name="horizontalLayout_8">
           <item>
-           <widget class="CamView" name="camview">
+           <widget class="CamFidView" name="camfidview">
             <property name="camera_number" stdset="0">
              <number>1</number>
             </property>
@@ -1370,9 +1370,6 @@
             </property>
             <property name="aspect_ratio_height" stdset="0">
              <number>3</number>
-            </property>
-            <property name="block_wheel_rotation" stdset="0">
-             <bool>true</bool>
             </property>
            </widget>
           </item>
@@ -5207,6 +5204,11 @@
    <extends>QTabWidget</extends>
    <header>qtvcp.widgets.tab_widget</header>
    <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>CamFidView</class>
+   <extends>QWidget</extends>
+   <header>camview_fid_widget</header>
   </customwidget>
  </customwidgets>
  <resources>

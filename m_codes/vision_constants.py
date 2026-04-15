@@ -75,3 +75,19 @@ CALIBRATION_DETECTED_RADIUS_PX = 24.0
 
 # ISO 8601 timestamp of last calibration run.
 CALIBRATION_TIMESTAMP = "2026-04-14T14:51:31"
+
+# ---------------------------------------------------------------------------
+# SQUARE FIDUCIAL DETECTION — used by M510 S parameter
+# ---------------------------------------------------------------------------
+
+# Gaussian blur kernel size for square detection pre-processing (must be odd).
+SQUARE_BLUR_KERNEL_SIZE = 5
+
+# Offset added to the Otsu-computed threshold (0 = pure Otsu).
+# Increase to make thresholding stricter (fewer false-positive contours).
+SQUARE_OTSU_OFFSET = 0
+
+# Acceptable bounding-rect width/height aspect ratio range for a square.
+# 1.0 is a perfect square; allow some tolerance for PCB manufacturing variation.
+SQUARE_MIN_ASPECT = 0.80
+SQUARE_MAX_ASPECT = 1.20

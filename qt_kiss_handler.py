@@ -101,8 +101,9 @@ class HandlerClass:
         self.pin_djfreq_set = QHAL.newpin('dj-freq-set-value', QHAL.HAL_FLOAT, QHAL.HAL_IN)
         self.pin_djfreq_set.value_changed.connect(self.update_djfreq)
         # Fiducial parameter pins
-        self.pin_fid_find      = QHAL.newpin('fid-find-sw',      QHAL.HAL_BIT,   QHAL.HAL_IN)
+        self.pin_fid_find      = QHAL.newpin('fid-find-m500',      QHAL.HAL_BIT,   QHAL.HAL_IN)
         self.pin_fid_find.value_changed.connect(self.update_fid_find)
+
         self.pin_fid_is_square = QHAL.newpin('fid-is-square', QHAL.HAL_BIT,   QHAL.HAL_IN)
         self.pin_fid_is_square.value_changed.connect(self.update_fid_is_square)
         self.pin_fid_size      = QHAL.newpin('fid-size',      QHAL.HAL_FLOAT, QHAL.HAL_IN)
@@ -111,6 +112,8 @@ class HandlerClass:
         self.pin_fid_area.value_changed.connect(self.update_fid_area)
         self.pin_fid_tolerance = QHAL.newpin('fid-tolerance', QHAL.HAL_FLOAT, QHAL.HAL_IN)
         self.pin_fid_tolerance.value_changed.connect(self.update_fid_tolerance)
+
+        self.w.fid_find.clicked.connect(self.update_fid_find_out)
 
     def update_ph_setpoint(self, value):
         self.w.preheat_setpoint.setValue(value)
@@ -123,6 +126,9 @@ class HandlerClass:
 
     def update_fid_find(self, value):
         self.w.fid_find.setChecked(value)
+
+    def update_fid_find_out(self):
+        self.hal["fid-find-m500"] = self.w.fid_find.isChecked()
 
     def update_fid_is_square(self, value):
         self.w.fid_is_square.setChecked(value)

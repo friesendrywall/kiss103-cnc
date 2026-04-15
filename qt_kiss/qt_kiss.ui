@@ -955,6 +955,12 @@
              <property name="checkable">
               <bool>true</bool>
              </property>
+             <property name="indicator_HAL_pin_option" stdset="0">
+              <bool>false</bool>
+             </property>
+             <property name="python_command_option" stdset="0">
+              <bool>true</bool>
+             </property>
             </widget>
            </item>
            <item row="0" column="1">
@@ -970,6 +976,9 @@
              </property>
              <property name="checkable">
               <bool>true</bool>
+             </property>
+             <property name="indicator_HAL_pin_option" stdset="0">
+              <bool>false</bool>
              </property>
             </widget>
            </item>

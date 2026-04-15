@@ -16,6 +16,7 @@
 # use open cv to do camera alignment
 
 import os
+import time
 import _thread as Thread
 
 import hal
@@ -47,6 +48,14 @@ except:
     DEFAULT_API = 0
 
 import numpy as np
+
+# Fiducial state machine states
+_FID_IDLE      = 'idle'
+_FID_SEARCHING = 'searching'
+_FID_FOUND     = 'found'
+_FID_ERROR     = 'error'
+
+_FID_TIMEOUT   = 1.0   # seconds before search gives up
 
 
 class CamFidView(QtWidgets.QWidget, _HalWidgetBase):
@@ -83,6 +92,13 @@ class CamFidView(QtWidgets.QWidget, _HalWidgetBase):
         self.pix = None
         self.stopped = False
 
+        # Fiducial detection state
+        self._fid_state      = _FID_IDLE
+        self._fid_read_prev  = False
+        self._fid_search_t0  = 0.0
+        self._fid_found_pos  = None   # (x, y, r) in zoomed-frame pixels when found
+        self._frame_shape    = None   # (h, w) of last zoomed frame
+
         # trap so can run script directly to test
         try:
             if INFO.PROGRAM_PREFIX is not None:
@@ -93,6 +109,21 @@ class CamFidView(QtWidgets.QWidget, _HalWidgetBase):
     def _hal_init(self):
         if LIB_GOOD:
             STATUS.connect('periodic', self.nextFrameSlot)
+
+        n = self.HAL_NAME_
+        # --- Fiducial input pins ---
+        self.hal_pin_fid_show     = self.HAL_GCOMP_.newpin(n + '.fid_show',     hal.HAL_BIT,   hal.HAL_IN)
+        self.hal_pin_fid_read     = self.HAL_GCOMP_.newpin(n + '.fid_read',     hal.HAL_BIT,   hal.HAL_IN)
+        self.hal_pin_fid_size     = self.HAL_GCOMP_.newpin(n + '.fid_size',     hal.HAL_FLOAT, hal.HAL_IN)
+        self.hal_pin_fid_shape    = self.HAL_GCOMP_.newpin(n + '.fid_shape',    hal.HAL_FLOAT, hal.HAL_IN)
+        self.hal_pin_fid_search   = self.HAL_GCOMP_.newpin(n + '.fid_search',   hal.HAL_FLOAT, hal.HAL_IN)
+        self.hal_pin_pix_per_inch = self.HAL_GCOMP_.newpin(n + '.pix_per_inch', hal.HAL_FLOAT, hal.HAL_IN)
+
+        # --- Fiducial output pins ---
+        self.hal_pin_fid_found    = self.HAL_GCOMP_.newpin(n + '.fid_found',    hal.HAL_BIT,   hal.HAL_OUT)
+        self.hal_pin_fid_error    = self.HAL_GCOMP_.newpin(n + '.fid_error',    hal.HAL_BIT,   hal.HAL_OUT)
+        self.hal_pin_offset_x     = self.HAL_GCOMP_.newpin(n + '.offset_x',     hal.HAL_FLOAT, hal.HAL_OUT)
+        self.hal_pin_offset_y     = self.HAL_GCOMP_.newpin(n + '.offset_y',     hal.HAL_FLOAT, hal.HAL_OUT)
 
     ##################################
     # no button scroll = circle diameter
@@ -146,11 +177,158 @@ class CamFidView(QtWidgets.QWidget, _HalWidgetBase):
         # set digital zoom
         frame = self.zoom(frame, self.scale)
 
+        # record frame dimensions for overlay mapping
+        self._frame_shape = frame.shape[:2]   # (h, w)
+
+        # --- Fiducial state machine ---
+        if hasattr(self, 'hal_pin_fid_read'):
+            self._update_fid_state(frame)
+
         # make a Q image
         self.pix = self.makeImage(frame, self._qImageFormat)
 
         # repaint the window
         self.update()
+
+    # ------------------------------------------------------------------ #
+    #  Fiducial detection state machine                                    #
+    # ------------------------------------------------------------------ #
+
+    def _update_fid_state(self, frame):
+        fid_read = self.hal_pin_fid_read.get()
+
+        if fid_read and not self._fid_read_prev:
+            # Rising edge → start search
+            self._fid_state     = _FID_SEARCHING
+            self._fid_search_t0 = time.time()
+            self._fid_found_pos = None
+
+        elif not fid_read and self._fid_state != _FID_IDLE:
+            # fid_read cleared → reset everything
+            self._fid_state     = _FID_IDLE
+            self._fid_found_pos = None
+            self.hal_pin_fid_found.set(False)
+            self.hal_pin_fid_error.set(False)
+            self.hal_pin_offset_x.set(0.0)
+            self.hal_pin_offset_y.set(0.0)
+
+        self._fid_read_prev = fid_read
+
+        if self._fid_state == _FID_SEARCHING:
+            found, fx, fy, fr = self._detect_fiducial(frame)
+            if found:
+                self._fid_state     = _FID_FOUND
+                self._fid_found_pos = (fx, fy, fr)
+                fh, fw = frame.shape[:2]
+                ppi = self.hal_pin_pix_per_inch.get()
+                if ppi > 0:
+                    self.hal_pin_offset_x.set( (fx - fw / 2.0) / ppi)
+                    self.hal_pin_offset_y.set(-(fy - fh / 2.0) / ppi)
+                self.hal_pin_fid_found.set(True)
+                self.hal_pin_fid_error.set(False)
+            elif time.time() - self._fid_search_t0 > _FID_TIMEOUT:
+                self._fid_state     = _FID_ERROR
+                self._fid_found_pos = None
+                self.hal_pin_fid_found.set(False)
+                self.hal_pin_fid_error.set(True)
+
+    # ------------------------------------------------------------------ #
+    #  Detection helpers                                                   #
+    # ------------------------------------------------------------------ #
+
+    def _detect_fiducial(self, frame):
+        """Return (found, x, y, r) in frame pixels, all ints."""
+        ppi        = self.hal_pin_pix_per_inch.get()
+        fid_size   = self.hal_pin_fid_size.get()
+        fid_search = self.hal_pin_fid_search.get()
+        fid_shape  = self.hal_pin_fid_shape.get()
+
+        if ppi <= 0 or fid_size <= 0 or fid_search <= 0:
+            return False, 0, 0, 0
+
+        fid_size_px  = fid_size  * ppi
+        search_px    = fid_search * ppi
+
+        fh, fw = frame.shape[:2]
+        fcx, fcy = fw // 2, fh // 2
+        half = int(search_px / 2)
+
+        x1 = max(0, fcx - half)
+        y1 = max(0, fcy - half)
+        x2 = min(fw, fcx + half)
+        y2 = min(fh, fcy + half)
+
+        if x2 <= x1 or y2 <= y1:
+            return False, 0, 0, 0
+
+        roi = frame[y1:y2, x1:x2]
+
+        if fid_shape < 0.5:
+            return self._detect_circle(roi, fid_size_px, x1, y1)
+        else:
+            return self._detect_square(roi, fid_size_px, x1, y1)
+
+    def _detect_circle(self, roi, fid_size_px, x1, y1):
+        gray = CV.cvtColor(roi, CV.COLOR_BGR2GRAY)
+        gray = CV.GaussianBlur(gray, (5, 5), 0)
+
+        r     = fid_size_px / 2.0
+        min_r = max(1, int(r * 0.7))
+        max_r = max(2, int(r * 1.3))
+
+        circles = CV.HoughCircles(gray, CV.HOUGH_GRADIENT, dp=1,
+                                   minDist=int(max(1, r * 1.5)),
+                                   param1=100, param2=30,
+                                   minRadius=min_r, maxRadius=max_r)
+        if circles is None:
+            return False, 0, 0, 0
+
+        roi_cx = roi.shape[1] / 2.0
+        roi_cy = roi.shape[0] / 2.0
+        best = min(circles[0],
+                   key=lambda c: (c[0] - roi_cx) ** 2 + (c[1] - roi_cy) ** 2)
+        return True, int(x1 + best[0]), int(y1 + best[1]), int(best[2])
+
+    def _detect_square(self, roi, fid_size_px, x1, y1):
+        gray    = CV.cvtColor(roi, CV.COLOR_BGR2GRAY)
+        blurred = CV.GaussianBlur(gray, (5, 5), 0)
+        _, thresh = CV.threshold(blurred, 0, 255,
+                                  CV.THRESH_BINARY + CV.THRESH_OTSU)
+        contours, _ = CV.findContours(thresh, CV.RETR_LIST,
+                                       CV.CHAIN_APPROX_SIMPLE)
+
+        roi_cx      = roi.shape[1] / 2.0
+        roi_cy      = roi.shape[0] / 2.0
+        area_target = fid_size_px ** 2
+        best        = None
+        best_dist   = float('inf')
+
+        for cnt in contours:
+            area = CV.contourArea(cnt)
+            if area < area_target * 0.4 or area > area_target * 1.6:
+                continue
+            peri  = CV.arcLength(cnt, True)
+            approx = CV.approxPolyDP(cnt, 0.04 * peri, True)
+            if len(approx) != 4:
+                continue
+            bx, by, bw, bh = CV.boundingRect(cnt)
+            if max(bw, bh) / max(1, min(bw, bh)) > 1.3:
+                continue
+            cx_cnt = bx + bw / 2.0
+            cy_cnt = by + bh / 2.0
+            d = (cx_cnt - roi_cx) ** 2 + (cy_cnt - roi_cy) ** 2
+            if d < best_dist:
+                best_dist = d
+                # r = half the average side length
+                best = (int(x1 + cx_cnt), int(y1 + cy_cnt), int((bw + bh) / 4))
+
+        if best:
+            return True, best[0], best[1], best[2]
+        return False, 0, 0, 0
+
+    # ------------------------------------------------------------------ #
+    #  Image helpers                                                        #
+    # ------------------------------------------------------------------ #
 
     def convertToRGB(self, img):
         return CV.cvtColor(img, CV.COLOR_BGR2RGB)
@@ -221,6 +399,10 @@ class CamFidView(QtWidgets.QWidget, _HalWidgetBase):
         CV.addWeighted(overlay, opacity, image, 1 - opacity, 0, image)
         CV.imshow("Output", image)
 
+    # ------------------------------------------------------------------ #
+    #  Qt events                                                            #
+    # ------------------------------------------------------------------ #
+
     def showEvent(self, event):
         if LIB_GOOD:
             try:
@@ -256,7 +438,12 @@ class CamFidView(QtWidgets.QWidget, _HalWidgetBase):
             self.drawCircle(event, qp)
         if self._showCrosshair:
             self.drawCrossHair(event, qp)
+        self.drawFidOverlay(qp)
         qp.end()
+
+    # ------------------------------------------------------------------ #
+    #  Drawing helpers                                                      #
+    # ------------------------------------------------------------------ #
 
     def drawText(self, event, qp):
         qp.setPen(self.text_color)
@@ -287,6 +474,92 @@ class CamFidView(QtWidgets.QWidget, _HalWidgetBase):
         gp.drawLine(-w, 0, 0 - self._crossGap, 0)
         gp.drawLine(0 + self._crossGap, 0, w, 0)
         gp.drawLine(0, 0 + self._crossGap, 0, h)
+
+    def drawFidOverlay(self, qp):
+        """Draw fiducial overlays: search area, ghost/result fiducial."""
+        # Guard: pins not yet created (called before _hal_init)
+        if not hasattr(self, 'hal_pin_fid_show'):
+            return
+        if self._frame_shape is None:
+            return
+
+        fid_show  = self.hal_pin_fid_show.get()
+        fid_read  = self.hal_pin_fid_read.get()
+
+        if not fid_show and not fid_read:
+            return
+
+        ppi        = self.hal_pin_pix_per_inch.get()
+        fid_size   = self.hal_pin_fid_size.get()
+        fid_search = self.hal_pin_fid_search.get()
+        fid_shape  = self.hal_pin_fid_shape.get()
+
+        if ppi <= 0:
+            return
+
+        fh, fw = self._frame_shape
+        ww, wh = self.width(), self.height()
+        if fh == 0 or fw == 0 or ww == 0 or wh == 0:
+            return
+
+        # Frame pixel → widget pixel scale factors
+        sx = ww / float(fw)
+        sy = wh / float(fh)
+
+        # Widget-space frame centre
+        wcx = ww / 2.0
+        wcy = wh / 2.0
+
+        qp.setBrush(QtCore.Qt.NoBrush)
+
+        # --- Search area rectangle (green) ---
+        if fid_search > 0:
+            half_wx = fid_search * ppi * sx / 2.0
+            half_wy = fid_search * ppi * sy / 2.0
+            qp.setPen(QPen(QtCore.Qt.green, 2, QtCore.Qt.SolidLine))
+            qp.drawRect(int(wcx - half_wx), int(wcy - half_wy),
+                        int(half_wx * 2),   int(half_wy * 2))
+
+        # --- Fiducial shape indicator ---
+        if fid_size <= 0:
+            return
+
+        r_wx = fid_size * ppi * sx / 2.0   # expected half-size in widget pixels
+        r_wy = fid_size * ppi * sy / 2.0
+
+        if fid_read and self._fid_state == _FID_FOUND and self._fid_found_pos is not None:
+            # Yellow outline at actual detected position/size
+            fx, fy, fr = self._fid_found_pos
+            wx = fx * sx
+            wy = fy * sy
+            wr = fr * sx   # use X scale for radius (symmetric)
+            qp.setPen(QPen(QtCore.Qt.yellow, 2, QtCore.Qt.SolidLine))
+            if fid_shape < 0.5:
+                qp.drawEllipse(QtCore.QPointF(wx, wy), wr, wr)
+            else:
+                qp.drawRect(int(wx - wr), int(wy - wr), int(wr * 2), int(wr * 2))
+
+        elif fid_read:
+            # Red: actively searching or timed-out error — show expected size at centre
+            qp.setPen(QPen(QtCore.Qt.red, 2, QtCore.Qt.SolidLine))
+            if fid_shape < 0.5:
+                qp.drawEllipse(QtCore.QPointF(wcx, wcy), r_wx, r_wy)
+            else:
+                qp.drawRect(int(wcx - r_wx), int(wcy - r_wy),
+                            int(r_wx * 2),   int(r_wy * 2))
+
+        else:
+            # fid_show only (no active read): white dashed ghost at centre
+            qp.setPen(QPen(QtCore.Qt.white, 1, QtCore.Qt.DashLine))
+            if fid_shape < 0.5:
+                qp.drawEllipse(QtCore.QPointF(wcx, wcy), r_wx, r_wy)
+            else:
+                qp.drawRect(int(wcx - r_wx), int(wcy - r_wy),
+                            int(r_wx * 2),   int(r_wy * 2))
+
+    # ------------------------------------------------------------------ #
+    #  Public helpers                                                       #
+    # ------------------------------------------------------------------ #
 
     def setCircleColor(self, color):
         self.circle_color = color

@@ -1363,7 +1363,7 @@
           <item>
            <widget class="CamFidView" name="camfidview">
             <property name="camera_number" stdset="0">
-             <number>1</number>
+             <number>0</number>
             </property>
             <property name="aspect_ratio_width" stdset="0">
              <number>4</number>

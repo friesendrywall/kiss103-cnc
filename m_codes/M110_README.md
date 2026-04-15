@@ -1,5 +1,5 @@
-# M110 PCB Fiducial Vision System
-## LinuxCNC User M-Code — Installation & Usage Guide
+# PCB Fiducial Vision System
+## LinuxCNC M-Code Reference — M110 / M500 / M510 / M520
 
 ---
 
@@ -7,9 +7,13 @@
 
 | File | Purpose |
 |---|---|
-| `M110.py` | The M-code itself — called from G-code with `M110 P<diameter>` |
+| `M110.py` | Single-shot centering: move to fiducial, detect offset — `M110 P<diameter>` |
 | `M110_calibrate.py` | One-time calibration utility — run from terminal |
 | `vision_constants.py` | All configuration and calibration values — edit here |
+| `../python/m500_fid.py` | REMAP handler for M500 (clear state) |
+| `../python/m510_fid.py` | REMAP handler for M510 (detect and store fiducial) |
+| `../python/m520_fid.py` | REMAP handler for M520 (calculate correction) |
+| `../python/fid_detect.py` | Shared OpenCV detection (circle + square) |
 
 ---
 
@@ -132,4 +136,121 @@ It will print the result instead of writing named parameters.
 | Large fiducial | 0.079" (2.0 mm) |
 | Small fiducial | 0.024" (0.6 mm) |
 
-Use these as your `P` value in `M110 P<value>`.
+Use these as your `P` value in `M110 P<value>` or `D` value in `M510 N1 D<value>`.
+
+---
+
+## Two-Fiducial Workflow — M500 / M510 / M520
+
+These three remapped M-codes provide full PCB alignment: detect two fiducials, then
+compute the XY translation offset and (optionally) the PCB rotation angle.
+
+### M500 — Clear State
+
+```gcode
+M500
+```
+
+Zeros all fiducial named parameters and clears the camera widget overlay.
+Call this at the start of a new board alignment sequence.
+
+---
+
+### M510 — Detect and Store a Fiducial
+
+```gcode
+M510 N<1|2> D<diameter> T<tolerance%> A<search_area>   ; circle fiducial
+M510 N<1|2> S<side_length> T<tolerance%> A<search_area> ; square fiducial
+```
+
+Jog the machine so the camera is over the fiducial, then call M510.
+The current WCS position is recorded alongside the detected pixel offset.
+
+| Word | Required | Description |
+|---|---|---|
+| `N` | Yes | Fiducial number: `1` or `2` |
+| `D` | One of D or S | Expected circle diameter in inches |
+| `S` | One of D or S | Expected square side length in inches |
+| `T` | No (default 10) | Size tolerance in percent — e.g. `T10` = ±10% |
+| `A` | No | Search area half-width in inches (reserved for future crop) |
+
+**Example:**
+```gcode
+M510 N1 D0.039 T15 A0.5     ; detect 1.0 mm circle fiducial, ±15% tolerance
+M510 N2 D0.039 T15 A0.5     ; detect second fiducial
+```
+
+**Named parameters written (replace `1` with `2` for second fiducial):**
+
+| Parameter | Description |
+|---|---|
+| `#<_fid1_x>` | WCS X position when M510 N1 was called |
+| `#<_fid1_y>` | WCS Y position when M510 N1 was called |
+| `#<_fid1_x_offset>` | Camera X offset to fiducial center, inches (+right) |
+| `#<_fid1_y_offset>` | Camera Y offset to fiducial center, inches (+up) |
+| `#<_fid1_found>` | `1.0` if detected, `0.0` if not |
+| `#<_fid1_conf>` | Detection confidence, 0.0–1.0 |
+| `#<_fid_fail>` | Set to `1.0` on any detection failure |
+
+The `CamFidView` widget will show a green overlay circle with the offset label
+for 5 seconds after each successful M510 call.
+
+---
+
+### M520 — Calculate Correction Offsets
+
+```gcode
+M520 P1    ; single fiducial — translation only, no rotation
+M520 P2    ; two fiducials  — midpoint translation + PCB rotation
+```
+
+Must be called after the required M510 calls.
+
+| Mode | Prerequisites | What it calculates |
+|---|---|---|
+| `P1` | M510 N1 | `calc_x/y_offset` = fid1 camera offsets |
+| `P2` | M510 N1 and M510 N2 | midpoint translation + `pcb_rotation` angle |
+
+**Named parameters written:**
+
+| Parameter | Description |
+|---|---|
+| `#<_calc_x_offset>` | X correction to apply to WCS, inches |
+| `#<_calc_y_offset>` | Y correction to apply to WCS, inches |
+| `#<_pcb_rotation>` | PCB rotation in degrees (`0.0` for P1 mode) |
+| `#<_fid_fail>` | Set to `1.0` if required fiducials were not detected |
+
+**Applying the correction** (typical usage):
+```gcode
+; shift the active WCS by the detected offset:
+G10 L2 P0 X[#<_calc_x_offset>] Y[#<_calc_y_offset>]
+```
+
+---
+
+### Full Two-Fiducial Example
+
+```gcode
+M500                              ; clear previous state
+G0 X1.500 Y0.750                  ; move to nominal fid 1 location
+M510 N1 D0.039 T15 A0.5          ; detect fid 1
+O100 if [#<_fid_fail> EQ 1.0]
+    (DEBUG, Fiducial 1 not found — aborting)
+    M2
+O100 endif
+
+G0 X5.500 Y0.750                  ; move to nominal fid 2 location
+M510 N2 D0.039 T15 A0.5          ; detect fid 2
+O101 if [#<_fid_fail> EQ 1.0]
+    (DEBUG, Fiducial 2 not found — aborting)
+    M2
+O101 endif
+
+M520 P2                           ; compute rotation + translation
+(DEBUG, PCB rotation = #<_pcb_rotation> degrees)
+(DEBUG, X offset = #<_calc_x_offset>)
+(DEBUG, Y offset = #<_calc_y_offset>)
+
+G10 L2 P0 X[#<_calc_x_offset>] Y[#<_calc_y_offset>]
+; continue with corrected program...
+```

@@ -1,0 +1,201 @@
+# M-Code Reference — KISS103-MESA
+
+All custom M-codes live in `m_codes/`. M100–M199 are standard user M-codes
+executed directly from `USER_M_PATH`. M500–M520 are Python REMAP handlers
+defined in `python/`.
+
+---
+
+## M110 — Single-Shot Fiducial Centering
+
+Move the camera over a fiducial, then call M110 to detect its offset from
+frame center. Results are written as named parameters for use in G-code.
+
+```gcode
+M110 P<diameter_in>
+```
+
+| Word | Description |
+|---|---|
+| `P` | Expected fiducial diameter in inches |
+
+**Parameters written:**
+
+| Parameter | Description |
+|---|---|
+| `#<_vision_x_offset>` | X offset to fiducial center, inches (+right) |
+| `#<_vision_y_offset>` | Y offset to fiducial center, inches (+up) |
+| `#<_vision_found>` | `1.0` if detected |
+| `#<_vision_confidence>` | Detection confidence 0.0–1.0 |
+| `#<_vision_radius_px>` | Detected radius in pixels (debug) |
+
+**Example:**
+```gcode
+M110 P0.039
+O100 if [#<_vision_found> EQ 1.0]
+    G0 X[#<_vision_x_offset>] Y[#<_vision_y_offset>]
+O100 endif
+```
+
+See `m_codes/M110_README.md` for calibration instructions and tuning.
+
+---
+
+## M150 — Preheater Setpoint
+
+```gcode
+M150 P<value>
+```
+
+| Word | Range | Description |
+|---|---|---|
+| `P` | 25–125 | Preheater temperature setpoint (°C) |
+
+---
+
+## M160 — Dropjet Dot Size
+
+```gcode
+M160 P<value>
+```
+
+| Word | Range | Description |
+|---|---|---|
+| `P` | 1–25 | Dropjet dot size |
+
+---
+
+## M170 — Dropjet Frequency
+
+```gcode
+M170 P<value>
+```
+
+| Word | Range | Description |
+|---|---|---|
+| `P` | 1–100 | Dropjet pulse frequency (Hz) |
+
+---
+
+## M500 — Clear Fiducial State
+
+Zeros all fiducial named parameters and clears the camera widget overlay.
+Call at the start of every new board alignment sequence.
+
+```gcode
+M500
+```
+
+---
+
+## M510 — Detect and Store a Fiducial
+
+Jog the camera over the fiducial, then call M510. The current WCS position
+is stored together with the pixel-derived inch offset from frame center.
+
+```gcode
+M510 N<1|2> D<diameter>                  ; circle fiducial
+M510 N<1|2> S<side_length>               ; square fiducial
+; optional: T<tolerance_%>  A<search_area_in>
+```
+
+| Word | Required | Default | Description |
+|---|---|---|---|
+| `N` | Yes | — | Fiducial number: `1` or `2` |
+| `D` | One of D/S | — | Expected circle diameter, inches |
+| `S` | One of D/S | — | Expected square side length, inches |
+| `T` | No | `10` | Size tolerance in percent (e.g. `T10` = ±10%) |
+| `A` | No | — | Search area half-width, inches (reserved) |
+
+**Parameters written** (substitute `2` for second fiducial):
+
+| Parameter | Description |
+|---|---|
+| `#<_fid1_x>` | WCS X when M510 N1 was called |
+| `#<_fid1_y>` | WCS Y when M510 N1 was called |
+| `#<_fid1_x_offset>` | Camera X offset to fiducial, inches (+right) |
+| `#<_fid1_y_offset>` | Camera Y offset to fiducial, inches (+up) |
+| `#<_fid1_found>` | `1.0` if detected |
+| `#<_fid1_conf>` | Detection confidence 0.0–1.0 |
+| `#<_fid_fail>` | `1.0` on any detection failure |
+
+The `CamFidView` widget shows a green overlay circle with offset label for 5 seconds
+after each successful detection.
+
+**Example:**
+```gcode
+M510 N1 D0.039 T15 A0.5
+M510 N2 D0.039 T15 A0.5
+```
+
+---
+
+## M520 — Calculate PCB Correction
+
+Must be called after the required M510 calls. Computes the corrective XY
+offset and (P2 only) the PCB rotation angle.
+
+```gcode
+M520 P1    ; single fiducial — translation offset only
+M520 P2    ; two fiducials  — midpoint translation + rotation
+```
+
+| Mode | Prerequisites | Calculates |
+|---|---|---|
+| `P1` | M510 N1 | Translation from fid1 camera offsets |
+| `P2` | M510 N1 + M510 N2 | Midpoint translation + PCB rotation angle |
+
+**Parameters written:**
+
+| Parameter | Description |
+|---|---|
+| `#<_calc_x_offset>` | X correction to apply to WCS, inches |
+| `#<_calc_y_offset>` | Y correction to apply to WCS, inches |
+| `#<_pcb_rotation>` | PCB rotation in degrees (`0.0` for P1 mode) |
+| `#<_fid_fail>` | `1.0` if required fiducials were not detected |
+
+**Applying the correction:**
+```gcode
+G10 L2 P0 X[#<_calc_x_offset>] Y[#<_calc_y_offset>]
+```
+
+---
+
+## Full Two-Fiducial Alignment Example
+
+```gcode
+M500                                      ; clear previous state
+
+G0 X1.500 Y0.750                          ; move to nominal fid 1 position
+M510 N1 D0.039 T15 A0.5                  ; detect fid 1
+O100 if [#<_fid_fail> EQ 1.0]
+    (DEBUG, Fiducial 1 not found - aborting)
+    M2
+O100 endif
+
+G0 X5.500 Y0.750                          ; move to nominal fid 2 position
+M510 N2 D0.039 T15 A0.5                  ; detect fid 2
+O101 if [#<_fid_fail> EQ 1.0]
+    (DEBUG, Fiducial 2 not found - aborting)
+    M2
+O101 endif
+
+M520 P2                                   ; compute rotation + translation
+(DEBUG, PCB rotation = #<_pcb_rotation> degrees)
+(DEBUG, X correction = #<_calc_x_offset>  Y correction = #<_calc_y_offset>)
+
+G10 L2 P0 X[#<_calc_x_offset>] Y[#<_calc_y_offset>]
+
+; continue with board program using corrected WCS...
+```
+
+---
+
+## Common PCB Fiducial Sizes
+
+| Standard | Diameter |
+|---|---|
+| IPC-7351 Type 1 | 0.039" (1.0 mm) |
+| IPC-7351 Type 2 | 0.059" (1.5 mm) |
+| Large | 0.079" (2.0 mm) |
+| Small | 0.024" (0.6 mm) |

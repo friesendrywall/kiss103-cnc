@@ -6,30 +6,31 @@ previously stored fiducial positions.
 
 G-code usage:
     M520 P1    ; single-fiducial: translation offset only (no rotation)
-    M520 P2    ; two-fiducial:    midpoint translation + PCB rotation
+    M520 P2    ; two-fiducial:    fid1 translation + PCB rotation
 
 Prerequisites:
-    P1: M510 P1 must have been called successfully
-    P2: M510 P1 and M510 P2 must both have been called successfully
+    P1: M510 Q1 must have been called successfully
+    P2: M510 Q1 and M510 Q2 must both have been called successfully
 
 Named parameters written:
-    #<_calc_x_offset>  — X correction to apply to WCS (G10/G92)
+    #<_calc_x_offset>  — X correction to apply to WCS
     #<_calc_y_offset>  — Y correction to apply to WCS
     #<_pcb_rotation>   — PCB rotation in degrees (0.0 for P1 mode)
     #<_fid_fail>       — set to 1.0 if prerequisites not met
 
-Offset conventions (both modes):
-    Positive X offset means the PCB is shifted RIGHT of nominal.
-    Positive Y offset means the PCB is shifted UP (in machine Y) of nominal.
-    Apply to WCS with: G10 L2 P0 X[#<_calc_x_offset>] Y[#<_calc_y_offset>]
-    (or add to existing WCS, depending on your workflow)
+Applying the correction:
+    P1: G10 L2 P0 X[#<_calc_x_offset>] Y[#<_calc_y_offset>]
+    P2: G10 L2 P0 X[#<_calc_x_offset>] Y[#<_calc_y_offset>] R[#<_pcb_rotation>]
+
+    G10 L2 R rotates the WCS around machine (0,0). calc_x/y account for this
+    so that fiducial 1 maps exactly to its actual position after correction.
 """
 
 import sys
 import math
 
 try:
-    from interpreter import INTERP_OK, INTERP_EXECUTE_FINISH, INTERP_ERROR
+    from interpreter import INTERP_OK, INTERP_ERROR
 except ImportError:
     INTERP_OK    = 0
     INTERP_ERROR = 1
@@ -80,14 +81,14 @@ def m520_fid(self, **words):
                   "X={:+.4f}\" Y={:+.4f}\"".format(calc_x, calc_y))
             return INTERP_OK
 
-        # ---- P2: two fiducials, midpoint translation + rotation -------------
+        # ---- P2: two fiducials, rotation + shifted translation ---------------
         try:
             fid2_found = float(self.params.get('_fid2_found', 0.0))
         except Exception:
             fid2_found = 0.0
 
         if fid2_found != 1.0:
-            sys.stderr.write("M520 ERROR: Fiducial 2 has not been detected (run M510 N2 first).\n")
+            sys.stderr.write("M520 ERROR: Fiducial 2 has not been detected (run M510 Q2 first).\n")
             self.params['_fid_fail'] = 1.0
             return INTERP_ERROR
 
@@ -106,11 +107,9 @@ def m520_fid(self, **words):
         act2_x = fid2_x + fid2_x_offset
         act2_y = fid2_y + fid2_y_offset
 
-        # Rotation: angle of actual fid vector minus angle of nominal fid vector
+        # Step 1 & 2: angles of nominal and actual fid vectors
         nom_dx = nom2_x - nom1_x
         nom_dy = nom2_y - nom1_y
-        act_dx = act2_x - act1_x
-        act_dy = act2_y - act1_y
 
         if abs(nom_dx) < 1e-9 and abs(nom_dy) < 1e-9:
             sys.stderr.write("M520 ERROR: Fiducial 1 and 2 nominal positions are identical — "
@@ -118,20 +117,31 @@ def m520_fid(self, **words):
             self.params['_fid_fail'] = 1.0
             return INTERP_ERROR
 
+        act_dx = act2_x - act1_x
+        act_dy = act2_y - act1_y
+
         nom_angle = math.atan2(nom_dy, nom_dx)
         act_angle = math.atan2(act_dy, act_dx)
-        rotation_deg = math.degrees(act_angle - nom_angle)
 
-        # Translation: midpoint of actual positions minus midpoint of nominal positions
-        calc_x = ((act1_x + act2_x) - (nom1_x + nom2_x)) / 2.0
-        calc_y = ((act1_y + act2_y) - (nom1_y + nom2_y)) / 2.0
+        # Step 3: rotation angle (positive = CCW)
+        rotation_deg = math.degrees(act_angle - nom_angle)
+        theta = math.radians(rotation_deg)
+
+        # Step 4: shifted offset — G10 L2 R rotates around WCS (0,0), so
+        # translation must place fid1 at its actual position after rotation.
+        # With G10 L2 P0 X[cx] Y[cy] R[rot], a move to (nom1_x, nom1_y) lands at:
+        #   machine_x = cx + nom1_x*cos(theta) - nom1_y*sin(theta)
+        #   machine_y = cy + nom1_x*sin(theta) + nom1_y*cos(theta)
+        # Setting this equal to act1_x/y and solving:
+        calc_x = nom1_x * (1 - math.cos(theta)) + nom1_y * math.sin(theta) + fid1_x_offset
+        calc_y = nom1_y * (1 - math.cos(theta)) - nom1_x * math.sin(theta) + fid1_y_offset
 
         self.params['_calc_x_offset'] = calc_x
         self.params['_calc_y_offset'] = calc_y
         self.params['_pcb_rotation']  = rotation_deg
 
         print("M520 P2: Rotation+Translation correction — "
-              "X={:+.4f}\" Y={:+.4f}\" Rotation={:+.4f}°".format(
+              "X={:+.4f}\" Y={:+.4f}\" Rotation={:+.4f}deg".format(
                   calc_x, calc_y, rotation_deg))
         return INTERP_OK
 

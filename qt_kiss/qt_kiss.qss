@@ -471,7 +471,7 @@ QSpinBox {
 QSpinBox::down-button {
     width: 20px;
     height: 20px;
-    background: #c8c6c0;
+    background: #a8a6a0;
     border-left: 1.5px solid #888880;
     border-top: 1px solid #888880;
 }
@@ -484,7 +484,7 @@ QSpinBox::down-arrow {
 QSpinBox::up-button {
     width: 20px;
     height: 20px;
-    background: #c8c6c0;
+    background: #a8a6a0;
     border-left: 1.5px solid #888880;
     border-bottom: 1px solid #888880;
 }
@@ -543,9 +543,10 @@ QTabBar::tab:!selected {
 
 /** GCode 3D Preview **/
 GCodeGraphics {
-    qproperty-background_color: #f5f4f0;
-    qproperty-Preview_feed_color: #ff0000ff;
-    qproperty-Preview_rapid_color: #ff00aaff;
+    qproperty-background_color: #1a1a1a;
+    qproperty-Preview_feed_color: #00dd44;
+    qproperty-Preview_rapid_color: #cc8800;
+    qproperty-jog_color: #00ff66;
     qproperty-Flip_display: true;
 }
 
@@ -575,4 +576,329 @@ EditorBase {
     qproperty-styleColor5: #aa2200;  /* Other (feed, spindle, radius, etc) */
     qproperty-styleColor6: #224488;  /* Axes Values */
     qproperty-styleColor7: #884400;  /* Other Values */
+}
+
+/* ============================================================ */
+/*  ADDITIONS: LED indicators, jog buttons, remaining widgets    */
+/* ============================================================ */
+
+/** LED widgets - match the theme green used throughout */
+LED {
+    qproperty-color: #00dd44;
+    qproperty-off_color: #1a1a1a;
+}
+
+/** Fault / limit / low-supply LEDs - show red when ON (alert) */
+LED#ind_limit_x,
+LED#ind_limit_y,
+LED#ind_limit_z,
+LED#ind_low_air,
+LED#ind_low_air_,
+LED#ind_low_solder,
+LED#ind_low_solder_,
+LED#ind_low_flux,
+LED#ind_low_flux_ {
+    qproperty-color: #cc2200;
+    qproperty-off_color: #1a1a1a;
+}
+
+/** Found indicator - keep green but explicit so it's consistent */
+LED#fid_found {
+    qproperty-color: #00dd44;
+    qproperty-off_color: #1a1a1a;
+    qproperty-diameter: 25;
+}
+LED#fid_error {
+    qproperty-color: #cc2200;
+    qproperty-off_color: #1a1a1a;
+    qproperty-diameter: 25;
+}
+
+/** Indicated PushButton / ActionButton - LED-dot indicators on buttons */
+PushButton,
+ActionButton,
+SystemToolButton {
+    qproperty-on_color: #00dd44;
+    qproperty-off_color: #404040;
+}
+
+/* ============================================================ */
+/*  Jog buttons - dark background so the light PNG icons pop    */
+/* ============================================================ */
+
+ActionButton#x_plus_jogbutton,
+ActionButton#x_minus_jogbutton,
+ActionButton#y_plus_jogbutton,
+ActionButton#y_minus_jogbutton,
+ActionButton#z_plus_jogbutton,
+ActionButton#z_minus_jogbutton {
+    background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
+        stop:0 #2a2a2a, stop:0.5 #1a1a1a, stop:1.0 #0a0a0a);
+    border: 1.5px solid #444440;
+    border-bottom: 2px solid #00aa33;
+    border-radius: 4px;
+}
+
+ActionButton#x_plus_jogbutton:hover,
+ActionButton#x_minus_jogbutton:hover,
+ActionButton#y_plus_jogbutton:hover,
+ActionButton#y_minus_jogbutton:hover,
+ActionButton#z_plus_jogbutton:hover,
+ActionButton#z_minus_jogbutton:hover {
+    background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
+        stop:0 #353535, stop:0.5 #252525, stop:1.0 #151515);
+    border: 1.5px solid #00dd44;
+    border-bottom: 2px solid #00dd44;
+}
+
+ActionButton#x_plus_jogbutton:pressed,
+ActionButton#x_minus_jogbutton:pressed,
+ActionButton#y_plus_jogbutton:pressed,
+ActionButton#y_minus_jogbutton:pressed,
+ActionButton#z_plus_jogbutton:pressed,
+ActionButton#z_minus_jogbutton:pressed {
+    background: #00aa33;
+    border: 1.5px solid #00dd44;
+}
+
+ActionButton#x_plus_jogbutton:disabled,
+ActionButton#x_minus_jogbutton:disabled,
+ActionButton#y_plus_jogbutton:disabled,
+ActionButton#y_minus_jogbutton:disabled,
+ActionButton#z_plus_jogbutton:disabled,
+ActionButton#z_minus_jogbutton:disabled {
+    background: #4a4a48;
+    border: 1.5px solid #606058;
+    border-bottom: 2px solid #606058;
+}
+
+/* ============================================================ */
+/*  Remaining widget classes from the .ui that weren't styled   */
+/* ============================================================ */
+
+/** qtvcp's custom TabWidget (distinct from stock QTabWidget) */
+TabWidget::pane {
+    border: 1.5px solid #909088;
+    top: -1px;
+    background: #c8c6c0;
+}
+
+TabWidget QTabBar::tab {
+    background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
+        stop: 0 #d8d6d0, stop: 0.5 #d0cec8, stop: 1.0 #c8c6c0);
+    border: 1.5px solid #909088;
+    border-top-left-radius: 3px;
+    border-top-right-radius: 3px;
+    min-width: 8ex;
+    min-height: 3.5ex;
+    padding: 3px 6px;
+    color: #404040;
+    font: 10pt "Lato Heavy";
+}
+
+TabWidget QTabBar::tab:selected,
+TabWidget QTabBar::tab:hover {
+    background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
+        stop: 0 #f0eeea, stop: 0.5 #e8e6e0, stop: 1.0 #dddbd5);
+    color: #1a1a1a;
+}
+
+TabWidget QTabBar::tab:selected {
+    border-color: #444440;
+    border-bottom-color: #c8c6c0;
+}
+
+TabWidget QTabBar::tab:!selected {
+    margin-top: 2px;
+}
+
+/** LCDNumber (fiducial offsets, etc) - DRO-style dark panel */
+QLCDNumber,
+LCDNumber {
+    background: #0a0a0a;
+    border: 1.5px solid #333333;
+    border-radius: 2px;
+    color: #00dd44;
+}
+
+/** JogIncrements combo/selector - follow QComboBox theme */
+JogIncrements {
+    background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
+        stop:0 #f0eeea, stop:0.5 #e8e6e0, stop:1.0 #d8d6d0);
+    border: 1.5px solid #888880;
+    border-bottom: 2px solid #686860;
+    border-radius: 3px;
+    padding-left: 4px;
+    padding-right: 4px;
+    font: 10pt "Lato Heavy";
+    color: #1a1a1a;
+}
+
+/** DoubleScale - spinbox-like with up/down buttons */
+DoubleScale {
+    background: #f5f4f0;
+    border: 1.5px solid #888880;
+    border-radius: 2px;
+    font: 10pt "Lato Heavy";
+    color: #1a1a1a;
+}
+
+DoubleScale::up-button,
+DoubleScale::down-button {
+    width: 20px;
+    background: #c8c6c0;
+    border-left: 1.5px solid #888880;
+}
+
+DoubleScale::up-button:hover,
+DoubleScale::down-button:hover {
+    background: #b0aea8;
+}
+
+DoubleScale::up-button:pressed,
+DoubleScale::down-button:pressed {
+    background: #006622;
+}
+
+DoubleScale::up-arrow,
+DoubleScale::down-arrow {
+    width: 7px;
+    height: 7px;
+}
+
+/** File manager / list/tree views */
+FileManager,
+QListView,
+QTreeView,
+QTableView {
+    background: #f5f4f0;
+    border: 1.5px solid #888880;
+    border-radius: 2px;
+    font: 10pt "Lato Heavy";
+    color: #1a1a1a;
+    gridline-color: #b0aead;
+    alternate-background-color: #eae8e2;
+    selection-background-color: #1a1a1a;
+    selection-color: #00dd44;
+}
+
+FileManager QPushButton,
+FileManager QToolButton {
+    min-height: 28px;
+    padding: 2px 8px;
+}
+
+/** MDI history view */
+MDIHistory {
+    background: #f5f4f0;
+    border: 1.5px solid #888880;
+    border-radius: 2px;
+    font: 10pt "Lato Heavy";
+    color: #1a1a1a;
+    selection-background-color: #1a1a1a;
+    selection-color: #00dd44;
+}
+
+/** Machine log - dark console look, fits the theme's dark panels */
+MachineLog {
+    background: #0a0a0a;
+    border: 1.5px solid #333333;
+    border-radius: 2px;
+    font: 10pt "DejaVu Sans Mono";
+    color: #cccccc;
+    selection-background-color: #1a1a1a;
+    selection-color: #00dd44;
+}
+
+/** GcodeEditor - inherits EditorBase properties already set above;
+    add a border so it sits consistently with the other panels   */
+GcodeEditor {
+    border: 1.5px solid #888880;
+    border-radius: 2px;
+}
+
+/** Camera views */
+CamView,
+CamFidView {
+    background: #0a0a0a;
+    border: 1.5px solid #333333;
+    border-radius: 2px;
+}
+
+/** Tool selector - action-button style */
+ToolSelector {
+    background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
+        stop:0 #f0eeea, stop:0.5 #e8e6e0, stop:1.0 #d8d6d0);
+    border: 1.5px solid #888880;
+    border-bottom: 2px solid #686860;
+    border-radius: 3px;
+    font: 10pt "Lato Heavy";
+    color: #1a1a1a;
+    padding: 2px 6px;
+}
+
+ToolSelector:hover {
+    border: 1.5px solid #444440;
+    border-bottom: 2px solid #303030;
+}
+
+ToolSelector:checked,
+ToolSelector:pressed {
+    background: #1a1a1a;
+    border: 1.5px solid #404040;
+    color: #00dd44;
+}
+
+/** ScrollBars - neutral to fit the warm-grey theme */
+QScrollBar:vertical {
+    background: #d0cec8;
+    width: 14px;
+    border: 1px solid #888880;
+    border-radius: 2px;
+}
+
+QScrollBar::handle:vertical {
+    background: qlineargradient(x1:0, y1:0, x2:1, y2:0,
+        stop:0 #f0eeea, stop:1 #c8c6c0);
+    border: 1px solid #686860;
+    border-radius: 2px;
+    min-height: 20px;
+}
+
+QScrollBar::handle:vertical:hover {
+    background: #f5f4f0;
+    border: 1px solid #1a1a1a;
+}
+
+QScrollBar:horizontal {
+    background: #d0cec8;
+    height: 14px;
+    border: 1px solid #888880;
+    border-radius: 2px;
+}
+
+QScrollBar::handle:horizontal {
+    background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
+        stop:0 #f0eeea, stop:1 #c8c6c0);
+    border: 1px solid #686860;
+    border-radius: 2px;
+    min-width: 20px;
+}
+
+QScrollBar::handle:horizontal:hover {
+    background: #f5f4f0;
+    border: 1px solid #1a1a1a;
+}
+
+QScrollBar::add-line,
+QScrollBar::sub-line {
+    background: none;
+    border: none;
+    width: 0px;
+    height: 0px;
+}
+
+QScrollBar::add-page,
+QScrollBar::sub-page {
+    background: none;
 }

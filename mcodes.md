@@ -153,7 +153,10 @@ M520 P2    ; two fiducials  — translation offset + rotation
 
 **Applying the correction:**
 ```gcode
+; P1 (translation only):
 G10 L2 P0 X[#<_calc_x_offset>] Y[#<_calc_y_offset>]
+; P2 (rotation + translation — G10 L2 R rotates around machine 0,0):
+G10 L2 P0 X[#<_calc_x_offset>] Y[#<_calc_y_offset>] R[#<_pcb_rotation>]
 ```
 
 ---
@@ -181,7 +184,7 @@ M520 P2                                   ; compute rotation + translation
 (DEBUG, PCB rotation = #<_pcb_rotation> degrees)
 (DEBUG, X correction = #<_calc_x_offset>  Y correction = #<_calc_y_offset>)
 
-G10 L2 P0 X[#<_calc_x_offset>] Y[#<_calc_y_offset>]
+G10 L2 P0 X[#<_calc_x_offset>] Y[#<_calc_y_offset>] R[#<_pcb_rotation>]
 
 ; continue with board program using corrected WCS...
 ```

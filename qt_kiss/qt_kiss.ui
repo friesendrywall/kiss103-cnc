@@ -47,7 +47,7 @@
          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
         </property>
         <property name="currentIndex">
-         <number>1</number>
+         <number>2</number>
         </property>
         <property name="documentMode">
          <bool>false</bool>
@@ -65,6 +65,11 @@
            </widget>
           </item>
          </layout>
+        </widget>
+        <widget class="QWidget" name="tab_9">
+         <attribute name="title">
+          <string>HAAS_MDI</string>
+         </attribute>
         </widget>
         <widget class="QWidget" name="MDI">
          <attribute name="title">
@@ -115,7 +120,7 @@
          <enum>QTabWidget::Rounded</enum>
         </property>
         <property name="currentIndex">
-         <number>4</number>
+         <number>3</number>
         </property>
         <property name="iconSize">
          <size>
@@ -751,249 +756,280 @@
          <attribute name="title">
           <string>Fiducials</string>
          </attribute>
-         <widget class="QWidget" name="gridLayoutWidget">
-          <property name="geometry">
-           <rect>
-            <x>10</x>
-            <y>10</y>
-            <width>391</width>
-            <height>481</height>
-           </rect>
-          </property>
-          <layout class="QGridLayout" name="gridLayout_3">
-           <item row="2" column="1">
-            <widget class="QLabel" name="label_23">
-             <property name="text">
-              <string>size</string>
-             </property>
-             <property name="alignment">
-              <set>Qt::AlignCenter</set>
-             </property>
-            </widget>
-           </item>
-           <item row="9" column="2">
-            <widget class="LCDNumber" name="fid_offset_y">
-             <property name="digitCount">
-              <number>8</number>
-             </property>
-            </widget>
-           </item>
-           <item row="9" column="1">
-            <widget class="QLabel" name="label_24">
-             <property name="text">
-              <string>Y</string>
-             </property>
-             <property name="alignment">
-              <set>Qt::AlignCenter</set>
-             </property>
-            </widget>
-           </item>
-           <item row="4" column="1">
-            <widget class="QLabel" name="label_25">
-             <property name="text">
-              <string>Tolerance %</string>
-             </property>
-             <property name="alignment">
-              <set>Qt::AlignCenter</set>
-             </property>
-            </widget>
-           </item>
-           <item row="4" column="2">
-            <widget class="DoubleScale" name="fid_tolerance">
-             <property name="minimumSize">
-              <size>
-               <width>0</width>
-               <height>35</height>
-              </size>
-             </property>
-             <property name="decimals">
-              <number>0</number>
-             </property>
-             <property name="minimum">
-              <double>1.000000000000000</double>
-             </property>
-             <property name="maximum">
-              <double>50.000000000000000</double>
-             </property>
-             <property name="value">
-              <double>10.000000000000000</double>
-             </property>
-            </widget>
-           </item>
-           <item row="7" column="1">
-            <widget class="QLabel" name="label_20">
-             <property name="text">
-              <string>Error</string>
-             </property>
-             <property name="alignment">
-              <set>Qt::AlignCenter</set>
-             </property>
-            </widget>
-           </item>
-           <item row="6" column="2">
-            <widget class="LED" name="fid_found">
-             <property name="diameter">
-              <number>25</number>
-             </property>
-             <property name="color">
-              <color>
-               <red>51</red>
-               <green>209</green>
-               <blue>122</blue>
-              </color>
-             </property>
-            </widget>
-           </item>
-           <item row="8" column="2">
-            <widget class="LCDNumber" name="fid_offset_x">
-             <property name="digitCount">
-              <number>8</number>
-             </property>
-            </widget>
-           </item>
-           <item row="2" column="2">
-            <widget class="DoubleScale" name="fid_size">
-             <property name="minimumSize">
-              <size>
-               <width>0</width>
-               <height>35</height>
-              </size>
-             </property>
-             <property name="decimals">
-              <number>3</number>
-             </property>
-             <property name="minimum">
-              <double>0.015000000000000</double>
-             </property>
-             <property name="maximum">
-              <double>0.500000000000000</double>
-             </property>
-             <property name="singleStep">
-              <double>0.005000000000000</double>
-             </property>
-             <property name="value">
-              <double>0.050000000000000</double>
-             </property>
-            </widget>
-           </item>
-           <item row="3" column="1">
-            <widget class="QLabel" name="label_26">
-             <property name="text">
-              <string>search size</string>
-             </property>
-             <property name="alignment">
-              <set>Qt::AlignCenter</set>
-             </property>
-            </widget>
-           </item>
-           <item row="7" column="2">
-            <widget class="LED" name="fid_error">
-             <property name="diameter">
-              <number>25</number>
-             </property>
-            </widget>
-           </item>
-           <item row="8" column="1">
-            <widget class="QLabel" name="label_22">
-             <property name="text">
-              <string>X</string>
-             </property>
-             <property name="alignment">
-              <set>Qt::AlignCenter</set>
-             </property>
-            </widget>
-           </item>
-           <item row="3" column="2">
-            <widget class="DoubleScale" name="fid_area">
-             <property name="minimumSize">
-              <size>
-               <width>0</width>
-               <height>35</height>
-              </size>
-             </property>
-             <property name="minimum">
-              <double>0.150000000000000</double>
-             </property>
-             <property name="maximum">
-              <double>0.500000000000000</double>
-             </property>
-             <property name="singleStep">
-              <double>0.050000000000000</double>
-             </property>
-             <property name="value">
-              <double>0.250000000000000</double>
-             </property>
-            </widget>
-           </item>
-           <item row="6" column="1">
-            <widget class="QLabel" name="label_21">
-             <property name="text">
-              <string>Found</string>
-             </property>
-             <property name="alignment">
-              <set>Qt::AlignCenter</set>
-             </property>
-            </widget>
-           </item>
-           <item row="0" column="2">
-            <widget class="PushButton" name="fid_show_outline">
-             <property name="minimumSize">
-              <size>
-               <width>0</width>
-               <height>35</height>
-              </size>
-             </property>
-             <property name="text">
-              <string>SHOW</string>
-             </property>
-             <property name="checkable">
-              <bool>true</bool>
-             </property>
-            </widget>
-           </item>
-           <item row="1" column="2">
-            <widget class="PushButton" name="fid_is_square">
-             <property name="minimumSize">
-              <size>
-               <width>0</width>
-               <height>35</height>
-              </size>
-             </property>
-             <property name="text">
-              <string>SQUARE</string>
-             </property>
-             <property name="checkable">
-              <bool>true</bool>
-             </property>
-             <property name="indicator_HAL_pin_option" stdset="0">
-              <bool>false</bool>
-             </property>
-             <property name="python_command_option" stdset="0">
-              <bool>false</bool>
-             </property>
-            </widget>
-           </item>
-           <item row="0" column="1">
-            <widget class="PushButton" name="fid_find">
-             <property name="minimumSize">
-              <size>
-               <width>0</width>
-               <height>35</height>
-              </size>
-             </property>
-             <property name="text">
-              <string>SEARCH</string>
-             </property>
-             <property name="checkable">
-              <bool>true</bool>
-             </property>
-             <property name="indicator_HAL_pin_option" stdset="0">
-              <bool>false</bool>
-             </property>
-            </widget>
-           </item>
-          </layout>
-         </widget>
+         <layout class="QVBoxLayout" name="verticalLayout_5">
+          <item>
+           <layout class="QGridLayout" name="gridLayout_3">
+            <item row="2" column="1">
+             <widget class="QLabel" name="label_23">
+              <property name="text">
+               <string>size</string>
+              </property>
+              <property name="alignment">
+               <set>Qt::AlignCenter</set>
+              </property>
+             </widget>
+            </item>
+            <item row="9" column="2">
+             <widget class="LCDNumber" name="fid_offset_y">
+              <property name="maximumSize">
+               <size>
+                <width>16777215</width>
+                <height>70</height>
+               </size>
+              </property>
+              <property name="digitCount">
+               <number>8</number>
+              </property>
+             </widget>
+            </item>
+            <item row="9" column="1">
+             <widget class="QLabel" name="label_24">
+              <property name="text">
+               <string>Y</string>
+              </property>
+              <property name="alignment">
+               <set>Qt::AlignCenter</set>
+              </property>
+             </widget>
+            </item>
+            <item row="4" column="1">
+             <widget class="QLabel" name="label_25">
+              <property name="text">
+               <string>Tolerance %</string>
+              </property>
+              <property name="alignment">
+               <set>Qt::AlignCenter</set>
+              </property>
+             </widget>
+            </item>
+            <item row="4" column="2">
+             <widget class="DoubleScale" name="fid_tolerance">
+              <property name="minimumSize">
+               <size>
+                <width>0</width>
+                <height>35</height>
+               </size>
+              </property>
+              <property name="decimals">
+               <number>0</number>
+              </property>
+              <property name="minimum">
+               <double>1.000000000000000</double>
+              </property>
+              <property name="maximum">
+               <double>50.000000000000000</double>
+              </property>
+              <property name="value">
+               <double>10.000000000000000</double>
+              </property>
+             </widget>
+            </item>
+            <item row="7" column="1">
+             <widget class="QLabel" name="label_20">
+              <property name="text">
+               <string>Error</string>
+              </property>
+              <property name="alignment">
+               <set>Qt::AlignCenter</set>
+              </property>
+             </widget>
+            </item>
+            <item row="6" column="2">
+             <widget class="LED" name="fid_found">
+              <property name="maximumSize">
+               <size>
+                <width>16777215</width>
+                <height>70</height>
+               </size>
+              </property>
+              <property name="diameter">
+               <number>25</number>
+              </property>
+              <property name="color">
+               <color>
+                <red>51</red>
+                <green>209</green>
+                <blue>122</blue>
+               </color>
+              </property>
+             </widget>
+            </item>
+            <item row="8" column="2">
+             <widget class="LCDNumber" name="fid_offset_x">
+              <property name="maximumSize">
+               <size>
+                <width>16777215</width>
+                <height>70</height>
+               </size>
+              </property>
+              <property name="digitCount">
+               <number>8</number>
+              </property>
+             </widget>
+            </item>
+            <item row="2" column="2">
+             <widget class="DoubleScale" name="fid_size">
+              <property name="minimumSize">
+               <size>
+                <width>0</width>
+                <height>35</height>
+               </size>
+              </property>
+              <property name="decimals">
+               <number>3</number>
+              </property>
+              <property name="minimum">
+               <double>0.015000000000000</double>
+              </property>
+              <property name="maximum">
+               <double>0.500000000000000</double>
+              </property>
+              <property name="singleStep">
+               <double>0.005000000000000</double>
+              </property>
+              <property name="value">
+               <double>0.050000000000000</double>
+              </property>
+             </widget>
+            </item>
+            <item row="3" column="1">
+             <widget class="QLabel" name="label_26">
+              <property name="text">
+               <string>search size</string>
+              </property>
+              <property name="alignment">
+               <set>Qt::AlignCenter</set>
+              </property>
+             </widget>
+            </item>
+            <item row="7" column="2">
+             <widget class="LED" name="fid_error">
+              <property name="maximumSize">
+               <size>
+                <width>16777215</width>
+                <height>70</height>
+               </size>
+              </property>
+              <property name="diameter">
+               <number>25</number>
+              </property>
+             </widget>
+            </item>
+            <item row="8" column="1">
+             <widget class="QLabel" name="label_22">
+              <property name="text">
+               <string>X</string>
+              </property>
+              <property name="alignment">
+               <set>Qt::AlignCenter</set>
+              </property>
+             </widget>
+            </item>
+            <item row="3" column="2">
+             <widget class="DoubleScale" name="fid_area">
+              <property name="minimumSize">
+               <size>
+                <width>0</width>
+                <height>35</height>
+               </size>
+              </property>
+              <property name="minimum">
+               <double>0.150000000000000</double>
+              </property>
+              <property name="maximum">
+               <double>0.500000000000000</double>
+              </property>
+              <property name="singleStep">
+               <double>0.050000000000000</double>
+              </property>
+              <property name="value">
+               <double>0.250000000000000</double>
+              </property>
+             </widget>
+            </item>
+            <item row="6" column="1">
+             <widget class="QLabel" name="label_21">
+              <property name="text">
+               <string>Found</string>
+              </property>
+              <property name="alignment">
+               <set>Qt::AlignCenter</set>
+              </property>
+             </widget>
+            </item>
+            <item row="0" column="2">
+             <widget class="PushButton" name="fid_show_outline">
+              <property name="minimumSize">
+               <size>
+                <width>0</width>
+                <height>35</height>
+               </size>
+              </property>
+              <property name="text">
+               <string>SHOW</string>
+              </property>
+              <property name="checkable">
+               <bool>true</bool>
+              </property>
+             </widget>
+            </item>
+            <item row="1" column="2">
+             <widget class="PushButton" name="fid_is_square">
+              <property name="minimumSize">
+               <size>
+                <width>0</width>
+                <height>35</height>
+               </size>
+              </property>
+              <property name="text">
+               <string>SQUARE</string>
+              </property>
+              <property name="checkable">
+               <bool>true</bool>
+              </property>
+              <property name="indicator_HAL_pin_option" stdset="0">
+               <bool>false</bool>
+              </property>
+              <property name="python_command_option" stdset="0">
+               <bool>false</bool>
+              </property>
+             </widget>
+            </item>
+            <item row="0" column="1">
+             <widget class="PushButton" name="fid_find">
+              <property name="minimumSize">
+               <size>
+                <width>0</width>
+                <height>35</height>
+               </size>
+              </property>
+              <property name="text">
+               <string>SEARCH</string>
+              </property>
+              <property name="checkable">
+               <bool>true</bool>
+              </property>
+              <property name="indicator_HAL_pin_option" stdset="0">
+               <bool>false</bool>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+          <item>
+           <spacer name="verticalSpacer">
+            <property name="orientation">
+             <enum>Qt::Vertical</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>20</width>
+              <height>149</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+         </layout>
         </widget>
         <widget class="QWidget" name="tab_8">
          <attribute name="title">
@@ -1187,196 +1223,6 @@
            </property>
           </widget>
          </widget>
-         <widget class="ActionButton" name="qss_reload">
-          <property name="geometry">
-           <rect>
-            <x>20</x>
-            <y>180</y>
-            <width>101</width>
-            <height>41</height>
-           </rect>
-          </property>
-          <property name="text">
-           <string>Reload .qss</string>
-          </property>
-          <property name="indicator_option" stdset="0">
-           <bool>false</bool>
-          </property>
-          <property name="indicator_HAL_pin_option" stdset="0">
-           <bool>false</bool>
-          </property>
-          <property name="indicator_status_option" stdset="0">
-           <bool>false</bool>
-          </property>
-          <property name="checked_state_text_option" stdset="0">
-           <bool>false</bool>
-          </property>
-          <property name="python_command_option" stdset="0">
-           <bool>false</bool>
-          </property>
-          <property name="on_color" stdset="0">
-           <color>
-            <red>255</red>
-            <green>0</green>
-            <blue>0</blue>
-           </color>
-          </property>
-          <property name="shape_option" stdset="0">
-           <number>0</number>
-          </property>
-          <property name="off_color" stdset="0">
-           <color>
-            <red>0</red>
-            <green>0</green>
-            <blue>0</blue>
-           </color>
-          </property>
-          <property name="indicator_size" stdset="0">
-           <double>0.300000000000000</double>
-          </property>
-          <property name="circle_diameter" stdset="0">
-           <number>10</number>
-          </property>
-          <property name="right_edge_offset" stdset="0">
-           <number>0</number>
-          </property>
-          <property name="top_edge_offset" stdset="0">
-           <number>0</number>
-          </property>
-          <property name="corner_radius" stdset="0">
-           <double>5.000000000000000</double>
-          </property>
-          <property name="height_fraction" stdset="0">
-           <double>0.300000000000000</double>
-          </property>
-          <property name="width_fraction" stdset="0">
-           <double>0.900000000000000</double>
-          </property>
-          <property name="true_state_string" stdset="0">
-           <string>True</string>
-          </property>
-          <property name="false_state_string" stdset="0">
-           <string>False</string>
-          </property>
-          <property name="true_python_cmd_string" stdset="0">
-           <string>print(&quot;true command&quot;)</string>
-          </property>
-          <property name="false_python_cmd_string" stdset="0">
-           <string>print(&quot;false command&quot;)</string>
-          </property>
-          <property name="invert_the_status" stdset="0">
-           <bool>false</bool>
-          </property>
-          <property name="is_paused_status" stdset="0">
-           <bool>false</bool>
-          </property>
-          <property name="is_estopped_status" stdset="0">
-           <bool>false</bool>
-          </property>
-          <property name="is_on_status" stdset="0">
-           <bool>false</bool>
-          </property>
-          <property name="is_idle_status" stdset="0">
-           <bool>false</bool>
-          </property>
-          <property name="is_homed_status" stdset="0">
-           <bool>false</bool>
-          </property>
-          <property name="is_flood_status" stdset="0">
-           <bool>false</bool>
-          </property>
-          <property name="is_mist_status" stdset="0">
-           <bool>false</bool>
-          </property>
-          <property name="is_block_delete_status" stdset="0">
-           <bool>false</bool>
-          </property>
-          <property name="is_optional_stop_status" stdset="0">
-           <bool>false</bool>
-          </property>
-          <property name="is_joint_homed_status" stdset="0">
-           <bool>false</bool>
-          </property>
-          <property name="is_limits_overridden_status" stdset="0">
-           <bool>false</bool>
-          </property>
-          <property name="is_manual_status" stdset="0">
-           <bool>false</bool>
-          </property>
-          <property name="is_mdi_status" stdset="0">
-           <bool>false</bool>
-          </property>
-          <property name="is_auto_status" stdset="0">
-           <bool>false</bool>
-          </property>
-          <property name="is_spindle_stopped_status" stdset="0">
-           <bool>false</bool>
-          </property>
-          <property name="is_spindle_fwd_status" stdset="0">
-           <bool>false</bool>
-          </property>
-          <property name="is_spindle_rev_status" stdset="0">
-           <bool>false</bool>
-          </property>
-          <property name="joint_number_status" stdset="0">
-           <number>0</number>
-          </property>
-          <property name="estop_action" stdset="0">
-           <bool>false</bool>
-          </property>
-          <property name="template_label_option" stdset="0">
-           <bool>false</bool>
-          </property>
-          <property name="joint_number" stdset="0">
-           <number>-1</number>
-          </property>
-          <property name="incr_imperial_number" stdset="0">
-           <double>0.010000000000000</double>
-          </property>
-          <property name="incr_mm_number" stdset="0">
-           <double>0.025000000000000</double>
-          </property>
-          <property name="incr_angular_number" stdset="0">
-           <double>-1.000000000000000</double>
-          </property>
-          <property name="toggle_float_option" stdset="0">
-           <bool>false</bool>
-          </property>
-          <property name="float_num" stdset="0">
-           <double>0.300000000000000</double>
-          </property>
-          <property name="float_alt_num" stdset="0">
-           <double>50.000000000000000</double>
-          </property>
-          <property name="view_type_string" stdset="0">
-           <string>P</string>
-          </property>
-          <property name="command_text_string" stdset="0">
-           <string/>
-          </property>
-          <property name="ini_mdi_number" stdset="0">
-           <number>0</number>
-          </property>
-          <property name="textTemplate" stdset="0">
-           <string>%1.3f in</string>
-          </property>
-          <property name="alt_textTemplate" stdset="0">
-           <string>%1.2f mm</string>
-          </property>
-         </widget>
-         <widget class="ActionButton" name="open_ladder">
-          <property name="geometry">
-           <rect>
-            <x>20</x>
-            <y>130</y>
-            <width>101</width>
-            <height>41</height>
-           </rect>
-          </property>
-          <property name="text">
-           <string>Ladder</string>
-          </property>
-         </widget>
          <widget class="ActionButton" name="actionbutton_12">
           <property name="geometry">
            <rect>
@@ -1565,7 +1411,7 @@
           </property>
           <layout class="QGridLayout" name="gridLayout_6">
            <item row="5" column="1">
-            <widget class="LED" name="ind_slide_out">
+            <widget class="LED" name="ind_slide_out_">
              <property name="diameter">
               <number>15</number>
              </property>
@@ -1592,10 +1438,10 @@
             </widget>
            </item>
            <item row="0" column="1">
-            <widget class="LED" name="ind_low_air"/>
+            <widget class="LED" name="ind_low_air_"/>
            </item>
            <item row="4" column="1">
-            <widget class="LED" name="ind_slide_in"/>
+            <widget class="LED" name="ind_slide_in_"/>
            </item>
            <item row="8" column="1">
             <widget class="LED" name="led_2"/>
@@ -1621,7 +1467,7 @@
             </widget>
            </item>
            <item row="1" column="1">
-            <widget class="LED" name="ind_low_solder"/>
+            <widget class="LED" name="ind_low_solder_"/>
            </item>
            <item row="5" column="0">
             <widget class="QLabel" name="label_29">
@@ -1644,10 +1490,10 @@
             </widget>
            </item>
            <item row="6" column="1">
-            <widget class="LED" name="ind_wave_height"/>
+            <widget class="LED" name="ind_wave_height_"/>
            </item>
            <item row="8" column="0">
-            <widget class="QLabel" name="ind_motion_on">
+            <widget class="QLabel" name="ind_motion_on_">
              <property name="text">
               <string>MOTION-PWR</string>
              </property>
@@ -1657,7 +1503,7 @@
             </widget>
            </item>
            <item row="3" column="1">
-            <widget class="LED" name="ind_lift_down"/>
+            <widget class="LED" name="ind_lift_down_"/>
            </item>
            <item row="1" column="0">
             <widget class="QLabel" name="label_17">
@@ -1670,7 +1516,7 @@
             </widget>
            </item>
            <item row="2" column="1">
-            <widget class="LED" name="ind_low_flux"/>
+            <widget class="LED" name="ind_low_flux_"/>
            </item>
            <item row="2" column="0">
             <widget class="QLabel" name="label_18">
@@ -1693,10 +1539,10 @@
             </widget>
            </item>
            <item row="7" column="1">
-            <widget class="LED" name="ind_pump_on"/>
+            <widget class="LED" name="ind_pump_on_"/>
            </item>
            <item row="9" column="0">
-            <widget class="QLabel" name="ind_service_key">
+            <widget class="QLabel" name="ind_service_key_">
              <property name="text">
               <string>SERVICE-KEY</string>
              </property>
@@ -1807,7 +1653,7 @@
      </layout>
     </item>
     <item>
-     <layout class="QHBoxLayout" name="layout_bottom" stretch="1,1,1,2,2,1,1,0">
+     <layout class="QHBoxLayout" name="layout_bottom" stretch="1,3,3,5,5,3,3,3">
       <property name="leftMargin">
        <number>2</number>
       </property>
@@ -1821,11 +1667,168 @@
        <number>2</number>
       </property>
       <item>
+       <widget class="QGroupBox" name="groupBox_2">
+        <property name="title">
+         <string>Status</string>
+        </property>
+        <layout class="QGridLayout" name="gridLayout_7">
+         <item row="0" column="0">
+          <layout class="QGridLayout" name="gridLayout_4">
+           <item row="0" column="0">
+            <widget class="QLabel" name="ind_motion_on">
+             <property name="text">
+              <string>MOTION-PWR</string>
+             </property>
+             <property name="alignment">
+              <set>Qt::AlignCenter</set>
+             </property>
+            </widget>
+           </item>
+           <item row="0" column="1">
+            <widget class="LED" name="led_4"/>
+           </item>
+           <item row="1" column="0">
+            <widget class="QLabel" name="label_32">
+             <property name="text">
+              <string>LOW-AIR</string>
+             </property>
+             <property name="alignment">
+              <set>Qt::AlignCenter</set>
+             </property>
+            </widget>
+           </item>
+           <item row="1" column="1">
+            <widget class="LED" name="ind_low_air"/>
+           </item>
+           <item row="2" column="0">
+            <widget class="QLabel" name="label_36">
+             <property name="text">
+              <string>LOW-SOLDER</string>
+             </property>
+             <property name="alignment">
+              <set>Qt::AlignCenter</set>
+             </property>
+            </widget>
+           </item>
+           <item row="2" column="1">
+            <widget class="LED" name="ind_low_solder"/>
+           </item>
+           <item row="3" column="0">
+            <widget class="QLabel" name="label_37">
+             <property name="text">
+              <string>LOW-FLUX</string>
+             </property>
+             <property name="alignment">
+              <set>Qt::AlignCenter</set>
+             </property>
+            </widget>
+           </item>
+           <item row="3" column="1">
+            <widget class="LED" name="ind_low_flux"/>
+           </item>
+           <item row="4" column="0">
+            <widget class="QLabel" name="label_38">
+             <property name="text">
+              <string>PUMP-ON</string>
+             </property>
+             <property name="alignment">
+              <set>Qt::AlignCenter</set>
+             </property>
+            </widget>
+           </item>
+           <item row="4" column="1">
+            <widget class="LED" name="ind_pump_on"/>
+           </item>
+           <item row="5" column="0">
+            <widget class="QLabel" name="label_33">
+             <property name="text">
+              <string>LIFT DOWN</string>
+             </property>
+             <property name="alignment">
+              <set>Qt::AlignCenter</set>
+             </property>
+            </widget>
+           </item>
+           <item row="5" column="1">
+            <widget class="LED" name="ind_lift_down"/>
+           </item>
+           <item row="6" column="0">
+            <widget class="QLabel" name="label_35">
+             <property name="text">
+              <string>SLIDE-IN</string>
+             </property>
+             <property name="alignment">
+              <set>Qt::AlignCenter</set>
+             </property>
+            </widget>
+           </item>
+           <item row="6" column="1">
+            <widget class="LED" name="ind_slide_in"/>
+           </item>
+           <item row="7" column="0">
+            <widget class="QLabel" name="label_34">
+             <property name="text">
+              <string>SLIDE-OUT</string>
+             </property>
+             <property name="alignment">
+              <set>Qt::AlignCenter</set>
+             </property>
+            </widget>
+           </item>
+           <item row="7" column="1">
+            <widget class="LED" name="ind_slide_out">
+             <property name="diameter">
+              <number>15</number>
+             </property>
+             <property name="color">
+              <color>
+               <red>51</red>
+               <green>209</green>
+               <blue>122</blue>
+              </color>
+             </property>
+             <property name="currentstate" stdset="0">
+              <bool>false</bool>
+             </property>
+            </widget>
+           </item>
+           <item row="8" column="0">
+            <widget class="QLabel" name="label_31">
+             <property name="text">
+              <string>WAVE-DET</string>
+             </property>
+             <property name="alignment">
+              <set>Qt::AlignCenter</set>
+             </property>
+            </widget>
+           </item>
+           <item row="8" column="1">
+            <widget class="LED" name="ind_wave_height"/>
+           </item>
+           <item row="9" column="0">
+            <widget class="QLabel" name="ind_service_key">
+             <property name="text">
+              <string>SERVICE-KEY</string>
+             </property>
+             <property name="alignment">
+              <set>Qt::AlignCenter</set>
+             </property>
+            </widget>
+           </item>
+           <item row="9" column="1">
+            <widget class="LED" name="led_5"/>
+           </item>
+          </layout>
+         </item>
+        </layout>
+       </widget>
+      </item>
+      <item>
        <widget class="QGroupBox" name="MACHINECONTROLS">
         <property name="title">
          <string>Machine Controls</string>
         </property>
-        <layout class="QVBoxLayout" name="verticalLayout_15">
+        <layout class="QVBoxLayout" name="verticalLayout_15" stretch="1,3,3,6">
          <item>
           <layout class="QGridLayout" name="gridLayout_5">
            <item row="0" column="0">
@@ -2051,7 +2054,7 @@
            <property name="minimumSize">
             <size>
              <width>0</width>
-             <height>35</height>
+             <height>50</height>
             </size>
            </property>
            <property name="text">
@@ -2064,7 +2067,7 @@
             <bool>false</bool>
            </property>
            <property name="indicator_status_option" stdset="0">
-            <bool>false</bool>
+            <bool>true</bool>
            </property>
            <property name="checked_state_text_option" stdset="0">
             <bool>false</bool>
@@ -2132,7 +2135,7 @@
             <bool>false</bool>
            </property>
            <property name="is_on_status" stdset="0">
-            <bool>false</bool>
+            <bool>true</bool>
            </property>
            <property name="is_idle_status" stdset="0">
             <bool>false</bool>
@@ -2964,13 +2967,13 @@
             <string>AUTO</string>
            </property>
            <property name="indicator_option" stdset="0">
-            <bool>false</bool>
+            <bool>true</bool>
            </property>
            <property name="indicator_HAL_pin_option" stdset="0">
             <bool>false</bool>
            </property>
            <property name="indicator_status_option" stdset="0">
-            <bool>false</bool>
+            <bool>true</bool>
            </property>
            <property name="checked_state_text_option" stdset="0">
             <bool>false</bool>
@@ -2996,7 +2999,7 @@
             </color>
            </property>
            <property name="indicator_size" stdset="0">
-            <double>0.300000000000000</double>
+            <double>0.400000000000000</double>
            </property>
            <property name="circle_diameter" stdset="0">
             <number>10</number>
@@ -3071,7 +3074,7 @@
             <bool>false</bool>
            </property>
            <property name="is_auto_status" stdset="0">
-            <bool>false</bool>
+            <bool>true</bool>
            </property>
            <property name="is_spindle_stopped_status" stdset="0">
             <bool>false</bool>
@@ -3107,7 +3110,7 @@
             <bool>false</bool>
            </property>
            <property name="float_num" stdset="0">
-            <double>0.300000000000000</double>
+            <double>0.400000000000000</double>
            </property>
            <property name="float_alt_num" stdset="0">
             <double>50.000000000000000</double>
@@ -3141,13 +3144,13 @@
             <string>MDI</string>
            </property>
            <property name="indicator_option" stdset="0">
-            <bool>false</bool>
+            <bool>true</bool>
            </property>
            <property name="indicator_HAL_pin_option" stdset="0">
             <bool>false</bool>
            </property>
            <property name="indicator_status_option" stdset="0">
-            <bool>false</bool>
+            <bool>true</bool>
            </property>
            <property name="checked_state_text_option" stdset="0">
             <bool>false</bool>
@@ -3173,7 +3176,7 @@
             </color>
            </property>
            <property name="indicator_size" stdset="0">
-            <double>0.300000000000000</double>
+            <double>0.400000000000000</double>
            </property>
            <property name="circle_diameter" stdset="0">
             <number>10</number>
@@ -3245,7 +3248,7 @@
             <bool>false</bool>
            </property>
            <property name="is_mdi_status" stdset="0">
-            <bool>false</bool>
+            <bool>true</bool>
            </property>
            <property name="is_auto_status" stdset="0">
             <bool>false</bool>
@@ -3284,7 +3287,7 @@
             <bool>false</bool>
            </property>
            <property name="float_num" stdset="0">
-            <double>0.300000000000000</double>
+            <double>0.400000000000000</double>
            </property>
            <property name="float_alt_num" stdset="0">
             <double>50.000000000000000</double>
@@ -3318,13 +3321,13 @@
             <string>MANUAL</string>
            </property>
            <property name="indicator_option" stdset="0">
-            <bool>false</bool>
+            <bool>true</bool>
            </property>
            <property name="indicator_HAL_pin_option" stdset="0">
             <bool>false</bool>
            </property>
            <property name="indicator_status_option" stdset="0">
-            <bool>false</bool>
+            <bool>true</bool>
            </property>
            <property name="checked_state_text_option" stdset="0">
             <bool>false</bool>
@@ -3350,7 +3353,7 @@
             </color>
            </property>
            <property name="indicator_size" stdset="0">
-            <double>0.300000000000000</double>
+            <double>0.400000000000000</double>
            </property>
            <property name="circle_diameter" stdset="0">
             <number>10</number>
@@ -3419,7 +3422,7 @@
             <bool>false</bool>
            </property>
            <property name="is_manual_status" stdset="0">
-            <bool>false</bool>
+            <bool>true</bool>
            </property>
            <property name="is_mdi_status" stdset="0">
             <bool>false</bool>
@@ -3461,7 +3464,7 @@
             <bool>false</bool>
            </property>
            <property name="float_num" stdset="0">
-            <double>0.300000000000000</double>
+            <double>0.400000000000000</double>
            </property>
            <property name="float_alt_num" stdset="0">
             <double>50.000000000000000</double>
@@ -3484,13 +3487,6 @@
           </widget>
          </item>
         </layout>
-       </widget>
-      </item>
-      <item>
-       <widget class="QGroupBox" name="groupBox_2">
-        <property name="title">
-         <string>Status</string>
-        </property>
        </widget>
       </item>
       <item>
@@ -5452,8 +5448,20 @@
      <height>22</height>
     </rect>
    </property>
+   <widget class="QMenu" name="menuFile">
+    <property name="title">
+     <string>File</string>
+    </property>
+    <addaction name="actionOpen"/>
+   </widget>
+   <addaction name="menuFile"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
+  <action name="actionOpen">
+   <property name="text">
+    <string>Open</string>
+   </property>
+  </action>
  </widget>
  <customwidgets>
   <customwidget>

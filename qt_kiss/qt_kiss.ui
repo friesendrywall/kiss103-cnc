@@ -105,7 +105,7 @@
          <enum>QTabWidget::Rounded</enum>
         </property>
         <property name="currentIndex">
-         <number>3</number>
+         <number>4</number>
         </property>
         <property name="iconSize">
          <size>
@@ -1547,18 +1547,48 @@
          <widget class="QWidget" name="gridLayoutWidget_2">
           <property name="geometry">
            <rect>
-            <x>20</x>
-            <y>230</y>
-            <width>160</width>
-            <height>80</height>
+            <x>160</x>
+            <y>30</y>
+            <width>241</width>
+            <height>421</height>
            </rect>
           </property>
           <layout class="QGridLayout" name="gridLayout_6">
-           <item row="0" column="1">
-            <widget class="LED" name="low_air"/>
+           <item row="5" column="1">
+            <widget class="LED" name="ind_slide_out">
+             <property name="diameter">
+              <number>15</number>
+             </property>
+             <property name="color">
+              <color>
+               <red>51</red>
+               <green>209</green>
+               <blue>122</blue>
+              </color>
+             </property>
+             <property name="currentstate" stdset="0">
+              <bool>false</bool>
+             </property>
+            </widget>
            </item>
-           <item row="1" column="1">
-            <widget class="LED" name="low_solder"/>
+           <item row="6" column="0">
+            <widget class="QLabel" name="label_30">
+             <property name="text">
+              <string>WAVE-DET</string>
+             </property>
+             <property name="alignment">
+              <set>Qt::AlignCenter</set>
+             </property>
+            </widget>
+           </item>
+           <item row="0" column="1">
+            <widget class="LED" name="ind_low_air"/>
+           </item>
+           <item row="4" column="1">
+            <widget class="LED" name="ind_slide_in"/>
+           </item>
+           <item row="8" column="1">
+            <widget class="LED" name="led_2"/>
            </item>
            <item row="0" column="0">
             <widget class="QLabel" name="label_16">
@@ -1570,6 +1600,55 @@
              </property>
             </widget>
            </item>
+           <item row="3" column="0">
+            <widget class="QLabel" name="label_27">
+             <property name="text">
+              <string>LIFT DOWN</string>
+             </property>
+             <property name="alignment">
+              <set>Qt::AlignCenter</set>
+             </property>
+            </widget>
+           </item>
+           <item row="1" column="1">
+            <widget class="LED" name="ind_low_solder"/>
+           </item>
+           <item row="5" column="0">
+            <widget class="QLabel" name="label_29">
+             <property name="text">
+              <string>SLIDE-OUT</string>
+             </property>
+             <property name="alignment">
+              <set>Qt::AlignCenter</set>
+             </property>
+            </widget>
+           </item>
+           <item row="4" column="0">
+            <widget class="QLabel" name="label_28">
+             <property name="text">
+              <string>SLIDE-IN</string>
+             </property>
+             <property name="alignment">
+              <set>Qt::AlignCenter</set>
+             </property>
+            </widget>
+           </item>
+           <item row="6" column="1">
+            <widget class="LED" name="ind_wave_height"/>
+           </item>
+           <item row="8" column="0">
+            <widget class="QLabel" name="ind_motion_on">
+             <property name="text">
+              <string>MOTION-PWR</string>
+             </property>
+             <property name="alignment">
+              <set>Qt::AlignCenter</set>
+             </property>
+            </widget>
+           </item>
+           <item row="3" column="1">
+            <widget class="LED" name="ind_lift_down"/>
+           </item>
            <item row="1" column="0">
             <widget class="QLabel" name="label_17">
              <property name="text">
@@ -1579,6 +1658,9 @@
               <set>Qt::AlignCenter</set>
              </property>
             </widget>
+           </item>
+           <item row="2" column="1">
+            <widget class="LED" name="ind_low_flux"/>
            </item>
            <item row="2" column="0">
             <widget class="QLabel" name="label_18">
@@ -1590,8 +1672,31 @@
              </property>
             </widget>
            </item>
-           <item row="2" column="1">
-            <widget class="LED" name="low_flux"/>
+           <item row="7" column="0">
+            <widget class="QLabel" name="label_7">
+             <property name="text">
+              <string>PUMP-ON</string>
+             </property>
+             <property name="alignment">
+              <set>Qt::AlignCenter</set>
+             </property>
+            </widget>
+           </item>
+           <item row="7" column="1">
+            <widget class="LED" name="ind_pump_on"/>
+           </item>
+           <item row="9" column="0">
+            <widget class="QLabel" name="ind_service_key">
+             <property name="text">
+              <string>SERVICE-KEY</string>
+             </property>
+             <property name="alignment">
+              <set>Qt::AlignCenter</set>
+             </property>
+            </widget>
+           </item>
+           <item row="9" column="1">
+            <widget class="LED" name="led_3"/>
            </item>
           </layout>
          </widget>
@@ -1601,7 +1706,7 @@
       <item>
        <widget class="TabWidget" name="CAMERA">
         <property name="currentIndex">
-         <number>2</number>
+         <number>0</number>
         </property>
         <widget class="QWidget" name="tab_5">
          <attribute name="title">
@@ -1724,10 +1829,10 @@
             </widget>
            </item>
            <item row="1" column="1">
-            <widget class="LED" name="limit_y"/>
+            <widget class="LED" name="ind_limit_y"/>
            </item>
            <item row="1" column="2">
-            <widget class="LED" name="limit_z"/>
+            <widget class="LED" name="ind_limit_z"/>
            </item>
            <item row="0" column="1">
             <widget class="QLabel" name="label_10">
@@ -1740,7 +1845,7 @@
             </widget>
            </item>
            <item row="1" column="0">
-            <widget class="LED" name="limit_x"/>
+            <widget class="LED" name="ind_limit_x"/>
            </item>
            <item row="0" column="2">
             <widget class="QLabel" name="label_15">
@@ -4720,7 +4825,7 @@
             </widget>
            </item>
            <item>
-            <widget class="LED" name="pump_at_speed"/>
+            <widget class="LED" name="ind_pump_at_speed"/>
            </item>
           </layout>
          </item>
@@ -4737,7 +4842,7 @@
             </widget>
            </item>
            <item>
-            <widget class="LED" name="solder_at_temp"/>
+            <widget class="LED" name="ind_solder_at_temp"/>
            </item>
           </layout>
          </item>
@@ -4754,7 +4859,7 @@
             </widget>
            </item>
            <item>
-            <widget class="LED" name="n2_pressure"/>
+            <widget class="LED" name="ind_n2"/>
            </item>
           </layout>
          </item>
@@ -5240,30 +5345,6 @@
          <item>
           <layout class="QHBoxLayout" name="horizontalLayout_11">
            <item>
-            <widget class="QLabel" name="label_7">
-             <property name="text">
-              <string>SLIDE</string>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="LED" name="slide_in">
-             <property name="diameter">
-              <number>20</number>
-             </property>
-             <property name="color">
-              <color>
-               <red>51</red>
-               <green>209</green>
-               <blue>122</blue>
-              </color>
-             </property>
-             <property name="currentstate" stdset="0">
-              <bool>false</bool>
-             </property>
-            </widget>
-           </item>
-           <item>
             <widget class="QLabel" name="label_8">
              <property name="text">
               <string>READY</string>
@@ -5271,7 +5352,7 @@
             </widget>
            </item>
            <item>
-            <widget class="LED" name="preheat_ready">
+            <widget class="LED" name="ind_preheat_ready">
              <property name="diameter">
               <number>20</number>
              </property>

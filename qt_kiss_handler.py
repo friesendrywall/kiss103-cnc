@@ -101,27 +101,27 @@ class HandlerClass:
         self.pin_djfreq_set = QHAL.newpin('dj-freq-set-value', QHAL.HAL_FLOAT, QHAL.HAL_IN)
         self.pin_djfreq_set.value_changed.connect(self.update_djfreq)
         # Fiducial parameter pins
-        self.pin_fid_find      = QHAL.newpin('fid-find-m500',      QHAL.HAL_BIT,   QHAL.HAL_IN)
+        self.pin_fid_find      = QHAL.newpin('ext-fid-find',      QHAL.HAL_BIT,   QHAL.HAL_IN)
         self.pin_fid_find.value_changed.connect(self.update_fid_find)
 
-        self.pin_fid_is_square = QHAL.newpin('fid-is-square', QHAL.HAL_BIT,   QHAL.HAL_IN)
+        self.pin_fid_is_square = QHAL.newpin('ext-fid-is-square', QHAL.HAL_BIT,   QHAL.HAL_IN)
         self.pin_fid_is_square.value_changed.connect(self.update_fid_is_square)
-        self.pin_fid_size      = QHAL.newpin('fid-size',      QHAL.HAL_FLOAT, QHAL.HAL_IN)
+        self.pin_fid_size      = QHAL.newpin('ext-fid-size',      QHAL.HAL_FLOAT, QHAL.HAL_IN)
         self.pin_fid_size.value_changed.connect(self.update_fid_size)
-        self.pin_fid_area      = QHAL.newpin('fid-area',      QHAL.HAL_FLOAT, QHAL.HAL_IN)
+        self.pin_fid_area      = QHAL.newpin('ext-fid-area',      QHAL.HAL_FLOAT, QHAL.HAL_IN)
         self.pin_fid_area.value_changed.connect(self.update_fid_area)
-        self.pin_fid_tolerance = QHAL.newpin('fid-tolerance', QHAL.HAL_FLOAT, QHAL.HAL_IN)
+        self.pin_fid_tolerance = QHAL.newpin('ext-fid-tolerance', QHAL.HAL_FLOAT, QHAL.HAL_IN)
         self.pin_fid_tolerance.value_changed.connect(self.update_fid_tolerance)
 
         # Reverse connections: widget change → keep handler HAL_IN pins current
         self.w.preheat_setpoint.valueChanged.connect(lambda v: self.hal.__setitem__('preheat-set-value', v))
         self.w.dj_dotsize.valueChanged.connect(      lambda v: self.hal.__setitem__('dj-dot-set-value',  v))
         self.w.dj_freq.valueChanged.connect(         lambda v: self.hal.__setitem__('dj-freq-set-value', v))
-        self.w.fid_find.toggled.connect(             lambda v: self.hal.__setitem__('fid-find-m500',    v))
-        self.w.fid_is_square.toggled.connect(        lambda v: self.hal.__setitem__('fid-is-square',     v))
-        self.w.fid_size.valueChanged.connect(        lambda v: self.hal.__setitem__('fid-size',          v))
-        self.w.fid_area.valueChanged.connect(        lambda v: self.hal.__setitem__('fid-area',          v))
-        self.w.fid_tolerance.valueChanged.connect(   lambda v: self.hal.__setitem__('fid-tolerance',     v))
+        self.w.fid_find.toggled.connect(             lambda v: self.hal.__setitem__('ext-fid-find',          v))
+        self.w.fid_is_square.toggled.connect(        lambda v: self.hal.__setitem__('ext-fid-is-square',     v))
+        self.w.fid_size.valueChanged.connect(        lambda v: self.hal.__setitem__('ext-fid-size',          v))
+        self.w.fid_area.valueChanged.connect(        lambda v: self.hal.__setitem__('ext-fid-area',          v))
+        self.w.fid_tolerance.valueChanged.connect(   lambda v: self.hal.__setitem__('ext-fid-tolerance',     v))
 
     def update_ph_setpoint(self, value):
         self.w.preheat_setpoint.setValue(value)

@@ -98,14 +98,13 @@ M510 Q<1|2> D<diameter>                  ; circle fiducial
 M510 Q<1|2> S<side_length>               ; square fiducial
 ; optional: E<tolerance_%>  P<search_area_in>
 ```
-
 | Word | Required | Default | Description |
 |---|---|---|---|
 | `Q` | Yes | — | Fiducial number: `1` or `2` |
-| `D` | One of D/S | — | Expected circle diameter, inches |
-| `S` | One of D/S | — | Expected square side length, inches |
+| `D` | One of D/K | — | Expected circle diameter, inches |
+| `K` | One of D/K | — | Expected square side length, inches |
 | `E` | No | `10` | Size tolerance in percent (e.g. `E15` = ±15%) |
-| `P` | No | — | Search area half-width, inches |
+| `P` | Yes | — | Search area box, inches |
 
 **Parameters written** (substitute `2` for second fiducial):
 
@@ -116,16 +115,14 @@ M510 Q<1|2> S<side_length>               ; square fiducial
 | `#<_fid1_x_offset>` | Camera X offset to fiducial, inches (+right) |
 | `#<_fid1_y_offset>` | Camera Y offset to fiducial, inches (+up) |
 | `#<_fid1_found>` | `1.0` if detected |
-| `#<_fid1_conf>` | Detection confidence 0.0–1.0 |
 | `#<_fid_fail>` | `1.0` on any detection failure |
 
-The `CamFidView` widget shows a green overlay circle with offset label for 5 seconds
-after each successful detection.
+The `CamFidView` widget shows a green overlay circle with offset label until fid_read is cleared
 
 **Example:**
 ```gcode
-M510 Q1 D0.039 E15 P0.5
-M510 Q2 D0.039 E15 P0.5
+M510 Q1 D0.050 E15 P0.25
+M510 Q2 D0.050 E15 P0.25
 ```
 
 ---
@@ -133,17 +130,17 @@ M510 Q2 D0.039 E15 P0.5
 ## M520 — Calculate PCB Correction
 
 Must be called after the required M510 calls. Computes the corrective XY
-offset and (P2 only) the PCB rotation angle.
+offset and (P2 only) the PCB rotation angle.  It then applies this to the current active work offset
 
 ```gcode
 M520 P1    ; single fiducial — translation offset only
-M520 P2    ; two fiducials  — midpoint translation + rotation
+M520 P2    ; two fiducials  — translation offset + rotation
 ```
 
 | Mode | Prerequisites | Calculates |
 |---|---|---|
-| `P1` | M510 N1 | Translation from fid1 camera offsets |
-| `P2` | M510 N1 + M510 N2 | Midpoint translation + PCB rotation angle |
+| `P1` | M510 Q1 | Translation from fid1 camera offsets |
+| `P2` | M510 Q1 + M510 Q2 | First fid offset translation + PCB rotation angle |
 
 **Parameters written:**
 
@@ -167,14 +164,14 @@ G10 L2 P0 X[#<_calc_x_offset>] Y[#<_calc_y_offset>]
 M500                                      ; clear previous state
 
 G0 X1.500 Y0.750                          ; move to nominal fid 1 position
-M510 Q1 D0.039 E15 P0.5                  ; detect fid 1
+M510 Q1 D0.050 E15 P0.25                  ; detect fid 1
 O100 if [#<_fid_fail> EQ 1.0]
     (DEBUG, Fiducial 1 not found - aborting)
     M2
 O100 endif
 
 G0 X5.500 Y0.750                          ; move to nominal fid 2 position
-M510 Q2 D0.039 E15 P0.5                  ; detect fid 2
+M510 Q2 D0.050 E15 P0.25                  ; detect fid 2
 O101 if [#<_fid_fail> EQ 1.0]
     (DEBUG, Fiducial 2 not found - aborting)
     M2

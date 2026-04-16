@@ -29,16 +29,16 @@ import time
 import subprocess
 
 try:
-    from interpreter import INTERP_OK, INTERP_ERROR   # noqa: F401
+    from interpreter import INTERP_OK, INTERP_EXECUTE_FINISH, INTERP_ERROR   # noqa: F401
 except ImportError:
     INTERP_OK    = 0
     INTERP_ERROR = 1
 
 _CAM = 'qt_kiss.camfidview'   # HAL component prefix for the camera widget
-_POLL_INTERVAL = 0.05          # seconds between search_done polls
+_POLL_INTERVAL = 0.05           # seconds between search_done polls
 _POLL_TIMEOUT  = 2.5           # seconds before giving up
 _PARAM_SETTLE  = 0.25          # seconds for GUI to propagate settings through widget nets
-
+_VISUAL_DELAY  = 0.5
 
 def _halcmd_setp(pin, value):
     """Write a value to a HAL pin via halcmd. Silent on failure."""
@@ -86,7 +86,6 @@ def m510_fid(self, **words):
         k_word = words.get('k', None)
         e_word = words.get('e', 10.0)
         p_word = words.get('p', None)
-
         if q_word is None:
             sys.stderr.write("M510 ERROR: Q word (fiducial number 1 or 2) is required.\n")
             self.params['_fid_fail'] = 1.0
@@ -124,13 +123,16 @@ def m510_fid(self, **words):
         _halcmd_setp('qt_kiss.ext-fid-size',      fid_size)
         _halcmd_setp('qt_kiss.ext-fid-area',      fid_search)
         _halcmd_setp('qt_kiss.ext-fid-tolerance', fid_tol)
+        yield INTERP_EXECUTE_FINISH
+        time.sleep(_PARAM_SETTLE)
         _halcmd_setp('qt_kiss.ext-fid-find', 1)
         # Allow GUI to propagate settings through widget nets to camfidview
         # QApplication.processEvents()
+        yield INTERP_EXECUTE_FINISH
         time.sleep(_PARAM_SETTLE)
 
         # Trigger detection via fid_find button → net fid-find → camfidview.fid_read
-        _halcmd_setp('qt_kiss.ext-fid-find', 1)
+        # _halcmd_setp('qt_kiss.ext-fid-find', 1)
 
         # ---- Wait for search_done -------------------------------------------
         deadline = time.time() + _POLL_TIMEOUT
@@ -139,6 +141,7 @@ def m510_fid(self, **words):
             if _halcmd_getp(_CAM + '.search_done') == 'TRUE':
                 search_done = True
                 break
+            yield INTERP_EXECUTE_FINISH
             time.sleep(_POLL_INTERVAL)
 
         fid_found = search_done and (_halcmd_getp(_CAM + '.fid_found') == 'TRUE')
@@ -154,6 +157,8 @@ def m510_fid(self, **words):
                 pass
 
         # ---- Release detection trigger --------------------------------------
+        yield INTERP_EXECUTE_FINISH
+        time.sleep(_VISUAL_DELAY)
         _halcmd_setp('qt_kiss.ext-fid-find', 0)
 
         # ---- Write named parameters -----------------------------------------

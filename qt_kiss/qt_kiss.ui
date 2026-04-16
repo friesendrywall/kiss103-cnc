@@ -47,7 +47,7 @@
          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
         </property>
         <property name="currentIndex">
-         <number>0</number>
+         <number>1</number>
         </property>
         <property name="documentMode">
          <bool>false</bool>
@@ -76,7 +76,17 @@
             <x>0</x>
             <y>-10</y>
             <width>471</width>
-            <height>511</height>
+            <height>341</height>
+           </rect>
+          </property>
+         </widget>
+         <widget class="MachineLog" name="machinelog">
+          <property name="geometry">
+           <rect>
+            <x>0</x>
+            <y>340</y>
+            <width>461</width>
+            <height>151</height>
            </rect>
           </property>
          </widget>
@@ -1706,7 +1716,7 @@
       <item>
        <widget class="TabWidget" name="CAMERA">
         <property name="currentIndex">
-         <number>0</number>
+         <number>2</number>
         </property>
         <widget class="QWidget" name="tab_5">
          <attribute name="title">
@@ -5470,6 +5480,11 @@
    <class>DoubleScale</class>
    <extends>QDoubleSpinBox</extends>
    <header>qtvcp.widgets.simple_widgets</header>
+  </customwidget>
+  <customwidget>
+   <class>MachineLog</class>
+   <extends>QTextEdit</extends>
+   <header>qtvcp.widgets.machine_log</header>
   </customwidget>
   <customwidget>
    <class>LED</class>

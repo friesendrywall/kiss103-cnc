@@ -1,2 +1,4 @@
 __pycache__/
 *.pyc
+machine_log.dat
+halshow.preferences

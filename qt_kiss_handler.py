@@ -60,6 +60,7 @@ class HandlerClass:
         self.hal = halcomp
         self.w = widgets
         self.PATHS = paths
+        STATUS.emit('update-machine-log', "QT-Dragon started", None)
 
     ##########################################
     # Special Functions called from QTSCREEN

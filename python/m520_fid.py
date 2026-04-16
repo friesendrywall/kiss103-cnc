@@ -9,8 +9,8 @@ G-code usage:
     M520 P2    ; two-fiducial:    midpoint translation + PCB rotation
 
 Prerequisites:
-    P1: M510 N1 must have been called successfully
-    P2: M510 N1 and M510 N2 must both have been called successfully
+    P1: M510 P1 must have been called successfully
+    P2: M510 P1 and M510 P2 must both have been called successfully
 
 Named parameters written:
     #<_calc_x_offset>  — X correction to apply to WCS (G10/G92)
@@ -29,7 +29,7 @@ import sys
 import math
 
 try:
-    from interpreter import INTERP_OK, INTERP_ERROR
+    from interpreter import INTERP_OK, INTERP_EXECUTE_FINISH, INTERP_ERROR
 except ImportError:
     INTERP_OK    = 0
     INTERP_ERROR = 1

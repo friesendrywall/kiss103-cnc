@@ -552,7 +552,7 @@ GCodeGraphics {
     qproperty-Preview_feed_color: #00dd44;
     qproperty-Preview_rapid_color: #cc8800;
     qproperty-jog_color: #00ff66;
-    qproperty-Flip_display: true;
+    qproperty-Flip_display: false;
 }
 
 /** GCode Display **/

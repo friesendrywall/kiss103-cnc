@@ -471,32 +471,37 @@ QSpinBox {
 QSpinBox::down-button {
     width: 20px;
     height: 20px;
-    background: #a8a6a0;
+    background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
+        stop:0 #e8e6e0, stop:1 #c8c6c0);
     border-left: 1.5px solid #888880;
     border-top: 1px solid #888880;
 }
 
 QSpinBox::down-arrow {
-    width: 7px;
-    height: 7px;
+    image: url(/home/kiss/linuxcnc/configs/KISS103-MESA/qt_kiss/images/spinbox_arrow_down.svg);
+    width: 8px;
+    height: 8px;
 }
 
 QSpinBox::up-button {
     width: 20px;
     height: 20px;
-    background: #a8a6a0;
+    background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
+        stop:0 #e8e6e0, stop:1 #c8c6c0);
     border-left: 1.5px solid #888880;
     border-bottom: 1px solid #888880;
 }
 
 QSpinBox::up-arrow {
-    width: 7px;
-    height: 7px;
+    image: url(/home/kiss/linuxcnc/configs/KISS103-MESA/qt_kiss/images/spinbox_arrow_up.svg);
+    width: 8px;
+    height: 8px;
 }
 
 QSpinBox::down-button:hover,
 QSpinBox::up-button:hover {
-    background: #b0aea8;
+    background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
+        stop:0 #f0eeea, stop:1 #d8d6d0);
 }
 
 QSpinBox::down-button:pressed,
@@ -760,10 +765,16 @@ DoubleScale::down-button:pressed {
     background: #006622;
 }
 
-DoubleScale::up-arrow,
+DoubleScale::up-arrow {
+    image: url(/home/kiss/linuxcnc/configs/KISS103-MESA/qt_kiss/images/spinbox_arrow_up.svg);
+    width: 8px;
+    height: 8px;
+}
+
 DoubleScale::down-arrow {
-    width: 7px;
-    height: 7px;
+    image: url(/home/kiss/linuxcnc/configs/KISS103-MESA/qt_kiss/images/spinbox_arrow_down.svg);
+    width: 8px;
+    height: 8px;
 }
 
 /** File manager / list/tree views */

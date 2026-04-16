@@ -13,6 +13,7 @@ from PyQt5 import QtCore, QtWidgets
 
 from qtvcp.widgets.mdi_line import MDILine as MDI_WIDGET
 from qtvcp.widgets.gcode_editor import GcodeEditor as GCODE
+from mdi_haas import MDIHaas as MDI_HAAS
 from qtvcp.widgets.stylesheeteditor import  StyleSheetEditor as SSE
 from qtvcp.widgets.tool_offsetview import ToolOffsetView as TOOL_OFFSET
 from qtvcp.widgets.origin_offsetview import OriginOffsetView as ORIGIN_OFFSET
@@ -86,9 +87,11 @@ class HandlerClass:
             # Connect the fileChanged signal to your reload function
             self.watcher.fileChanged.connect(lambda path: self.reload_qss(path))
 
-        self.w.gcodegraphics.setBackgroundColor(QColor(245, 244, 240))  # #f5f4f0
-        self.w.gcodegraphics.setFeedColor(QColor(0, 85, 255, 255))      # #0055ff, alpha must be >0
-        self.w.gcodegraphics.setRapidColor(QColor(0, 170, 255, 255))    # #00aaff
+        # self.w.gcodegraphics.setBackgroundColor(QColor(245, 244, 240))  # #f5f4f0
+        # self.w.gcodegraphics.setFeedColor(QColor(0, 85, 255, 255))      # #0055ff, alpha must be >0
+        # self.w.gcodegraphics.setRapidColor(QColor(0, 170, 255, 255))    # #00aaff
+
+        self.w.CLEARSTATUS.clicked.connect(self.CLEARSTATUS_clicked)
 
         # External spin edit calls
         # preheater setpoint
@@ -169,6 +172,9 @@ class HandlerClass:
                 if isinstance(receiver2, GCODE):
                     flag = True
                     break
+                if isinstance(receiver2, MDI_HAAS):
+                    flag = True
+                    break
                 if isinstance(receiver2, TOOL_OFFSET):
                     flag = True
                     break
@@ -181,9 +187,7 @@ class HandlerClass:
                 receiver2 = receiver2.parent()
 
             if flag:
-                if isinstance(receiver2, GCODE):
-                    # if in manual do our keybindings - otherwise
-                    # send events to gcode widget
+                if isinstance(receiver2, (GCODE, MDI_HAAS)):
                     if is_pressed:
                         receiver.keyPressEvent(event)
                         event.accept()
@@ -248,6 +252,9 @@ class HandlerClass:
     # callbacks from form #
     #######################
 
+    # Utilities tab
+    def CLEARSTATUS_clicked(self):
+        STATUS.emit('update-machine-log', None, 'DELETE')
 
     #####################
     # general functions #

@@ -329,6 +329,62 @@ class  GCodeGraphics(Lcnc_3dGraphics, _HalWidgetBase):
             from OpenGL import GL
             GL.glScalef(1.0, -1.0, 1.0)
 
+    def make_cone(self, n):
+        from OpenGL.GL import (glNewList, glEndList, GL_COMPILE, glRotatef,
+                               glPushMatrix, glPopMatrix, glTranslatef,
+                               glBlendColor, glEnable, glDisable, GL_LIGHTING,
+                               glFrontFace, GL_CW, GL_CCW)
+        from OpenGL.GLU import gluNewQuadric, gluCylinder, gluDisk, gluDeleteQuadric
+        q = gluNewQuadric()
+        glNewList(n, GL_COMPILE)
+        glBlendColor(0, 0, 0, self.colors['tool_alpha'])
+        glEnable(GL_LIGHTING)
+        glFrontFace(GL_CW)           # rotation reverses apparent winding; compensate
+        glRotatef(180, 1, 0, 0)      # flip so cone extends downward (-Z)
+        gluCylinder(q, 0, .1, .25, 32, 1)
+        glPushMatrix()
+        glTranslatef(0, 0, .25)
+        gluDisk(q, 0, .1, 32, 1)
+        glPopMatrix()
+        glFrontFace(GL_CCW)          # restore default
+        glDisable(GL_LIGHTING)
+        glEndList()
+        gluDeleteQuadric(q)
+
+    def cache_tool(self, current_tool):
+        from OpenGL.GL import (glNewList, glEndList, GL_COMPILE, glRotatef,
+                               glPushMatrix, glPopMatrix, glTranslatef,
+                               glBlendColor, glEnable, glDisable, GL_LIGHTING,
+                               glFrontFace, GL_CW, GL_CCW)
+        from OpenGL.GLU import gluNewQuadric, gluCylinder, gluDisk, gluDeleteQuadric
+        self.cached_tool = current_tool
+        glNewList(self.dlist('tool'), GL_COMPILE)
+        if self.is_lathe() and current_tool and current_tool.orientation != 0:
+            glBlendColor(0, 0, 0, self.colors['lathetool_alpha'])
+            self.lathetool(current_tool)
+        else:
+            glBlendColor(0, 0, 0, self.colors['tool_alpha'])
+            if self.is_lathe():
+                glRotatef(90, 0, 1, 0)
+            else:
+                dia = current_tool.diameter
+                r = self.to_internal_linear_unit(dia) / 2.
+                q = gluNewQuadric()
+                glEnable(GL_LIGHTING)
+                glFrontFace(GL_CW)           # rotation reverses apparent winding; compensate
+                glRotatef(180, 1, 0, 0)      # flip so cylinder extends downward (-Z)
+                gluCylinder(q, r, r, 8*r, 32, 1)
+                glPushMatrix()
+                glRotatef(180, 1, 0, 0)
+                gluDisk(q, 0, r, 32, 1)
+                glPopMatrix()
+                glTranslatef(0, 0, 8*r)
+                gluDisk(q, 0, r, 32, 1)
+                glFrontFace(GL_CCW)          # restore default
+                glDisable(GL_LIGHTING)
+                gluDeleteQuadric(q)
+        glEndList()
+
     def emit_percent(self, f):
         super( GCodeGraphics, self).emit_percent(f)
         STATUS.emit('graphics-loading-progress',f)

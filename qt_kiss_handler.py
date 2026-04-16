@@ -73,12 +73,7 @@ class HandlerClass:
     def initialized__(self):
         KEYBIND.add_call('Key_F12', 'on_keycall_F12')
         self._last_tool = None
-        self._run_from_line = 0
         STATUS.connect('periodic', self.on_tool_changed)
-        STATUS.connect('file-loaded', self.on_file_loaded)
-        STATUS.connect('interp-idle', self.on_interp_idle)
-        self.w.gcodeeditor.lineSelected.connect(self.on_gcode_line_selected)
-        self.w.actionbutton_4.clicked.connect(self._reset_run_from_line)
         self.w.SETTINGS.currentChanged.connect(self.tab_changed)
         self.w.GCODE.currentChanged.connect(self.gcode_tab_changed)
         offsets = ['G54','G55','G56','G57','G58','G59','G59.1','G59.2','G59.3']
@@ -97,7 +92,6 @@ class HandlerClass:
         # self.w.gcodegraphics.setRapidColor(QColor(0, 170, 255, 255))    # #00aaff
 
         self.w.CLEARSTATUS.clicked.connect(self.CLEARSTATUS_clicked)
-        self.w.CYCLESTART.clicked.connect(self.CYCLESTART_clicked)
 
         # External spin edit calls
         # preheater setpoint
@@ -257,27 +251,6 @@ class HandlerClass:
     #######################
     # callbacks from form #
     #######################
-
-    def on_gcode_line_selected(self, line):
-        self._run_from_line = line
-        LOG.debug('Run-from-line set to {}'.format(line))
-
-    def on_file_loaded(self, w, filename):
-        self._reset_run_from_line()
-
-    def on_interp_idle(self, widget):
-        if self._run_from_line > 0:
-            self._reset_run_from_line()
-
-    def _reset_run_from_line(self):
-        self._run_from_line = 0
-        self.w.gcodeeditor.clear_selected_line()
-
-    def CYCLESTART_clicked(self):
-        if STATUS.stat.paused:
-            ACTION.PAUSE()
-        elif not STATUS.is_auto_running():
-            ACTION.RUN(self._run_from_line)
 
     # Utilities tab
     def CLEARSTATUS_clicked(self):

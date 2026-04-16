@@ -92,6 +92,21 @@ QLabel {
     color: #1a1a1a;
 }
 
+QLabel#motion_on,
+QLabel#low_air,
+QLabel#low_solder,
+QLabel#low_flux,
+QLabel#pump_on,
+QLabel#slide_in,
+QLabel#slide_out,
+QLabel#wave_det,
+QLabel#service_key {
+    font: 6pt "Lato Heavy";
+}
+QLabel#lift_down {
+    font: 6pt "Lato Heavy";
+}
+
 DROLabel,
 QLabel#label_axis_x,
 QLabel#label_axis_y,

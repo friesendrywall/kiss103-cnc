@@ -1653,7 +1653,7 @@
      </layout>
     </item>
     <item>
-     <layout class="QHBoxLayout" name="layout_bottom" stretch="1,3,0,5,5,3,3,3">
+     <layout class="QHBoxLayout" name="layout_bottom" stretch="1,2,3,5,5,3,3,3">
       <property name="leftMargin">
        <number>2</number>
       </property>
@@ -1675,7 +1675,12 @@
          <item row="0" column="0">
           <layout class="QGridLayout" name="gridLayout_4">
            <item row="0" column="0">
-            <widget class="QLabel" name="ind_motion_on">
+            <widget class="QLabel" name="motion_on">
+             <property name="font">
+              <font>
+               <pointsize>6</pointsize>
+              </font>
+             </property>
              <property name="text">
               <string>MOTION-PWR</string>
              </property>
@@ -1685,10 +1690,15 @@
             </widget>
            </item>
            <item row="0" column="1">
-            <widget class="LED" name="led_4"/>
+            <widget class="LED" name="ind_motion_on"/>
            </item>
            <item row="1" column="0">
-            <widget class="QLabel" name="label_32">
+            <widget class="QLabel" name="low_air">
+             <property name="font">
+              <font>
+               <pointsize>6</pointsize>
+              </font>
+             </property>
              <property name="text">
               <string>LOW-AIR</string>
              </property>
@@ -1701,7 +1711,12 @@
             <widget class="LED" name="ind_low_air"/>
            </item>
            <item row="2" column="0">
-            <widget class="QLabel" name="label_36">
+            <widget class="QLabel" name="low_solder">
+             <property name="font">
+              <font>
+               <pointsize>6</pointsize>
+              </font>
+             </property>
              <property name="text">
               <string>LOW-SOLDER</string>
              </property>
@@ -1714,7 +1729,12 @@
             <widget class="LED" name="ind_low_solder"/>
            </item>
            <item row="3" column="0">
-            <widget class="QLabel" name="label_37">
+            <widget class="QLabel" name="low_flux">
+             <property name="font">
+              <font>
+               <pointsize>6</pointsize>
+              </font>
+             </property>
              <property name="text">
               <string>LOW-FLUX</string>
              </property>
@@ -1727,7 +1747,12 @@
             <widget class="LED" name="ind_low_flux"/>
            </item>
            <item row="4" column="0">
-            <widget class="QLabel" name="label_38">
+            <widget class="QLabel" name="pump_on">
+             <property name="font">
+              <font>
+               <pointsize>6</pointsize>
+              </font>
+             </property>
              <property name="text">
               <string>PUMP-ON</string>
              </property>
@@ -1739,21 +1764,16 @@
            <item row="4" column="1">
             <widget class="LED" name="ind_pump_on"/>
            </item>
-           <item row="5" column="0">
-            <widget class="QLabel" name="label_33">
-             <property name="text">
-              <string>LIFT DOWN</string>
-             </property>
-             <property name="alignment">
-              <set>Qt::AlignCenter</set>
-             </property>
-            </widget>
-           </item>
            <item row="5" column="1">
             <widget class="LED" name="ind_lift_down"/>
            </item>
            <item row="6" column="0">
-            <widget class="QLabel" name="label_35">
+            <widget class="QLabel" name="slide_in">
+             <property name="font">
+              <font>
+               <pointsize>6</pointsize>
+              </font>
+             </property>
              <property name="text">
               <string>SLIDE-IN</string>
              </property>
@@ -1766,7 +1786,12 @@
             <widget class="LED" name="ind_slide_in"/>
            </item>
            <item row="7" column="0">
-            <widget class="QLabel" name="label_34">
+            <widget class="QLabel" name="slide_out">
+             <property name="font">
+              <font>
+               <pointsize>6</pointsize>
+              </font>
+             </property>
              <property name="text">
               <string>SLIDE-OUT</string>
              </property>
@@ -1793,7 +1818,12 @@
             </widget>
            </item>
            <item row="8" column="0">
-            <widget class="QLabel" name="label_31">
+            <widget class="QLabel" name="wave_det">
+             <property name="font">
+              <font>
+               <pointsize>6</pointsize>
+              </font>
+             </property>
              <property name="text">
               <string>WAVE-DET</string>
              </property>
@@ -1805,8 +1835,16 @@
            <item row="8" column="1">
             <widget class="LED" name="ind_wave_height"/>
            </item>
-           <item row="9" column="0">
-            <widget class="QLabel" name="ind_service_key">
+           <item row="9" column="1">
+            <widget class="LED" name="ind_service_key"/>
+           </item>
+           <item row="9" column="0" alignment="Qt::AlignHCenter">
+            <widget class="QLabel" name="service_key">
+             <property name="font">
+              <font>
+               <pointsize>6</pointsize>
+              </font>
+             </property>
              <property name="text">
               <string>SERVICE-KEY</string>
              </property>
@@ -1815,8 +1853,23 @@
              </property>
             </widget>
            </item>
-           <item row="9" column="1">
-            <widget class="LED" name="led_5"/>
+           <item row="5" column="0">
+            <widget class="QLabel" name="lift_down">
+             <property name="font">
+              <font>
+               <pointsize>6</pointsize>
+              </font>
+             </property>
+             <property name="text">
+              <string>LIFT-DOWN</string>
+             </property>
+             <property name="alignment">
+              <set>Qt::AlignCenter</set>
+             </property>
+             <property name="margin">
+              <number>0</number>
+             </property>
+            </widget>
            </item>
           </layout>
          </item>

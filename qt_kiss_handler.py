@@ -74,6 +74,8 @@ class HandlerClass:
         KEYBIND.add_call('Key_F12', 'on_keycall_F12')
         self._last_tool = None
         STATUS.connect('periodic', self.on_tool_changed)
+        STATUS.connect('state-estop', lambda w: self._set_estop_style(True))
+        STATUS.connect('state-estop-reset', lambda w: self._set_estop_style(False))
         self.w.SETTINGS.currentChanged.connect(self.tab_changed)
         self.w.GCODE.currentChanged.connect(self.gcode_tab_changed)
         offsets = ['G54','G55','G56','G57','G58','G59','G59.1','G59.2','G59.3']
@@ -251,6 +253,11 @@ class HandlerClass:
     #######################
     # callbacks from form #
     #######################
+
+    def _set_estop_style(self, active):
+        self.w.actionbutton_5.setProperty('isEstopped', active)
+        self.w.actionbutton_5.style().unpolish(self.w.actionbutton_5)
+        self.w.actionbutton_5.style().polish(self.w.actionbutton_5)
 
     # Utilities tab
     def CLEARSTATUS_clicked(self):

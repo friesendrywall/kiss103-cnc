@@ -1562,7 +1562,7 @@
       <item>
        <widget class="TabWidget" name="CAMERA">
         <property name="currentIndex">
-         <number>1</number>
+         <number>0</number>
         </property>
         <widget class="QWidget" name="tab_5">
          <attribute name="title">
@@ -1598,7 +1598,7 @@
              <cursorShape>ArrowCursor</cursorShape>
             </property>
             <property name="camera_number" stdset="0">
-             <number>2</number>
+             <number>1</number>
             </property>
             <property name="aspect_ratio_width" stdset="0">
              <number>4</number>
@@ -1627,7 +1627,7 @@
           <item>
            <widget class="CamView" name="camview_3">
             <property name="camera_number" stdset="0">
-             <number>3</number>
+             <number>2</number>
             </property>
             <property name="aspect_ratio_width" stdset="0">
              <number>4</number>
@@ -2286,6 +2286,12 @@
              <width>140</width>
              <height>100</height>
             </size>
+           </property>
+           <property name="font">
+            <font>
+             <family>DejaVu Sans</family>
+             <pointsize>18</pointsize>
+            </font>
            </property>
            <property name="text">
             <string>ESTOP</string>

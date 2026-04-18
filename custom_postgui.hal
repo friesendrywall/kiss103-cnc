@@ -53,3 +53,7 @@ net fid-find qt_kiss.fid_find => qt_kiss.camfidview.fid_read
 net fid-found qt_kiss.camfidview.fid_found => qt_kiss.fid_found
 net fid-offset-x qt_kiss.camfidview.offset_x => qt_kiss.fid_offset_x
 net fid-offset-y qt_kiss.camfidview.offset_y => qt_kiss.fid_offset_y
+
+net home-x qt_kiss.ind_limit_x
+net home-y qt_kiss.ind_limit_y
+net max-home-z qt_kiss.ind_limit_z

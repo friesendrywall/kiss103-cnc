@@ -128,7 +128,6 @@ class GcodeLexer(QsciLexerCustom):
 class EditorBase(QsciScintilla):
     CURRENT_MARKER_NUM = 0
     USER_MARKER_NUM = 1
-    SELECTED_LINE_NUM = 2
 
     _styleFont = {
         0: QFont("Courier", 11),
@@ -149,7 +148,6 @@ class EditorBase(QsciScintilla):
     _styleBackgroundColor = QColor("#c0c0c0")
     _styleMarginsBackgroundColor = QColor("#cccccc")
     _styleMarkerBackgroundColor = QColor("#a5a526")
-    _styleSelectedLineColor = QColor("#1a5276")
     _styleSelectionBackgroundColor = QColor("#001111")
     _styleSelectionForegroundColor = QColor("#ffffff")
     _styleSyntaxHighlightEnabled = True
@@ -175,10 +173,6 @@ class EditorBase(QsciScintilla):
         self.userHandle = self.markerDefine(QsciScintilla.Background,
                           self.USER_MARKER_NUM)
         self.setMarkerBackgroundColor(QColor("#ffc0c0"), self.USER_MARKER_NUM)
-        self.selectedHandle = self.markerDefine(QsciScintilla.Background,
-                          self.SELECTED_LINE_NUM)
-        self.setMarkerBackgroundColor(self._styleSelectedLineColor, self.SELECTED_LINE_NUM)
-        self._selectedLine = -1
         self.setBraceMatching(QsciScintilla.SloppyBraceMatch)
         self.setCaretLineVisible(False)
         self.SendScintilla(QsciScintilla.SCI_GETCARETLINEVISIBLEALWAYS, True)
@@ -400,13 +394,6 @@ class EditorBase(QsciScintilla):
         self.setMarkerBackgroundColor(value, self.CURRENT_MARKER_NUM)
     styleColorMarkerBackground = pyqtProperty(QColor, getColorMarkerBackground, setColorMarkerBackground)
 
-    def getColorSelectedLine(self):
-        return self._styleSelectedLineColor
-    def setColorSelectedLine(self, value):
-        self._styleSelectedLineColor = value
-        self.setMarkerBackgroundColor(value, self.SELECTED_LINE_NUM)
-    styleColorSelectedLine = pyqtProperty(QColor, getColorSelectedLine, setColorSelectedLine)
-
     def setDefaultFont(self, value):
         self._styleFont[0] = value
         self.setFont(value)
@@ -506,7 +493,6 @@ class EditorBase(QsciScintilla):
 class GcodeDisplay(EditorBase, _HalWidgetBase):
     CURRENT_MARKER_NUM = 0
     USER_MARKER_NUM = 1
-    lineSelected = pyqtSignal(int)
 
     def __init__(self, parent=None):
         super(GcodeDisplay, self).__init__(parent)
@@ -636,26 +622,6 @@ class GcodeDisplay(EditorBase, _HalWidgetBase):
         self.setCursorPosition(line+1, 0)
         self.highlight_line(None, line+1)
 
-    def mousePressEvent(self, event):
-        super().mousePressEvent(event)
-        line = self.lineAt(event.pos())
-        if line >= 0:
-            self._set_selected_line(line)
-
-    def _set_selected_line(self, line):
-        self.markerDeleteHandle(self.selectedHandle)
-        self.selectedHandle = self.markerAdd(line, self.SELECTED_LINE_NUM)
-        self._selectedLine = line
-        self.lineSelected.emit(line + 1)
-
-    def get_selected_line(self):
-        return self._selectedLine + 1 if self._selectedLine >= 0 else -1
-
-    def clear_selected_line(self):
-        self.markerDeleteHandle(self.selectedHandle)
-        self.selectedHandle = self.markerDefine(QsciScintilla.Background, self.SELECTED_LINE_NUM)
-        self._selectedLine = -1
-
     def jump_line(self, jump):
         line, col = self.getCursorPosition()
         line = line + jump
@@ -692,7 +658,6 @@ class GcodeDisplay(EditorBase, _HalWidgetBase):
 
 class GcodeEditor2(QWidget, _HalWidgetBase):
     percentDone = pyqtSignal(int)
-    lineSelected = pyqtSignal(int)
 
     def __init__(self, parent=None):
         super(GcodeEditor2, self).__init__(parent)
@@ -711,7 +676,6 @@ class GcodeEditor2(QWidget, _HalWidgetBase):
 
         # make editor
         self.editor = GcodeDisplay(self)
-        self.editor.lineSelected.connect(self.lineSelected)
 
         # class patch editor's function to ours
         self.editor.emit_percent = self.emit_percent
@@ -955,12 +919,6 @@ class GcodeEditor2(QWidget, _HalWidgetBase):
 
     def get_line(self):
         return self.editor.getCursorPosition()[0] +1
-
-    def get_selected_line(self):
-        return self.editor.get_selected_line()
-
-    def clear_selected_line(self):
-        self.editor.clear_selected_line()
 
     def set_margin_metric(self,width):
         self.editor.set_margin_metric(width)

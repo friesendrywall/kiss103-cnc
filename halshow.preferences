@@ -1,28 +1,19 @@
 # Halshow settings
 # This file is generated automatically.
-wm geometry . 1309x867+2051+54
+wm geometry . 1309x867+155+38
 placeFrames 0.3
 set ::ratio 0.3
 set ::old_w_leftf 160
 set ::watchlist {
-    pin+qt_kiss.camfidview.fid_error
-    pin+qt_kiss.camfidview.fid_found
-    pin+qt_kiss.camfidview.fid_read
-    pin+qt_kiss.camfidview.fid_search
-    pin+qt_kiss.camfidview.fid_show
-    pin+qt_kiss.camfidview.fid_size
-    pin+qt_kiss.camfidview.fid_square
-    pin+qt_kiss.camfidview.fid_tol
-    pin+qt_kiss.camfidview.offset_x
-    pin+qt_kiss.camfidview.offset_y
-    pin+qt_kiss.camfidview.pix_per_inch
-    pin+qt_kiss.camfidview.pix_per_inch_y
-    pin+qt_kiss.camfidview.search_done
-    pin+qt_kiss.ext-fid-area
-    pin+qt_kiss.ext-fid-find
-    pin+qt_kiss.ext-fid-is-square
-    pin+qt_kiss.ext-fid-size
-    pin+qt_kiss.ext-fid-tolerance
+    pin+qt_kiss.ind_limit_x
+    pin+qt_kiss.ind_limit_y
+    pin+qt_kiss.ind_limit_z
+    sig+home-x
+    sig+home-y
+    pin+joint.1.home-sw-in
+    pin+hm2_7i76e.0.7i76.0.0.output-13
+    param+hm2_7i76e.0.7i76.0.0.output_sink
+    param+hm2_7i76e.0.7i76.0.0.output_source
 }
 set ::workmode watchhal
 set ::watchInterval 100

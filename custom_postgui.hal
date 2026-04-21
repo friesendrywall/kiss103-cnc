@@ -54,6 +54,13 @@ net fid-found qt_kiss.camfidview.fid_found => qt_kiss.fid_found
 net fid-offset-x qt_kiss.camfidview.offset_x => qt_kiss.fid_offset_x
 net fid-offset-y qt_kiss.camfidview.offset_y => qt_kiss.fid_offset_y
 
+net feed-inches-per-minute => qt_kiss.feed_rate
+
 net home-x qt_kiss.ind_limit_x
 net home-y qt_kiss.ind_limit_y
 net max-home-z qt_kiss.ind_limit_z
+
+setp qt_kiss.ext-fid-is-square 0
+setp qt_kiss.ext-fid-size 0.05
+setp qt_kiss.ext-fid-area 0.25
+setp qt_kiss.ext-fid-tolerance 15

@@ -1,0 +1,23 @@
+G54;
+M500;
+T1M6;
+G43;
+G0Z-0.5;
+G0X0Y0;
+G1Z0.F20.;
+G04P1.0;
+G1X0.15Y1.45F100.;
+G04P0.25;
+M510Q1D0.05E15P0.25;(Find Fid 1)
+G04P1.0;
+G1X7.85Y5.2;
+G04P0.25;
+M510Q2D0.05E15P0.25;(Find Fid 2)
+G04P1.0;
+M520P2; (Calculate fid)
+(DEBUG, PCB rotation = #<_pcb_rotation> degrees)
+(DEBUG, X correction = #<_calc_x_offset>  Y correction = #<_calc_y_offset>)
+
+G10 L2 P0 X[#<_calc_x_offset>] Y[#<_calc_y_offset>] R[#<_pcb_rotation>]
+M30;
+%

@@ -344,7 +344,7 @@ class CamFidView(QtWidgets.QWidget, _HalWidgetBase):
             ref_cx = float(pts[:, 0].mean()) + sx
             ref_cy = float(pts[:, 1].mean()) + sy
             if (ref_cx - cx_b) ** 2 + (ref_cy - cy_b) ** 2 <= found_r ** 2:
-                return True, int(x1 + ref_cx), int(y1 + ref_cy), int(found_r)
+                return True, round(x1 + ref_cx), round(y1 + ref_cy), int(found_r)
 
         return True, int(x1 + cx_b), int(y1 + cy_b), int(found_r)
 

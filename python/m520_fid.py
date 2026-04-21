@@ -53,19 +53,31 @@ def m520_fid(self, **words):
 
         # ---- Read previously stored fiducial named parameters ---------------
         try:
-            fid1_found = float(self.params.get('_fid1_found', 0.0))
-        except Exception:
+            fid1_found = float(self.params['_fid1_found'])
+        except (KeyError, TypeError, ValueError):
             fid1_found = 0.0
 
         if fid1_found != 1.0:
-            sys.stderr.write("M520 ERROR: Fiducial 1 has not been detected (run M510 N1 first).\n")
+            sys.stderr.write("M520 ERROR: Fiducial 1 has not been detected (run M510 Q1 first).\n")
             self.params['_fid_fail'] = 1.0
             return INTERP_ERROR
 
-        fid1_x        = float(self.params.get('_fid1_x',        0.0))
-        fid1_y        = float(self.params.get('_fid1_y',        0.0))
-        fid1_x_offset = float(self.params.get('_fid1_x_offset', 0.0))
-        fid1_y_offset = float(self.params.get('_fid1_y_offset', 0.0))
+        try:
+            fid1_x = float(self.params['_fid1_x'])
+        except (KeyError, TypeError, ValueError):
+            fid1_x = 0.0
+        try:
+            fid1_y = float(self.params['_fid1_y'])
+        except (KeyError, TypeError, ValueError):
+            fid1_y = 0.0
+        try:
+            fid1_x_offset = float(self.params['_fid1_x_offset'])
+        except (KeyError, TypeError, ValueError):
+            fid1_x_offset = 0.0
+        try:
+            fid1_y_offset = float(self.params['_fid1_y_offset'])
+        except (KeyError, TypeError, ValueError):
+            fid1_y_offset = 0.0
 
         # ---- P1: single fiducial, translation only --------------------------
         if mode == 1:
@@ -83,8 +95,8 @@ def m520_fid(self, **words):
 
         # ---- P2: two fiducials, rotation + shifted translation ---------------
         try:
-            fid2_found = float(self.params.get('_fid2_found', 0.0))
-        except Exception:
+            fid2_found = float(self.params['_fid2_found'])
+        except (KeyError, TypeError, ValueError):
             fid2_found = 0.0
 
         if fid2_found != 1.0:
@@ -92,10 +104,22 @@ def m520_fid(self, **words):
             self.params['_fid_fail'] = 1.0
             return INTERP_ERROR
 
-        fid2_x        = float(self.params.get('_fid2_x',        0.0))
-        fid2_y        = float(self.params.get('_fid2_y',        0.0))
-        fid2_x_offset = float(self.params.get('_fid2_x_offset', 0.0))
-        fid2_y_offset = float(self.params.get('_fid2_y_offset', 0.0))
+        try:
+            fid2_x = float(self.params['_fid2_x'])
+        except (KeyError, TypeError, ValueError):
+            fid2_x = 0.0
+        try:
+            fid2_y = float(self.params['_fid2_y'])
+        except (KeyError, TypeError, ValueError):
+            fid2_y = 0.0
+        try:
+            fid2_x_offset = float(self.params['_fid2_x_offset'])
+        except (KeyError, TypeError, ValueError):
+            fid2_x_offset = 0.0
+        try:
+            fid2_y_offset = float(self.params['_fid2_y_offset'])
+        except (KeyError, TypeError, ValueError):
+            fid2_y_offset = 0.0
 
         # Nominal positions (where machine was pointed for each fiducial)
         nom1_x, nom1_y = fid1_x, fid1_y
@@ -124,7 +148,14 @@ def m520_fid(self, **words):
         act_angle = math.atan2(act_dy, act_dx)
 
         # Step 3: rotation angle (positive = CCW)
+        _MAX_ROTATION_DEG = 5.0
         rotation_deg = math.degrees(act_angle - nom_angle)
+        if abs(rotation_deg) > _MAX_ROTATION_DEG:
+            sys.stderr.write("M520 ERROR: Computed rotation {:.3f}deg exceeds limit of "
+                             "+/-{}deg — check fiducial positions.\n".format(
+                                 rotation_deg, _MAX_ROTATION_DEG))
+            self.params['_fid_fail'] = 1.0
+            return INTERP_ERROR
         theta = math.radians(rotation_deg)
 
         # Step 4: shifted offset — G10 L2 R rotates around WCS (0,0), so

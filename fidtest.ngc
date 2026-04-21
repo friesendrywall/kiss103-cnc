@@ -1,4 +1,6 @@
 G54;
+G52 X0 Y0;
+G10 L2 P0 R0
 M500;
 T1M6;
 G43;
@@ -10,14 +12,20 @@ G1X0.15Y1.45F100.;
 G04P0.25;
 M510Q1D0.05E15P0.25;(Find Fid 1)
 G04P1.0;
-G1X7.85Y5.2;
+G0X7.85Y5.2;
 G04P0.25;
 M510Q2D0.05E15P0.25;(Find Fid 2)
 G04P1.0;
+(PRINT, f1 = #<_fid1_found> #<_fid_fail> f1)
 M520P2; (Calculate fid)
-(DEBUG, PCB rotation = #<_pcb_rotation> degrees)
-(DEBUG, X correction = #<_calc_x_offset>  Y correction = #<_calc_y_offset>)
+(PRINT, PCB rotation = #<_pcb_rotation> degrees)
+(PRINT, X correction = #<_calc_x_offset>  Y correction = #<_calc_y_offset>)
 
-G10 L2 P0 X[#<_calc_x_offset>] Y[#<_calc_y_offset>] R[#<_pcb_rotation>]
+G10 L2 P0 R[#<_pcb_rotation>]
+G52 X[#<_calc_x_offset>] Y[#<_calc_y_offset>]
+(Visualize)
+G0X7.85Y5.2;
+G04P2.0;
+G0X0.15Y1.45;
 M30;
 %

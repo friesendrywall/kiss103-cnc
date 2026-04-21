@@ -19,15 +19,23 @@ setp kiss-heater.0.iMin -10
 setp kiss-heater.0.iMax 10
 setp kiss-heater.0.temp-allowance 3.0
 
-net heater-ena   kiss-heater.0.ssr-ena   
-net heater-out-1 kiss-heater.0.ssr-out-01
-net heater-out-2 kiss-heater.0.ssr-out-02
-net heater-out-3 kiss-heater.0.ssr-out-03
-net heater-out-4 kiss-heater.0.ssr-out-04
-net heater-out-5 kiss-heater.0.ssr-out-05
-net heater-out-6 kiss-heater.0.ssr-out-06
+# link to hardware pins
+# outputs
+net heater-ena   <= kiss-heater.0.ssr-ena   
+net heater-out-1 <= kiss-heater.0.ssr-out-01
+net heater-out-2 <= kiss-heater.0.ssr-out-02
+net heater-out-3 <= kiss-heater.0.ssr-out-03
+net heater-out-4 <= kiss-heater.0.ssr-out-04
+net heater-out-5 <= kiss-heater.0.ssr-out-05
+net heater-out-6 <= kiss-heater.0.ssr-out-06
+# inputs
+net in-lift-down      => kiss-heat-slide.0.lift-down-sensor
+net in-ph-retracted   => kiss-heat-slide.0.retracted-sensor
+net in-ph-extended    => kiss-heat-slide.0.in-position-sensor
+net out-ph-slide      => kiss-heat-slide.0.slide-out
+net out-ph-lift       => kiss-heat-slide.0.lift-up-out
 
-net slide-in-position kiss-heater.0.slide-in-position hm2_7i76e.0.7i76.0.0.input-16
+net slide-in-position kiss-heat-slide.0.slide-in-position kiss-heater.0.slide-in-position
 
 net heater-enable or2.htr.out kiss-heat-slide.0.enable kiss-heater.0.enable
 

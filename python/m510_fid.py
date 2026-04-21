@@ -113,9 +113,6 @@ def m510_fid(self, **words):
         fid_tol    = float(e_word)
         prefix     = '_fid{}_'.format(fid_num)
 
-        # ---- Store WCS position before any processing -----------------------
-        wcs_x, wcs_y = _get_wcs_position()
-
         # ---- Configure widget via handler HAL_IN pins -----------------------
         # These flow through UI widgets via HAL nets to camfidview HAL_IN pins.
         # Direct setp of camfidview pins is blocked once nets are connected.
@@ -123,7 +120,15 @@ def m510_fid(self, **words):
         _halcmd_setp('qt_kiss.ext-fid-size',      fid_size)
         _halcmd_setp('qt_kiss.ext-fid-area',      fid_search)
         _halcmd_setp('qt_kiss.ext-fid-tolerance', fid_tol)
+
+        # Flush motion queue before reading position: the interpreter starts this
+        # generator during read-ahead, before the preceding G0/G1 move has landed.
+        # Yielding here guarantees the machine has physically arrived.
         yield INTERP_EXECUTE_FINISH
+
+        # ---- Store WCS position AFTER motions complete ----------------------
+        wcs_x, wcs_y = _get_wcs_position()
+
         time.sleep(_PARAM_SETTLE)
         _halcmd_setp('qt_kiss.ext-fid-find', 1)
         # Allow GUI to propagate settings through widget nets to camfidview

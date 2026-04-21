@@ -55,6 +55,11 @@ net fid-offset-x qt_kiss.camfidview.offset_x => qt_kiss.fid_offset_x
 net fid-offset-y qt_kiss.camfidview.offset_y => qt_kiss.fid_offset_y
 
 net feed-inches-per-minute => qt_kiss.feed_rate
+loadrt mult2 names=ipm
+# mult2.ipm = servo-thread
+# setp mult2.ipm.in0 60
+# net mult2.ipm.in1 <= motion.current-vel
+# net feed-inches-per-minute mult2.ipm.out
 
 net home-x qt_kiss.ind_limit_x
 net home-y qt_kiss.ind_limit_y

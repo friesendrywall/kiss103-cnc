@@ -77,6 +77,9 @@ class CamFidView(QtWidgets.QWidget, _HalWidgetBase):
         # Crosshair and circle visibility
         self._showCrosshair = True
         self._showCircle = True
+        # Mirror/flip
+        self._mirrorH = False
+        self._mirrorV = False
         # Crosshair appearance
         self._crossGap = 5
         self._crossLineWidth = 1
@@ -181,6 +184,14 @@ class CamFidView(QtWidgets.QWidget, _HalWidgetBase):
 
         # set digital zoom
         frame = self.zoom(frame, self.scale)
+
+        # apply mirror/flip
+        if self._mirrorH and self._mirrorV:
+            frame = CV.flip(frame, -1)
+        elif self._mirrorH:
+            frame = CV.flip(frame, 1)
+        elif self._mirrorV:
+            frame = CV.flip(frame, 0)
 
         # record frame dimensions for overlay mapping
         self._frame_shape = frame.shape[:2]   # (h, w)
@@ -313,7 +324,29 @@ class CamFidView(QtWidgets.QWidget, _HalWidgetBase):
         if abs(found_r - r) > r * band:
             return False, 0, 0, 0
 
-        return True, int(x1 + best[0]), int(y1 + best[1]), int(found_r)
+        # Refine center: HoughCircles accumulator can fit a larger circle tangent to the
+        # actual circle, shifting the center by (r_found - r_actual).  Re-derive the
+        # center as the mean of Canny edge points, which is unaffected by that bias.
+        cx_b, cy_b = int(best[0]), int(best[1])
+        margin = int(found_r * 0.3) + 2
+        sx = max(0, cx_b - int(found_r) - margin)
+        sy = max(0, cy_b - int(found_r) - margin)
+        ex = min(roi.shape[1], cx_b + int(found_r) + margin)
+        ey = min(roi.shape[0], cy_b + int(found_r) + margin)
+        sub = gray[sy:ey, sx:ex]
+        edges = CV.Canny(sub, 50, 150)
+        contours, _ = CV.findContours(edges, CV.RETR_EXTERNAL, CV.CHAIN_APPROX_NONE)
+        if contours:
+            expected_perim = 2.0 * np.pi * r
+            best_cnt = min(contours,
+                           key=lambda c: abs(CV.arcLength(c, True) - expected_perim))
+            pts = best_cnt[:, 0, :]
+            ref_cx = float(pts[:, 0].mean()) + sx
+            ref_cy = float(pts[:, 1].mean()) + sy
+            if (ref_cx - cx_b) ** 2 + (ref_cy - cy_b) ** 2 <= found_r ** 2:
+                return True, int(x1 + ref_cx), int(y1 + ref_cy), int(found_r)
+
+        return True, int(x1 + cx_b), int(y1 + cy_b), int(found_r)
 
     def _detect_square(self, roi, fid_size_px, tol, x1, y1):
         gray    = CV.cvtColor(roi, CV.COLOR_BGR2GRAY)
@@ -743,6 +776,22 @@ class CamFidView(QtWidgets.QWidget, _HalWidgetBase):
     def reset_cross_line_width(self):
         self._crossLineWidth = 1
 
+    def set_mirror_h(self, value):
+        self._mirrorH = value
+        self.update()
+    def get_mirror_h(self):
+        return self._mirrorH
+    def reset_mirror_h(self):
+        self._mirrorH = False
+
+    def set_mirror_v(self, value):
+        self._mirrorV = value
+        self.update()
+    def get_mirror_v(self):
+        return self._mirrorV
+    def reset_mirror_v(self):
+        self._mirrorV = False
+
     # designer will show these properties in this order:
     camera_number       = QtCore.pyqtProperty(int,  get_camnum,           set_camnum,           reset_camnum)
     capture_width       = QtCore.pyqtProperty(int,  get_capture_w,        set_capture_w,        reset_capture_w)
@@ -753,6 +802,8 @@ class CamFidView(QtWidgets.QWidget, _HalWidgetBase):
     show_circle         = QtCore.pyqtProperty(bool, get_show_circle,      set_show_circle,      reset_show_circle)
     cross_gap           = QtCore.pyqtProperty(int,  get_cross_gap,        set_cross_gap,        reset_cross_gap)
     cross_line_width    = QtCore.pyqtProperty(int,  get_cross_line_width, set_cross_line_width, reset_cross_line_width)
+    mirror_horizontal   = QtCore.pyqtProperty(bool, get_mirror_h,         set_mirror_h,         reset_mirror_h)
+    mirror_vertical     = QtCore.pyqtProperty(bool, get_mirror_v,         set_mirror_v,         reset_mirror_v)
 
 
 class WebcamVideoStream:

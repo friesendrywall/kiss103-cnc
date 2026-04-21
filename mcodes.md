@@ -6,41 +6,6 @@ defined in `python/`.
 
 ---
 
-## M110 — Single-Shot Fiducial Centering
-
-Move the camera over a fiducial, then call M110 to detect its offset from
-frame center. Results are written as named parameters for use in G-code.
-
-```gcode
-M110 P<diameter_in>
-```
-
-| Word | Description |
-|---|---|
-| `P` | Expected fiducial diameter in inches |
-
-**Parameters written:**
-
-| Parameter | Description |
-|---|---|
-| `#<_vision_x_offset>` | X offset to fiducial center, inches (+right) |
-| `#<_vision_y_offset>` | Y offset to fiducial center, inches (+up) |
-| `#<_vision_found>` | `1.0` if detected |
-| `#<_vision_confidence>` | Detection confidence 0.0–1.0 |
-| `#<_vision_radius_px>` | Detected radius in pixels (debug) |
-
-**Example:**
-```gcode
-M110 P0.039
-O100 if [#<_vision_found> EQ 1.0]
-    G0 X[#<_vision_x_offset>] Y[#<_vision_y_offset>]
-O100 endif
-```
-
-See `m_codes/M110_README.md` for calibration instructions and tuning.
-
----
-
 ## M150 — Preheater Setpoint
 
 ```gcode

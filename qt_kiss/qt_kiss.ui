@@ -1583,6 +1583,9 @@
             <property name="cross_gap" stdset="0">
              <number>5</number>
             </property>
+            <property name="mirror_vertical" stdset="0">
+             <bool>true</bool>
+            </property>
            </widget>
           </item>
          </layout>

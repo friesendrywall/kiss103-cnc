@@ -40,17 +40,48 @@ setp   hm2_7i76e.0.stepgen.04.velocity-cmd    10000
 
 net x-enable => hm2_7i76e.0.stepgen.04.enable
 
-# external input signals
+# 7i76EU
+# outputs
+net out-dropjet        => hm2_7i76e.0.7i76.0.0.output-00
+net out-flux           => hm2_7i76e.0.7i76.0.0.output-01
+net out-flux-lift      => hm2_7i76e.0.7i76.0.0.output-02
+net out-ph-slide       => hm2_7i76e.0.7i76.0.0.output-03
+net out-ph-lift        => hm2_7i76e.0.7i76.0.0.output-04
+net out-n2-enable      => hm2_7i76e.0.7i76.0.0.output-07
+net camera-light-inner => hm2_7i76e.0.7i76.0.0.output-11
+net camera-light-outer => hm2_7i76e.0.7i76.0.0.output-12
+net camera-cover       => hm2_7i76e.0.7i76.0.0.output-13
 
+# inputs
+net home-x            <= hm2_7i76e.0.7i76.0.0.input-00
+net home-y            <= hm2_7i76e.0.7i76.0.0.input-01
+net home-z            <= hm2_7i76e.0.7i76.0.0.input-02-not
+net limit-up-z        <= hm2_7i76e.0.7i76.0.0.input-03-not
+net in-solder-at-temp <= hm2_7i76e.0.7i76.0.0.input-04
+net in-solder-low     <= hm2_7i76e.0.7i76.0.0.input-05
+net in-motion-sw-on   <= hm2_7i76e.0.7i76.0.0.input-06
+net in-cycle-start    <= hm2_7i76e.0.7i76.0.0.input-07
+net in-flux-low       <= hm2_7i76e.0.7i76.0.0.input-08
+net in-service-sw     <= hm2_7i76e.0.7i76.0.0.input-09
+net in-solder-pump-on <= hm2_7i76e.0.7i76.0.0.input-10
+net in-n2-pressure    <= hm2_7i76e.0.7i76.0.0.input-11
+net in-hood-open      <= hm2_7i76e.0.7i76.0.0.input-12
+net in-wave-height    <= hm2_7i76e.0.7i76.0.0.input-13
+net in-air-pressure   <= hm2_7i76e.0.7i76.0.0.input-14
+net in-solder-pot-on  <= hm2_7i76e.0.7i76.0.0.input-15
 
-# --- HOME-X ---
-net home-x     <=  hm2_7i76e.0.7i76.0.0.input-00
-
-# --- HOME-Y ---
-net home-y     <=  hm2_7i76e.0.7i76.0.0.input-01
-
-# --- MAX-HOME-Z ---
-net max-home-z     <=  hm2_7i76e.0.7i76.0.0.input-02-not
+# 7i84
+# outputs
+net heater-ena   => hm2_7i76e.0.7i84.0.1.output-00
+net heater-out-1 => hm2_7i76e.0.7i84.0.1.output-01
+net heater-out-2 => hm2_7i76e.0.7i84.0.1.output-02
+net heater-out-3 => hm2_7i76e.0.7i84.0.1.output-03
+net heater-out-4 => hm2_7i76e.0.7i84.0.1.output-04
+net heater-out-5 => hm2_7i76e.0.7i84.0.1.output-05
+net heater-out-6 => hm2_7i76e.0.7i84.0.1.output-06
+net out-beep     => hm2_7i76e.0.7i84.0.1.output-15
+# inputs
+net  ssr-amp-switch    => hm2_7i76e.0.7i84.0.1.input-08
 
 #*******************
 #  AXIS X JOINT 0
@@ -208,9 +239,9 @@ net z-enable     => hm2_7i76e.0.stepgen.02.enable
 
 # ---setup home / limit switch signals---
 
-net max-home-z     =>  joint.2.home-sw-in
+net home-z          =>  joint.2.home-sw-in
 net z-neg-limit     =>  joint.2.neg-lim-sw-in
-net z-pos-limit     =>  joint.2.pos-lim-sw-in
+net limit-up-z      =>  joint.2.pos-lim-sw-in
 
 #*******************
 #  SPINDLE

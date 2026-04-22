@@ -36,6 +36,7 @@ net in-ph-retracted   => kiss-heat-slide.0.retracted-sensor
 net in-ph-extended    => kiss-heat-slide.0.in-position-sensor
 net out-ph-slide      => kiss-heat-slide.0.slide-out
 net out-ph-lift       => kiss-heat-slide.0.lift-up-out
+net in-heat1-amps     => kiss-heater.0.amp-switch
 
 # link heat <=> slide
 net slide-in-position kiss-heat-slide.0.slide-in-position kiss-heater.0.slide-in-position

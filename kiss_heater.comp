@@ -21,6 +21,7 @@ pin in bit   active_05;
 pin in bit   active_06;
 pin in float in_temperature;
 pin in float setpoint;
+pin in bit   amp_switch;
 
 pin out bit ssr_out_01;
 pin out bit ssr_out_02;
@@ -38,13 +39,14 @@ variable float limit;
 variable int   loadPeriod;
 variable float iState;
 variable float dState;
+variable int   element_error;
 function _;
 license "GPL";
 author "Erik Friesen";
 ;;
 
 FUNCTION(_) {
-  if (enable && slide_in_position) {
+  if (enable && slide_in_position && !element_error) {
     ssr_out_01 = 1;
     ssr_out_02 = active_02;
     ssr_out_03 = active_03;
@@ -82,6 +84,11 @@ FUNCTION(_) {
         limit = command;
       }
     }
+    // Element check
+    if (ssr_ena && !amp_switch) {
+      rtapi_print_msg(RTAPI_MSG_ERR, "Heater element 1 error\n");
+      element_error = 1;
+    }
     // PWM
     ssr_ena = limit > (min_cycle / 2) && (pwm_period * limit) >= currPeriod;
     currPeriod += fperiod;
@@ -91,6 +98,9 @@ FUNCTION(_) {
     }
     //
   } else {
+    if (enable == 0) {
+      element_error = 0;
+    }
     limit = 0;
     iState = 0;
     dState = in_temperature;

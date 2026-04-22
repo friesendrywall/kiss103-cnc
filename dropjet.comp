@@ -1,6 +1,7 @@
 component dropjet "Dropjet controller";
 pin in  float dot_size;
 pin in  float pulse_hz;
+pin in  bit   auto_enable;
 pin in  bit   manual_single;
 pin in  bit   single;
 pin in  bit   single_trigger;
@@ -25,9 +26,9 @@ FUNCTION(_) {
   if (pulse_width > 50) {
     pulse_width = 0;
   }
-  if (purge) {
+  if (!auto_enable && purge) {
     dj_pin = 1;
-  } else if (single && pulse_hz > 0.1F) {
+  } else if (auto_enable && single && pulse_hz > 0.1F) {
     et += fperiod;
     if (last_trigger != single_trigger && pulse_width > 0) {
       last_trigger = single_trigger;
@@ -40,7 +41,8 @@ FUNCTION(_) {
         dj_pin = 0;
       }
     }
-  } else if ((manual_multi || multi) && pulse_hz > 0.1F) {
+  } else if (((!auto_enable && manual_multi) || (multi && auto_enable)) &&
+             pulse_hz > 0.1F) {
     float per = 1.0f / pulse_hz;
     if (!last_multi) {
       tmr = per; // pre-load so first cycle fires immediately
@@ -59,7 +61,7 @@ FUNCTION(_) {
         dj_pin = 0;
       }
     }
-  } else if (manual_single && pulse_hz > 0.1F) {
+  } else if (!auto_enable && manual_single && pulse_hz > 0.1F) {
     et += fperiod;
     if (!manual_single_active && pulse_width > 0) {
       manual_single_active = 1;

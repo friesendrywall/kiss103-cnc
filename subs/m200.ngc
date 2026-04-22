@@ -1,0 +1,7 @@
+O<m200> sub
+(print,Setting startup defaults)
+M68 E0 Q3.0 (DJ DOT)
+M68 E1 Q15.0 (DJ FREQ)
+M68 E3 Q50.0 (PH TEMP)
+O<m200> endsub
+M2

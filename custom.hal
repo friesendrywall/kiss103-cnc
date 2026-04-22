@@ -4,7 +4,18 @@
 # Dropjet setup
 loadrt dropjet
 addf dropjet.0 servo-thread
+setp dropjet.0.dot-size 5
+setp dropjet.0.pulse-hz 15
 net out-dropjet => dropjet.0.dj-pin
+net dj-purge    <= dropjet.0.purge
+net dj-dotsize  => dropjet.0.dot-size
+net dj-dotfreq  => dropjet.0.pulse-hz
+net dj-manual-single dropjet.0.manual-single
+net dj-manual-multi  dropjet.0.manual-multi
+net dj-auto-single         => dropjet.0.single
+net dj-auto-single-trigger => dropjet.0.single-trigger
+net dj-auto-multi          => dropjet.0.multi
+net program-is-active      => dropjet.0.auto-enable
 
 # lighting setup
 loadrt lighting
@@ -17,21 +28,33 @@ net current-tool => lighting.0.tool-number
 net lighting-level => lighting.0.light-level
 
 #flux setup
-loadrt or2 names=or2.flux-on,or2.flux-up
+loadrt or2 names=or2.flux-on
 addf or2.flux-on servo-thread
-addf or2.flux-up servo-thread
 
-# TODO net motion.digital-out-XX => or2.flux-up.in0
-# TODO net motion.digital-out-XX => or2.flux-on.in0
-# TODO net flux-up-out   PIN?? => or2.flux-up.out
-# TODO net flux-out      PIN?? => or2.flux-on.out
+# Flux auto control
+loadrt and2 names=and.auto.flux
+addf and.auto.flux servo-thread
+net program-is-active => and.auto.flux.in0
+net ui-flux-cmd   => or2.flux-on.in0
+net auto-flux-cmd => or2.flux-on.in1
+net out-flux      <= or2.flux-on.out
+
 
 # Pump setup
 loadrt kiss_pump
 addf kiss-pump.0 servo-thread
 setp kiss-pump.0.pulses-per-rev 200
-setp kiss-pump.0.accel 1000
-# 7i76 setup
+setp kiss-pump.0.accel 1500
+net pump-at-speed kiss-pump.0.at-speed
+net pump-stopped  kiss-pump.0.stopped
+# Pump auto control
+loadrt and2 names=and.auto.pump
+addf and.auto.pump servo-thread
+net program-is-active and.auto.pump.in0
+net auto-pump-stop => and.auto.pump.in1
+net link-and-pump-auto and.auto.pump.out => kiss-pump.0.stop
+
+# 7i76 setup, pump outputs into this
 setp   hm2_7i76e.0.stepgen.03.dirsetup        10000
 setp   hm2_7i76e.0.stepgen.03.dirhold         10000
 setp   hm2_7i76e.0.stepgen.03.steplen         5000
@@ -45,3 +68,13 @@ setp   hm2_7i76e.0.stepgen.03.maxvel          0
 net machine-is-on =>  hm2_7i76e.0.stepgen.03.enable
 net pump-velocity kiss-pump.0.velocity => hm2_7i76e.0.stepgen.03.velocity-cmd
 
+# Lift fluxer if selected
+loadrt comp names=comp.fl
+addf comp.fl util-thread
+setp comp.fl.in0 2
+net current-tool-f comp.fl.in1
+net out-flux-lift comp.fl.equal
+
+
+# Cycle start
+net in-cycle-start halui.program.run

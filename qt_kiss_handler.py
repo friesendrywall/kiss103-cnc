@@ -22,6 +22,7 @@ from qtvcp.core import Status, Action
 from PyQt5.QtCore import QFileSystemWatcher
 from PyQt5.QtGui import QColor
 from qtvcp.core import Qhal
+from PyQt5.QtCore import QTimer
 QHAL = Qhal()
 
 # Set up logging
@@ -97,14 +98,18 @@ class HandlerClass:
 
         # External spin edit calls
         # preheater setpoint
-        self.pin_setpoint_set = QHAL.newpin('preheat-set-value', QHAL.HAL_FLOAT, QHAL.HAL_IN)
-        self.pin_setpoint_set.value_changed.connect(self.update_ph_setpoint)
+        ###   self.pin_setpoint_set = QHAL.newpin('preheat-set-value', QHAL.HAL_FLOAT, QHAL.HAL_IN)
+        ###   self.pin_setpoint_set.value_changed.connect(self.update_ph_setpoint)
+        self.w.dj_freq.valueChanged.connect(self.update_djfreq)
+        self.w.dj_dotsize.valueChanged.connect(self.update_djdot)
+        self.w.preheat_setpoint.valueChanged.connect(self.on_ph_setpoint_changed)
+
+        # djdot setpoint
+        ## self.pin_djdot_set = QHAL.newpin('dj-dot-set-value', QHAL.HAL_FLOAT, QHAL.HAL_IN)
+        ## self.pin_djdot_set.value_changed.connect(self.update_djdot)
         # preheater setpoint
-        self.pin_djdot_set = QHAL.newpin('dj-dot-set-value', QHAL.HAL_FLOAT, QHAL.HAL_IN)
-        self.pin_djdot_set.value_changed.connect(self.update_djdot)
-        # preheater setpoint
-        self.pin_djfreq_set = QHAL.newpin('dj-freq-set-value', QHAL.HAL_FLOAT, QHAL.HAL_IN)
-        self.pin_djfreq_set.value_changed.connect(self.update_djfreq)
+        ## self.pin_djfreq_set = QHAL.newpin('dj-freq-set-value', QHAL.HAL_FLOAT, QHAL.HAL_IN)
+        ## self.pin_djfreq_set.value_changed.connect(self.update_djfreq)
         # Fiducial parameter pins
         self.pin_fid_find      = QHAL.newpin('ext-fid-find',      QHAL.HAL_BIT,   QHAL.HAL_IN)
         self.pin_fid_find.value_changed.connect(self.update_fid_find)
@@ -122,9 +127,9 @@ class HandlerClass:
         self.pin_fid_tolerance.value_changed.connect(self.update_fid_tolerance)
 
         # Reverse connections: widget change → keep handler HAL_IN pins current
-        self.w.preheat_setpoint.valueChanged.connect(lambda v: self.hal.__setitem__('preheat-set-value', v))
-        self.w.dj_dotsize.valueChanged.connect(      lambda v: self.hal.__setitem__('dj-dot-set-value',  v))
-        self.w.dj_freq.valueChanged.connect(         lambda v: self.hal.__setitem__('dj-freq-set-value', v))
+        ##  self.w.preheat_setpoint.valueChanged.connect(lambda v: self.hal.__setitem__('preheat-set-value', v))
+        ## self.w.dj_dotsize.valueChanged.connect(      lambda v: self.hal.__setitem__('dj-dot-set-value',  v))
+        ## self.w.dj_freq.valueChanged.connect(         lambda v: self.hal.__setitem__('dj-freq-set-value', v))
         self.w.fid_find.toggled.connect(             lambda v: self.hal.__setitem__('ext-fid-find',          v))
         self.w.fid_is_square.toggled.connect(        lambda v: self.hal.__setitem__('ext-fid-is-square',     v))
         self.w.fid_size.valueChanged.connect(        lambda v: self.hal.__setitem__('ext-fid-size',          v))
@@ -145,6 +150,31 @@ class HandlerClass:
         STATUS.connect('interp-run',     lambda *a: self._update_park_btn())
 
         self.w.btn_park.setEnabled(False)   # start disabled
+        self.cmd = linuxcnc.command()
+
+        self.timer = QTimer()
+        self.timer.timeout.connect(self.poll_hal_changes)
+        self.timer.start(250)
+
+    def poll_hal_changes(self):
+        dj_dot = self.hal.getvalue('motion.analog-out-00')
+        dj_freq = self.hal.getvalue('motion.analog-out-01')
+        ph_temp = self.hal.getvalue('motion.analog-out-03')
+
+        self.w.preheat_setpoint.blockSignals(True)
+        self.w.preheat_setpoint.setValue(ph_temp)
+        self.w.preheat_setpoint.blockSignals(False)
+
+        self.w.dj_freq.blockSignals(True)
+        self.w.dj_freq.setValue(dj_freq)
+        self.w.dj_freq.blockSignals(False)
+
+        self.w.dj_dotsize.blockSignals(True)
+        self.w.dj_dotsize.setValue(dj_dot)
+        self.w.dj_dotsize.blockSignals(False)
+
+    def on_ph_setpoint_changed(self, value):
+        self.cmd.set_analog_output(3, float(value))
 
     def btn_park_clicked(self):
         ACTION.CALL_MDI("G90")
@@ -164,10 +194,12 @@ class HandlerClass:
         self.w.preheat_setpoint.setValue(value)
 
     def update_djdot(self, value):
-        self.w.dj_dotsize.setValue(value)
+        self.cmd.set_analog_output(0, float(value))
+        # self.w.dj_dotsize.setValue(value)
 
     def update_djfreq(self, value):
-        self.w.dj_freq.setValue(value)
+        self.cmd.set_analog_output(1, float(value))
+        # self.w.dj_freq.setValue(value)
 
     def update_fid_find(self, value):
         self.w.fid_find.setChecked(value)

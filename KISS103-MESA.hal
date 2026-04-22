@@ -4,7 +4,7 @@
 # overwritten when you run PNCconf again
 
 loadrt [KINS]KINEMATICS
-loadrt [EMCMOT]EMCMOT servo_period_nsec=[EMCMOT]SERVO_PERIOD num_joints=[KINS]JOINTS
+loadrt [EMCMOT]EMCMOT servo_period_nsec=[EMCMOT]SERVO_PERIOD num_joints=[KINS]JOINTS num_dio=8 num_aio=4
 loadrt hostmot2
 loadrt hm2_eth board_ip="10.10.10.10" config="num_encoders=1 num_pwmgens=0 num_stepgens=5 sserial_port_0=00xxxxxx" 
 setp   hm2_7i76e.0.watchdog.timeout_ns 5000000
@@ -90,6 +90,22 @@ net in-heat1-amps => hm2_7i76e.0.7i84.0.1.input-08-not
 
 # Globals
 net current-tool iocontrol.0.tool-number
+loadrt conv_s32_float names=conv_s32
+addf conv_s32 util-thread
+net current-tool conv_s32.in
+net current-tool-f conv_s32.out
+
+loadrt or2 names=or2.pgm
+addf or2.pgm servo-thread
+
+net pgm-running halui.program.is-running => or2.pgm.in0
+net pgm-paused halui.program.is-paused => or2.pgm.in1
+net program-is-active or2.pgm.out
+
+loadrt not names=not.pgm
+addf not.pgm servo-thread
+net program-is-active not.pgm.in
+net program-is-inactive not.pgm.out
 
 #*******************
 #  AXIS X JOINT 0
@@ -355,10 +371,6 @@ net probe-in     =>  motion.probe-input
 net in-position               <=  motion.in-position
 net machine-is-enabled        <=  motion.motion-enabled
 
-#  ---digital in / out signals---
-
-net dout-00     <=  motion.digital-out-00
-net din-00     =>  motion.digital-in-00
 #  ---estop signals---
 
 net estop-out     <=  iocontrol.0.user-enable-out

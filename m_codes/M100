@@ -1,0 +1,18 @@
+#!/bin/bash
+# M150 P<value> — sets the Preheater setpoint
+# Usage in G-code: M150 P85
+# Valid range: 25 to 125 (integers only)
+
+# Force to integer by truncating any decimal
+VALUE=$(printf "%.0f" $1)
+
+# Clamp to range 25-125
+if [ "$VALUE" -lt 25 ]; then
+    VALUE=25
+fi
+if [ "$VALUE" -gt 125 ]; then
+    VALUE=125
+fi
+
+halcmd setp qt_kiss.preheat-set-value $VALUE
+exit 0

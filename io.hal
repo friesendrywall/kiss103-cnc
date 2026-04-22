@@ -1,0 +1,24 @@
+# motion.digital-in-XX
+# motion.digital-out-XX
+# motion.analog-out-XX
+# definitions
+
+#   Prior nets           in-xx
+net in-air-pressure   motion.digital-in-00
+net in-n2-pressure    motion.digital-in-01
+net in-solder-at-temp motion.digital-in-02
+net ph-at-temp        motion.digital-in-03
+net pump-at-speed     motion.digital-in-04
+net pump-stopped      motion.digital-in-05
+net in-solder-low     motion.digital-in-06
+
+net dj-auto-single         <= motion.digital-out-00
+net dj-auto-single-trigger <= motion.digital-out-01
+net dj-auto-multi          <= motion.digital-out-02
+net auto-heat-cmd          <= motion.digital-out-03
+net auto-pump-stop         <= motion.digital-out-04
+net auto-flux-cmd          <= motion.digital-out-05
+
+net dj-dotsize       => motion.analog-out-00
+net dj-dotfreq       => motion.analog-out-01
+net preheat-setpoint => motion.analog-out-03

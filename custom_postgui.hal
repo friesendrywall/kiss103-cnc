@@ -6,27 +6,26 @@ net preheat3 kiss-heater.0.active-03 qt_kiss.preheat3
 net preheat4 kiss-heater.0.active-04 qt_kiss.preheat4
 net preheat5 kiss-heater.0.active-05 qt_kiss.preheat5
 net preheat6 kiss-heater.0.active-06 qt_kiss.preheat6
-net preheat-setpoint kiss-heater.0.setpoint qt_kiss.preheat_setpoint-f
+# net preheat-setpoint qt_kiss.preheat_setpoint-f
 net preheater-temp qt_kiss.preheat_temp
 
-net heat-cmd qt_kiss.heat_cmd => or2.htr.in1
+net manual-heat-cmd qt_kiss.heat_cmd
 net lift-cmd qt_kiss.lift_cmd => kiss-heat-slide.0.lift-up
 
-net dj-purge qt_kiss.dj_purge       => dropjet.0.purge
-net dj-dotsize qt_kiss.dj_dotsize-f => dropjet.0.dot-size
-net dj-dotfreq qt_kiss.dj_freq-f    => dropjet.0.pulse-hz
-net dj-dotsingle qt_kiss.dj_single  => dropjet.0.manual-single
-net dj-dotmulti qt_kiss.dj_stream   => dropjet.0.manual-multi
+net dj-purge   <= qt_kiss.dj_purge
+# net dj-dotsize qt_kiss.dj_dotsize-f => dropjet.0.dot-size
+# net dj-dotfreq qt_kiss.dj_freq-f    => dropjet.0.pulse-hz
+net dj-manual-single <= qt_kiss.dj_single
+net dj-manual-multi <=  qt_kiss.dj_stream
 
-net gui-flux-up qt_kiss.flux_on => or2.flux-up.in1
-net gui-flux-on qt_kiss.flux_up => or2.flux-on.in1
+net  ui-flux-cmd <= qt_kiss.flux_on
 
-net heat-at-temp kiss-heater.0.at-temp => qt_kiss.ind_preheat_ready
+net heater-at-temp => qt_kiss.ind_preheat_ready
 
 net pump-rpm qt_kiss.pump_speed-f       => kiss-pump.0.rpm
 net out-n2-enable qt_kiss.n2_enable     => kiss-pump.0.n2-signal
 net pump-run qt_kiss.pump_run           => kiss-pump.0.pump-run
-net pump-at-speed  kiss-pump.0.at-speed => qt_kiss.ind_pump_at_speed
+net pump-at-speed                       => qt_kiss.ind_pump_at_speed
 
 setp qt_kiss.camfidview.pix_per_inch   1038                                 
 setp qt_kiss.camfidview.fid_search     0.25                                    

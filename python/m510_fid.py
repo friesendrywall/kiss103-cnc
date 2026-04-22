@@ -78,6 +78,8 @@ def _get_wcs_position():
 
 
 def m510_fid(self, **words):
+    if self.task == 0:
+        return INTERP_OK
     """M510 handler: detect fiducial, store WCS position + camera offset."""
     try:
         # ---- Parse and validate words ----------------------------------------

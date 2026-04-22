@@ -6,6 +6,16 @@ loadrt dropjet
 addf dropjet.0 servo-thread
 net out-dropjet => dropjet.0.dj-pin
 
+# lighting setup
+loadrt lighting
+addf lighting.0 util-thread
+setp lighting.0.camera-tool-num 1
+net out-camera-cover   <= lighting.0.camera-cover
+net out-camera-light-h <= lighting.0.level-h
+net out-camera-light-l <= lighting.0.level-l
+net current-tool => lighting.0.tool-number
+net lighting-level => lighting.0.light-level
+
 #flux setup
 loadrt or2 names=or2.flux-on,or2.flux-up
 addf or2.flux-on servo-thread
@@ -19,7 +29,7 @@ addf or2.flux-up servo-thread
 # Pump setup
 loadrt kiss_pump
 addf kiss-pump.0 servo-thread
-setp kiss-pump.0.pulses-per-rev 2000
+setp kiss-pump.0.pulses-per-rev 200
 setp kiss-pump.0.accel 1000
 # 7i76 setup
 setp   hm2_7i76e.0.stepgen.03.dirsetup        10000
@@ -35,5 +45,3 @@ setp   hm2_7i76e.0.stepgen.03.maxvel          0
 net machine-is-on =>  hm2_7i76e.0.stepgen.03.enable
 net pump-velocity kiss-pump.0.velocity => hm2_7i76e.0.stepgen.03.velocity-cmd
 
-# net spindle-vel-cmd-rps     =>  hm2_7i76e.0.stepgen.03.velocity-cmd
-# net spindle-vel-fb-rps         <=  hm2_7i76e.0.stepgen.03.velocity-fb

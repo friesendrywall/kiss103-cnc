@@ -31,6 +31,8 @@ def _halcmd_setp(pin, value):
 
 
 def m500_fid(self, **words):
+    if self.task == 0:
+        return INTERP_OK
     """M500 handler: reset fiducial HAL pins."""
     try:
         _halcmd_setp('qt_kiss.camfidview.fid_read',   0)

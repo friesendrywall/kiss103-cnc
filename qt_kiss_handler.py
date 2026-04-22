@@ -108,6 +108,9 @@ class HandlerClass:
         # Fiducial parameter pins
         self.pin_fid_find      = QHAL.newpin('ext-fid-find',      QHAL.HAL_BIT,   QHAL.HAL_IN)
         self.pin_fid_find.value_changed.connect(self.update_fid_find)
+        # Fiducial lighting
+        self.pin_fid_light      = QHAL.newpin('ext-fid-light',      QHAL.HAL_FLOAT,   QHAL.HAL_IN)
+        self.pin_fid_light.value_changed.connect(self.update_fid_lighting)
 
         self.pin_fid_is_square = QHAL.newpin('ext-fid-is-square', QHAL.HAL_BIT,   QHAL.HAL_IN)
         self.pin_fid_is_square.value_changed.connect(self.update_fid_is_square)
@@ -127,6 +130,7 @@ class HandlerClass:
         self.w.fid_size.valueChanged.connect(        lambda v: self.hal.__setitem__('ext-fid-size',          v))
         self.w.fid_area.valueChanged.connect(        lambda v: self.hal.__setitem__('ext-fid-area',          v))
         self.w.fid_tolerance.valueChanged.connect(   lambda v: self.hal.__setitem__('ext-fid-tolerance',     v))
+        self.w.fid_light_level.valueChanged.connect( lambda v: self.hal.__setitem__('ext-fid-light', v))
 
         self.w.btn_park.clicked.connect(self.btn_park_clicked)
 
@@ -152,6 +156,9 @@ class HandlerClass:
                and STATUS.is_all_homed()
                and STATUS.is_interp_idle())
         self.w.btn_park.setEnabled(enabled)
+
+    def update_fid_lighting(self, value):
+        self.w.fid_light_level.setValue(value)
 
     def update_ph_setpoint(self, value):
         self.w.preheat_setpoint.setValue(value)

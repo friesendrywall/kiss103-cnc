@@ -2,7 +2,7 @@
 # pid.h set up in upper hal
 
 # 50mS thread
-loadrt threads name1=htr-thread period1=50000000
+# loadrt threads name1=htr-thread period1=50000000
 loadrt pid names=pid.htr
 loadrt or2 names=or2.htr
 loadrt kiss_heater

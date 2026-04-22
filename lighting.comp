@@ -1,0 +1,36 @@
+component lighting "Fiducial lighting controller";
+
+param rw s32 camera_tool_num;
+pin in float light_level;
+pin in s32   tool_number;
+
+pin out bit camera_cover;
+pin out bit level_h;
+pin out bit level_l;
+
+function _;
+license "GPL";
+author "Erik Friesen";
+;;
+
+FUNCTION(_) {
+  if (camera_tool_num == tool_number) {
+    camera_cover = 1;
+    if (light_level < 0.9) {
+      level_l = level_h = 0;
+    } else if (light_level < 1.9) {
+      level_l = 1;
+      level_h = 0;
+    } else if (light_level < 2.9) {
+      level_l = 0;
+      level_h = 1;
+    } else {
+      level_l = 1;
+      level_h = 1;
+    }
+  } else {
+    camera_cover = 0;
+    level_h = 0;
+    level_l = 0;
+  }
+}

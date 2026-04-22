@@ -106,7 +106,7 @@
          <enum>QTabWidget::Rounded</enum>
         </property>
         <property name="currentIndex">
-         <number>0</number>
+         <number>3</number>
         </property>
         <property name="iconSize">
          <size>
@@ -748,49 +748,6 @@
          <layout class="QVBoxLayout" name="verticalLayout_5">
           <item>
            <layout class="QGridLayout" name="gridLayout_3">
-            <item row="2" column="1">
-             <widget class="QLabel" name="label_23">
-              <property name="text">
-               <string>size</string>
-              </property>
-              <property name="alignment">
-               <set>Qt::AlignCenter</set>
-              </property>
-             </widget>
-            </item>
-            <item row="9" column="2">
-             <widget class="LCDNumber" name="fid_offset_y">
-              <property name="maximumSize">
-               <size>
-                <width>16777215</width>
-                <height>70</height>
-               </size>
-              </property>
-              <property name="digitCount">
-               <number>8</number>
-              </property>
-             </widget>
-            </item>
-            <item row="9" column="1">
-             <widget class="QLabel" name="label_24">
-              <property name="text">
-               <string>Y</string>
-              </property>
-              <property name="alignment">
-               <set>Qt::AlignCenter</set>
-              </property>
-             </widget>
-            </item>
-            <item row="4" column="1">
-             <widget class="QLabel" name="label_25">
-              <property name="text">
-               <string>Tolerance %</string>
-              </property>
-              <property name="alignment">
-               <set>Qt::AlignCenter</set>
-              </property>
-             </widget>
-            </item>
             <item row="4" column="2">
              <widget class="DoubleScale" name="fid_tolerance">
               <property name="minimumSize">
@@ -813,13 +770,25 @@
               </property>
              </widget>
             </item>
-            <item row="7" column="1">
-             <widget class="QLabel" name="label_20">
-              <property name="text">
-               <string>Error</string>
+            <item row="3" column="2">
+             <widget class="DoubleScale" name="fid_area">
+              <property name="minimumSize">
+               <size>
+                <width>0</width>
+                <height>35</height>
+               </size>
               </property>
-              <property name="alignment">
-               <set>Qt::AlignCenter</set>
+              <property name="minimum">
+               <double>0.150000000000000</double>
+              </property>
+              <property name="maximum">
+               <double>0.500000000000000</double>
+              </property>
+              <property name="singleStep">
+               <double>0.050000000000000</double>
+              </property>
+              <property name="value">
+               <double>0.250000000000000</double>
               </property>
              </widget>
             </item>
@@ -843,16 +812,77 @@
               </property>
              </widget>
             </item>
-            <item row="8" column="2">
-             <widget class="LCDNumber" name="fid_offset_x">
+            <item row="7" column="2">
+             <widget class="LED" name="fid_error">
               <property name="maximumSize">
                <size>
                 <width>16777215</width>
                 <height>70</height>
                </size>
               </property>
-              <property name="digitCount">
-               <number>8</number>
+              <property name="diameter">
+               <number>25</number>
+              </property>
+             </widget>
+            </item>
+            <item row="0" column="1">
+             <widget class="PushButton" name="fid_find">
+              <property name="minimumSize">
+               <size>
+                <width>0</width>
+                <height>35</height>
+               </size>
+              </property>
+              <property name="text">
+               <string>SEARCH</string>
+              </property>
+              <property name="checkable">
+               <bool>true</bool>
+              </property>
+              <property name="indicator_HAL_pin_option" stdset="0">
+               <bool>false</bool>
+              </property>
+             </widget>
+            </item>
+            <item row="8" column="1">
+             <widget class="QLabel" name="label_22">
+              <property name="text">
+               <string>X</string>
+              </property>
+              <property name="alignment">
+               <set>Qt::AlignCenter</set>
+              </property>
+             </widget>
+            </item>
+            <item row="4" column="1">
+             <widget class="QLabel" name="label_25">
+              <property name="text">
+               <string>Tolerance %</string>
+              </property>
+              <property name="alignment">
+               <set>Qt::AlignCenter</set>
+              </property>
+             </widget>
+            </item>
+            <item row="1" column="2">
+             <widget class="PushButton" name="fid_is_square">
+              <property name="minimumSize">
+               <size>
+                <width>0</width>
+                <height>35</height>
+               </size>
+              </property>
+              <property name="text">
+               <string>SQUARE</string>
+              </property>
+              <property name="checkable">
+               <bool>true</bool>
+              </property>
+              <property name="indicator_HAL_pin_option" stdset="0">
+               <bool>false</bool>
+              </property>
+              <property name="python_command_option" stdset="0">
+               <bool>false</bool>
               </property>
              </widget>
             </item>
@@ -891,48 +921,46 @@
               </property>
              </widget>
             </item>
-            <item row="7" column="2">
-             <widget class="LED" name="fid_error">
-              <property name="maximumSize">
-               <size>
-                <width>16777215</width>
-                <height>70</height>
-               </size>
-              </property>
-              <property name="diameter">
-               <number>25</number>
-              </property>
-             </widget>
-            </item>
-            <item row="8" column="1">
-             <widget class="QLabel" name="label_22">
+            <item row="2" column="1">
+             <widget class="QLabel" name="label_23">
               <property name="text">
-               <string>X</string>
+               <string>size</string>
               </property>
               <property name="alignment">
                <set>Qt::AlignCenter</set>
               </property>
              </widget>
             </item>
-            <item row="3" column="2">
-             <widget class="DoubleScale" name="fid_area">
-              <property name="minimumSize">
+            <item row="7" column="1">
+             <widget class="QLabel" name="label_20">
+              <property name="text">
+               <string>Error</string>
+              </property>
+              <property name="alignment">
+               <set>Qt::AlignCenter</set>
+              </property>
+             </widget>
+            </item>
+            <item row="9" column="2">
+             <widget class="LCDNumber" name="fid_offset_y">
+              <property name="maximumSize">
                <size>
-                <width>0</width>
-                <height>35</height>
+                <width>16777215</width>
+                <height>70</height>
                </size>
               </property>
-              <property name="minimum">
-               <double>0.150000000000000</double>
+              <property name="digitCount">
+               <number>8</number>
               </property>
-              <property name="maximum">
-               <double>0.500000000000000</double>
+             </widget>
+            </item>
+            <item row="9" column="1">
+             <widget class="QLabel" name="label_24">
+              <property name="text">
+               <string>Y</string>
               </property>
-              <property name="singleStep">
-               <double>0.050000000000000</double>
-              </property>
-              <property name="value">
-               <double>0.250000000000000</double>
+              <property name="alignment">
+               <set>Qt::AlignCenter</set>
               </property>
              </widget>
             </item>
@@ -962,44 +990,36 @@
               </property>
              </widget>
             </item>
-            <item row="1" column="2">
-             <widget class="PushButton" name="fid_is_square">
-              <property name="minimumSize">
+            <item row="8" column="2">
+             <widget class="LCDNumber" name="fid_offset_x">
+              <property name="maximumSize">
                <size>
-                <width>0</width>
-                <height>35</height>
+                <width>16777215</width>
+                <height>70</height>
                </size>
               </property>
-              <property name="text">
-               <string>SQUARE</string>
-              </property>
-              <property name="checkable">
-               <bool>true</bool>
-              </property>
-              <property name="indicator_HAL_pin_option" stdset="0">
-               <bool>false</bool>
-              </property>
-              <property name="python_command_option" stdset="0">
-               <bool>false</bool>
+              <property name="digitCount">
+               <number>8</number>
               </property>
              </widget>
             </item>
-            <item row="0" column="1">
-             <widget class="PushButton" name="fid_find">
-              <property name="minimumSize">
-               <size>
-                <width>0</width>
-                <height>35</height>
-               </size>
+            <item row="10" column="2">
+             <widget class="DoubleScale" name="fid_light_level">
+              <property name="decimals">
+               <number>0</number>
               </property>
+              <property name="maximum">
+               <double>3.000000000000000</double>
+              </property>
+             </widget>
+            </item>
+            <item row="10" column="1">
+             <widget class="QLabel" name="label_7">
               <property name="text">
-               <string>SEARCH</string>
+               <string>Light level</string>
               </property>
-              <property name="checkable">
-               <bool>true</bool>
-              </property>
-              <property name="indicator_HAL_pin_option" stdset="0">
-               <bool>false</bool>
+              <property name="alignment">
+               <set>Qt::AlignCenter</set>
               </property>
              </widget>
             </item>
@@ -1703,7 +1723,7 @@
               </font>
              </property>
              <property name="text">
-              <string>LOW-AIR</string>
+              <string>AIR</string>
              </property>
              <property name="alignment">
               <set>Qt::AlignCenter</set>
@@ -1711,7 +1731,7 @@
             </widget>
            </item>
            <item row="1" column="1">
-            <widget class="LED" name="ind_low_air"/>
+            <widget class="LED" name="ind_air_pressure"/>
            </item>
            <item row="2" column="0">
             <widget class="QLabel" name="low_solder">

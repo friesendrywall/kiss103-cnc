@@ -37,6 +37,8 @@ except ImportError:
 
 
 def m520_fid(self, **words):
+    if self.task == 0:
+        return INTERP_OK
     """M520 handler: compute PCB translation correction and (optionally) rotation."""
     try:
         p_word = words.get('p', None)

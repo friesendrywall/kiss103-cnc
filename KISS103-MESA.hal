@@ -9,6 +9,8 @@ loadrt hostmot2
 loadrt hm2_eth board_ip="10.10.10.10" config="num_encoders=1 num_pwmgens=0 num_stepgens=5 sserial_port_0=00xxxxxx" 
 setp   hm2_7i76e.0.watchdog.timeout_ns 5000000
 loadrt pid names=pid.x,pid.y,pid.z,pid.s
+# 25 and 50 mS threads
+loadrt threads name1=util-thread period1=25000000 name2=htr-thread period2=50000000
 # loadrt classicladder_rt numPhysInputs=15 numPhysOutputs=15 numS32in=10 numS32out=10 numFloatIn=10 numFloatOut=10 numBits=50 numWords=50
 
 addf hm2_7i76e.0.read         servo-thread
@@ -48,9 +50,9 @@ net out-flux-lift      => hm2_7i76e.0.7i76.0.0.output-02
 net out-ph-slide       => hm2_7i76e.0.7i76.0.0.output-03
 net out-ph-lift        => hm2_7i76e.0.7i76.0.0.output-04
 net out-n2-enable      => hm2_7i76e.0.7i76.0.0.output-07
-net camera-light-inner => hm2_7i76e.0.7i76.0.0.output-11
-net camera-light-outer => hm2_7i76e.0.7i76.0.0.output-12
-net camera-cover       => hm2_7i76e.0.7i76.0.0.output-13
+net out-camera-light-h => hm2_7i76e.0.7i76.0.0.output-11
+net out-camera-light-l => hm2_7i76e.0.7i76.0.0.output-12
+net out-camera-cover   => hm2_7i76e.0.7i76.0.0.output-13
 
 # inputs
 net home-x            <= hm2_7i76e.0.7i76.0.0.input-00
@@ -58,7 +60,7 @@ net home-y            <= hm2_7i76e.0.7i76.0.0.input-01
 net home-z            <= hm2_7i76e.0.7i76.0.0.input-02-not
 net limit-up-z        <= hm2_7i76e.0.7i76.0.0.input-03-not
 net in-solder-at-temp <= hm2_7i76e.0.7i76.0.0.input-04
-net in-solder-low     <= hm2_7i76e.0.7i76.0.0.input-05
+net in-solder-low     <= hm2_7i76e.0.7i76.0.0.input-05-not
 net in-motion-sw-on   <= hm2_7i76e.0.7i76.0.0.input-06
 net in-cycle-start    <= hm2_7i76e.0.7i76.0.0.input-07
 net in-flux-low       <= hm2_7i76e.0.7i76.0.0.input-08
@@ -85,6 +87,9 @@ net heater-out-6 => hm2_7i76e.0.7i84.0.1.output-06
 net out-beep     => hm2_7i76e.0.7i84.0.1.output-15
 # inputs
 net in-heat1-amps => hm2_7i76e.0.7i84.0.1.input-08-not
+
+# Globals
+net current-tool iocontrol.0.tool-number
 
 #*******************
 #  AXIS X JOINT 0
@@ -378,6 +383,8 @@ net tool-prepare-loopback iocontrol.0.tool-prepare => iocontrol.0.tool-prepared
 # Load Classicladder without GUI (can reload LADDER GUI in AXIS GUI
 
 # loadusr classicladder --nogui custom.clp
+
+net x-is-homed => halui.mdi-command-00
 
 
 

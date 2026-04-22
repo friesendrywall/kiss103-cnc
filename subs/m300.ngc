@@ -1,0 +1,10 @@
+O<m300> sub
+(RESET MISC KISS ITEMS)
+(print,Resetting all)
+M65 P0 (Turn off dj)
+M65 P2 (Turn off dj multi)
+M65 P3 (Turn off preheat)
+M65 P4 (Turn off pump stop)
+M65 P5 (Turn off flux on)
+O<m300> endsub
+M2

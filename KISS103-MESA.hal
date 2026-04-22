@@ -396,7 +396,11 @@ net tool-prepare-loopback iocontrol.0.tool-prepare => iocontrol.0.tool-prepared
 
 # loadusr classicladder --nogui custom.clp
 
-net x-is-homed => halui.mdi-command-00
+loadrt and2 names=and2.homed
+addf and2.homed servo-thread
+net x-is-homed and2.homed.in0
+net y-is-homed and2.homed.in1
+net send-mdi-cmd-00 and2.homed.out => halui.mdi-command-00
 
 
 

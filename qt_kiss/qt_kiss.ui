@@ -1884,7 +1884,14 @@
         <property name="title">
          <string>Machine Controls</string>
         </property>
-        <layout class="QVBoxLayout" name="verticalLayout_15" stretch="1,3,3,6">
+        <layout class="QVBoxLayout" name="verticalLayout_15" stretch="0,1,3,3,6">
+         <item>
+          <widget class="LCDNumber" name="feed_rate">
+           <property name="segmentStyle">
+            <enum>QLCDNumber::Flat</enum>
+           </property>
+          </widget>
+         </item>
          <item>
           <layout class="QGridLayout" name="gridLayout_5">
            <item row="0" column="0">
@@ -2287,7 +2294,7 @@
            <property name="minimumSize">
             <size>
              <width>140</width>
-             <height>100</height>
+             <height>90</height>
             </size>
            </property>
            <property name="font">
@@ -3586,9 +3593,6 @@
          <item>
           <layout class="QVBoxLayout" name="verticalLayout_11">
            <item>
-            <widget class="LCDNumber" name="feed_rate"/>
-           </item>
-           <item>
             <spacer name="verticalSpacer_4">
              <property name="orientation">
               <enum>Qt::Vertical</enum>
@@ -4013,6 +4017,13 @@
               </size>
              </property>
             </spacer>
+           </item>
+           <item>
+            <widget class="PushButton" name="btn_park">
+             <property name="text">
+              <string>PARK</string>
+             </property>
+            </widget>
            </item>
           </layout>
          </item>

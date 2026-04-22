@@ -65,7 +65,7 @@ net in-flux-low       <= hm2_7i76e.0.7i76.0.0.input-08
 net in-service-sw     <= hm2_7i76e.0.7i76.0.0.input-09
 net in-solder-pump-on <= hm2_7i76e.0.7i76.0.0.input-10
 net in-n2-pressure    <= hm2_7i76e.0.7i76.0.0.input-11
-net in-hood-open      <= hm2_7i76e.0.7i76.0.0.input-12
+net in-hood-open      <= hm2_7i76e.0.7i76.0.0.input-12-not
 net in-wave-height    <= hm2_7i76e.0.7i76.0.0.input-13
 net in-air-pressure   <= hm2_7i76e.0.7i76.0.0.input-14
 net in-solder-pot-on  <= hm2_7i76e.0.7i76.0.0.input-15
@@ -84,7 +84,7 @@ net heater-out-5 => hm2_7i76e.0.7i84.0.1.output-05
 net heater-out-6 => hm2_7i76e.0.7i84.0.1.output-06
 net out-beep     => hm2_7i76e.0.7i84.0.1.output-15
 # inputs
-net  ssr-amp-switch    => hm2_7i76e.0.7i84.0.1.input-08
+net in-heat1-amps => hm2_7i76e.0.7i84.0.1.input-08-not
 
 #*******************
 #  AXIS X JOINT 0

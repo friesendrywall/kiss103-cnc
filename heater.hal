@@ -19,6 +19,8 @@ setp kiss-heater.0.iMin -10
 setp kiss-heater.0.iMax 10
 setp kiss-heater.0.temp-allowance 3.0
 
+net preheater-temp kiss-heater.0.in-temperature
+
 # link to hardware pins
 # outputs
 net heater-ena   <= kiss-heater.0.ssr-ena   
@@ -35,6 +37,7 @@ net in-ph-extended    => kiss-heat-slide.0.in-position-sensor
 net out-ph-slide      => kiss-heat-slide.0.slide-out
 net out-ph-lift       => kiss-heat-slide.0.lift-up-out
 
+# link heat <=> slide
 net slide-in-position kiss-heat-slide.0.slide-in-position kiss-heater.0.slide-in-position
 
 net heater-enable or2.htr.out kiss-heat-slide.0.enable kiss-heater.0.enable

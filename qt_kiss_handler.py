@@ -128,6 +128,31 @@ class HandlerClass:
         self.w.fid_area.valueChanged.connect(        lambda v: self.hal.__setitem__('ext-fid-area',          v))
         self.w.fid_tolerance.valueChanged.connect(   lambda v: self.hal.__setitem__('ext-fid-tolerance',     v))
 
+        self.w.btn_park.clicked.connect(self.btn_park_clicked)
+
+        # Connect to any event that could change park-eligibility
+        STATUS.connect('state-on',       lambda *a: self._update_park_btn())
+        STATUS.connect('state-off',      lambda *a: self._update_park_btn())
+        STATUS.connect('state-estop',    lambda *a: self._update_park_btn())
+        STATUS.connect('state-estop-reset', lambda *a: self._update_park_btn())
+        STATUS.connect('all-homed',      lambda *a: self._update_park_btn())
+        STATUS.connect('not-all-homed',  lambda *a: self._update_park_btn())
+        STATUS.connect('interp-idle',    lambda *a: self._update_park_btn())
+        STATUS.connect('interp-run',     lambda *a: self._update_park_btn())
+
+        self.w.btn_park.setEnabled(False)   # start disabled
+
+    def btn_park_clicked(self):
+        ACTION.CALL_MDI("G90")
+        ACTION.CALL_MDI("G53 G0 Z-3.5")
+        ACTION.CALL_MDI("G53 G0 X0 Y0")
+
+    def _update_park_btn(self):
+        enabled = (STATUS.machine_is_on()
+               and STATUS.is_all_homed()
+               and STATUS.is_interp_idle())
+        self.w.btn_park.setEnabled(enabled)
+
     def update_ph_setpoint(self, value):
         self.w.preheat_setpoint.setValue(value)
 

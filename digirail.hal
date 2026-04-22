@@ -9,6 +9,8 @@ setp scale.preheat-temp.gain 0.1
 
 net digirail-ch1-raw mb2hal.digirail-temp-ch1.00.float => scale.preheat-temp.in
 
+net preheater-temp scale.preheat-temp.out
+
 # Scaled outputs (actual �C)
 # scale.0.out = Channel 1 temperature in �C
 # net digirail-ch1-temp scale.0.out

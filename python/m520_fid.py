@@ -158,14 +158,14 @@ def m520_fid(self, **words):
             return INTERP_ERROR
         theta = math.radians(rotation_deg)
 
-        # Step 4: shifted offset — G10 L2 R rotates around WCS (0,0), so
-        # translation must place fid1 at its actual position after rotation.
-        # With G10 L2 P0 X[cx] Y[cy] R[rot], a move to (nom1_x, nom1_y) lands at:
-        #   machine_x = cx + nom1_x*cos(theta) - nom1_y*sin(theta)
-        #   machine_y = cy + nom1_x*sin(theta) + nom1_y*cos(theta)
-        # Setting this equal to act1_x/y and solving:
-        calc_x = nom1_x * (1 - math.cos(theta)) + nom1_y * math.sin(theta) + fid1_x_offset
-        calc_y = nom1_y * (1 - math.cos(theta)) - nom1_x * math.sin(theta) + fid1_y_offset
+        # Step 4: G52 offset in the post-rotation frame.
+        # Model: machine = G10_trans + R(theta) * (G52 + program_pos)
+        # We want a move to nom1 to land at act1, so:
+        #   G52 = R(-theta) * act1 - nom1
+        act1_x = nom1_x + fid1_x_offset
+        act1_y = nom1_y + fid1_y_offset
+        calc_x =  math.cos(theta) * act1_x + math.sin(theta) * act1_y - nom1_x
+        calc_y = -math.sin(theta) * act1_x + math.cos(theta) * act1_y - nom1_y
 
         self.params['_calc_x_offset'] = calc_x
         self.params['_calc_y_offset'] = calc_y

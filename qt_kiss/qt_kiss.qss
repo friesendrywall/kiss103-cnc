@@ -534,6 +534,64 @@ QSpinBox::up-button:pressed {
     background: #006622;
 }
 
+/** FREQ / DOT / SETPOINT QDoubleSpinBoxes styled to match the RPM DoubleScale */
+QDoubleSpinBox#dj_freq,
+QDoubleSpinBox#dj_dotsize,
+QDoubleSpinBox#preheat_setpoint {
+    background: #f5f4f0;
+    border: 1.5px solid #888880;
+    border-radius: 2px;
+    font: 10pt "Lato Heavy";
+    color: #1a1a1a;
+    min-height: 26px;
+    max-height: 26px;
+}
+
+QDoubleSpinBox#dj_freq::up-button,
+QDoubleSpinBox#dj_freq::down-button,
+QDoubleSpinBox#dj_dotsize::up-button,
+QDoubleSpinBox#dj_dotsize::down-button,
+QDoubleSpinBox#preheat_setpoint::up-button,
+QDoubleSpinBox#preheat_setpoint::down-button {
+    width: 20px;
+    background: #c8c6c0;
+    border-left: 1.5px solid #888880;
+}
+
+QDoubleSpinBox#dj_freq::up-button:hover,
+QDoubleSpinBox#dj_freq::down-button:hover,
+QDoubleSpinBox#dj_dotsize::up-button:hover,
+QDoubleSpinBox#dj_dotsize::down-button:hover,
+QDoubleSpinBox#preheat_setpoint::up-button:hover,
+QDoubleSpinBox#preheat_setpoint::down-button:hover {
+    background: #b0aea8;
+}
+
+QDoubleSpinBox#dj_freq::up-button:pressed,
+QDoubleSpinBox#dj_freq::down-button:pressed,
+QDoubleSpinBox#dj_dotsize::up-button:pressed,
+QDoubleSpinBox#dj_dotsize::down-button:pressed,
+QDoubleSpinBox#preheat_setpoint::up-button:pressed,
+QDoubleSpinBox#preheat_setpoint::down-button:pressed {
+    background: #006622;
+}
+
+QDoubleSpinBox#dj_freq::up-arrow,
+QDoubleSpinBox#dj_dotsize::up-arrow,
+QDoubleSpinBox#preheat_setpoint::up-arrow {
+    image: url(/home/kiss/linuxcnc/configs/KISS103-MESA/qt_kiss/images/spinbox_arrow_up.svg);
+    width: 8px;
+    height: 8px;
+}
+
+QDoubleSpinBox#dj_freq::down-arrow,
+QDoubleSpinBox#dj_dotsize::down-arrow,
+QDoubleSpinBox#preheat_setpoint::down-arrow {
+    image: url(/home/kiss/linuxcnc/configs/KISS103-MESA/qt_kiss/images/spinbox_arrow_down.svg);
+    width: 8px;
+    height: 8px;
+}
+
 /** Tab Widget **/
 QTabWidget::pane {
     border: 1.5px solid #909088;

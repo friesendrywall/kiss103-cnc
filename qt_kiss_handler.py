@@ -18,7 +18,6 @@ from qtvcp.widgets.stylesheeteditor import  StyleSheetEditor as SSE
 from qtvcp.widgets.tool_offsetview import ToolOffsetView as TOOL_OFFSET
 from qtvcp.widgets.origin_offsetview import OriginOffsetView as ORIGIN_OFFSET
 from qtvcp.lib.keybindings import Keylookup
-from qtvcp.lib.machine_log import MachineLogger
 from qtvcp.core import Status, Action
 from PyQt5.QtCore import QFileSystemWatcher
 from PyQt5.QtGui import QColor
@@ -52,6 +51,42 @@ TOOL_TO_CAMERA_TAB = {
 # **** HANDLER CLASS SECTION **** #
 ###################################
 
+class _ErrorToast(QtWidgets.QFrame):
+    """Toast-style notification that floats over the main window."""
+
+    dismissed = QtCore.pyqtSignal(object)
+
+    def __init__(self, parent, text):
+        super().__init__(parent)
+        self.setFrameShape(QtWidgets.QFrame.StyledPanel)
+        self.setStyleSheet(
+            "_ErrorToast { background: #b00020; border: 2px solid #700014; "
+            "border-radius: 4px; } "
+            "QLabel { color: #ffffff; font: 11pt 'Lato Heavy'; background: transparent; } "
+            "QPushButton { color: #ffffff; background: transparent; border: none; "
+            "font: 12pt 'Lato Heavy'; padding: 0px; } "
+            "QPushButton:hover { color: #ffcccc; }"
+        )
+        layout = QtWidgets.QHBoxLayout(self)
+        layout.setContentsMargins(12, 10, 12, 10)
+        layout.setSpacing(8)
+        self._text_lbl = QtWidgets.QLabel(text, self)
+        self._text_lbl.setWordWrap(True)
+        layout.addWidget(self._text_lbl, 1)
+        close_btn = QtWidgets.QPushButton('X', self)
+        close_btn.setFixedSize(22, 22)
+        close_btn.setCursor(QtCore.Qt.PointingHandCursor)
+        close_btn.clicked.connect(self._dismiss)
+        layout.addWidget(close_btn, 0, QtCore.Qt.AlignTop)
+        self.setFixedWidth(420)
+        self.adjustSize()
+
+    def _dismiss(self):
+        self.dismissed.emit(self)
+        self.hide()
+        self.deleteLater()
+
+
 class HandlerClass:
 
     ########################
@@ -63,7 +98,7 @@ class HandlerClass:
         self.hal = halcomp
         self.w = widgets
         self.PATHS = paths
-        self._machine_logger = MachineLogger()
+        self._error_toasts = []
         STATUS.emit('update-machine-log', "QT-Dragon started", None)
 
     ##########################################
@@ -302,12 +337,32 @@ class HandlerClass:
             STATUS.emit('error', kind, text)
 
     def _on_error(self, w, kind, text):
-        if kind in (linuxcnc.OPERATOR_ERROR, linuxcnc.NML_ERROR):
-            prefix = 'ERROR: '
-        else:
-            prefix = ''
+        is_error = kind in (linuxcnc.OPERATOR_ERROR, linuxcnc.NML_ERROR)
+        prefix = 'ERROR: ' if is_error else ''
         STATUS.emit('update-machine-log', prefix + text, 'TIME')
         self.w.statusbar.showMessage(prefix + text.splitlines()[0], 5000)
+        if is_error:
+            self._show_error_popup(text)
+
+    def _show_error_popup(self, text):
+        toast = _ErrorToast(self.w, text)
+        toast.dismissed.connect(self._toast_dismissed)
+        self._error_toasts.append(toast)
+        self._reflow_toasts()
+
+    def _toast_dismissed(self, toast):
+        if toast in self._error_toasts:
+            self._error_toasts.remove(toast)
+        self._reflow_toasts()
+
+    def _reflow_toasts(self):
+        y = 20
+        for toast in self._error_toasts:
+            x = self.w.width() - toast.width() - 20
+            toast.move(x, y)
+            toast.show()
+            toast.raise_()
+            y += toast.height() + 8
 
     def tab_changed(self, index):
         if self.w.SETTINGS.tabText(index) == 'TOOLS':

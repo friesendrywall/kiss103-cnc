@@ -4,12 +4,11 @@
 # Lets the user accumulate MDI lines into a mini program, then run it.
 #
 
-import os
-import tempfile
+import linuxcnc
 
 from PyQt5.QtWidgets import (QWidget, QVBoxLayout, QHBoxLayout,
-                              QLineEdit, QPushButton, QLabel, QSizePolicy)
-from PyQt5.QtCore import pyqtProperty, QSize
+                              QPushButton, QSizePolicy)
+from PyQt5.QtCore import QSize
 from PyQt5.QtGui import QIcon
 
 from qtvcp.widgets.widget_baseclass import _HalWidgetBase
@@ -28,9 +27,13 @@ class MDIHaas(QWidget, _HalWidgetBase):
 
     def __init__(self, parent=None):
         super(MDIHaas, self).__init__(parent)
-        self._temp_file = None
-        self._auto_run = True
-        self._add_m2 = True
+        self._queue = []
+        self._running = False
+        self._awaiting = False
+        self._saw_non_idle = False
+        self._idle_streak = 0
+        self._wait_ticks = 0
+        self._marker_handle = None
         self._setup_ui()
 
     def _setup_ui(self):
@@ -62,22 +65,15 @@ class MDIHaas(QWidget, _HalWidgetBase):
         self.editor.setMinimumSize(QSize(200, 100))
         layout.addWidget(self.editor)
 
-        # Entry row
-        entry_row = QHBoxLayout()
-        lbl = QLabel("MDI:")
-        lbl.setFixedWidth(36)
-        self.entry = QLineEdit()
-        self.entry.setPlaceholderText("Enter command and press Enter to add to program")
-        self.entry.returnPressed.connect(self._add_line)
-        entry_row.addWidget(lbl)
-        entry_row.addWidget(self.entry)
-        layout.addLayout(entry_row)
-
         # Button row
         btn_row = QHBoxLayout()
         self.clear_btn = QPushButton("Clear")
+        self.clear_btn.setMinimumHeight(40)
+        self.clear_btn.setMinimumWidth(120)
         self.clear_btn.clicked.connect(self._clear_program)
         self.run_btn = QPushButton("Run")
+        self.run_btn.setMinimumHeight(40)
+        self.run_btn.setMinimumWidth(120)
         self.run_btn.clicked.connect(self._run_program)
         self.run_btn.setEnabled(False)
         btn_row.addWidget(self.clear_btn)
@@ -86,102 +82,101 @@ class MDIHaas(QWidget, _HalWidgetBase):
         layout.addLayout(btn_row)
 
     def _hal_init(self):
-        STATUS.connect('state-off',    lambda w: self._set_active(False))
-        STATUS.connect('state-estop',  lambda w: self._set_active(False))
-        STATUS.connect('all-homed',    lambda w: self._update_buttons())
-        STATUS.connect('interp-idle',  lambda w: self._update_buttons())
-        STATUS.connect('interp-run',   lambda w: self.run_btn.setEnabled(False))
-        STATUS.connect('mode-mdi',     lambda w: self._update_buttons())
-        STATUS.connect('mode-auto',    lambda w: self.run_btn.setEnabled(False))
-        STATUS.connect('mode-manual',  lambda w: self.run_btn.setEnabled(False))
-
-    def _set_active(self, enabled):
-        self.entry.setEnabled(enabled)
-        self.run_btn.setEnabled(False)
+        STATUS.connect('state-off',       lambda w: self._abort_queue())
+        STATUS.connect('state-estop',     lambda w: self._abort_queue())
+        STATUS.connect('all-homed',       lambda w: self._update_buttons())
+        STATUS.connect('interp-idle',     lambda w: self._update_buttons())
+        STATUS.connect('interp-run',      lambda w: self.run_btn.setEnabled(False))
+        STATUS.connect('mode-mdi',        lambda w: self._update_buttons())
+        STATUS.connect('mode-auto',       lambda w: self.run_btn.setEnabled(False))
+        STATUS.connect('mode-manual',     lambda w: self.run_btn.setEnabled(False))
+        STATUS.connect('periodic',        self._on_periodic)
+        STATUS.connect('error',           self._on_error_abort)
 
     def _update_buttons(self):
         machine_ready = STATUS.machine_is_on() and (
             STATUS.is_all_homed() or INFO.NO_HOME_REQUIRED)
         in_mdi = STATUS.is_mdi_mode()
         has_content = bool(self.editor.text().strip())
-        self.entry.setEnabled(machine_ready)
-        self.run_btn.setEnabled(machine_ready and in_mdi and has_content)
-
-    def _add_line(self):
-        text = self.entry.text().strip()
-        if not text:
-            return
-        current = self.editor.text()
-        if current and not current.endswith('\n'):
-            self.editor.append('\n')
-        self.editor.append(text + '\n')
-        self.entry.clear()
-        self.editor.setCursorPosition(self.editor.lines(), 0)
-        try:
-            self._update_buttons()
-        except Exception:
-            pass
+        self.run_btn.setEnabled(
+            machine_ready and in_mdi and has_content and not self._running)
 
     def _clear_program(self):
+        self._abort_queue()
         self.editor.setText('')
         self.run_btn.setEnabled(False)
-        if self._temp_file and os.path.exists(self._temp_file):
-            try:
-                os.remove(self._temp_file)
-            except Exception:
-                pass
-            self._temp_file = None
 
     def _run_program(self):
-        content = self.editor.text().strip()
-        if not content:
+        lines = self.editor.text().splitlines()
+        self._queue = [(i, l.strip()) for i, l in enumerate(lines) if l.strip()]
+        if not self._queue:
             return
+        ACTION.SET_MDI_MODE()
+        self._running = True
+        self._awaiting = False
+        self._update_buttons()
+        self._fire_next()
+
+    def _fire_next(self):
+        if not self._queue:
+            self._running = False
+            self._awaiting = False
+            self._clear_highlight()
+            self._update_buttons()
+            return
+        line_idx, text = self._queue.pop(0)
+        self._highlight(line_idx)
+        self._awaiting = True
+        self._saw_non_idle = False
+        self._idle_streak = 0
+        self._wait_ticks = 0
         try:
-            fd, path = tempfile.mkstemp(suffix='.ngc', prefix='mdi_haas_')
-            with os.fdopen(fd, 'w') as f:
-                f.write('%\n')
-                for line in content.splitlines():
-                    stripped = line.strip()
-                    if stripped:
-                        f.write(stripped + '\n')
-                if self._add_m2:
-                    f.write('M2\n')
-                f.write('%\n')
-
-            if self._temp_file and os.path.exists(self._temp_file):
-                try:
-                    os.remove(self._temp_file)
-                except Exception:
-                    pass
-            self._temp_file = path
-
-            ACTION.OPEN_PROGRAM(path)
-            if self._auto_run:
-                ACTION.RUN(0)
-
+            ACTION.CALL_MDI(text)
         except Exception as e:
-            LOG.error('MDIHaas run error: {}'.format(e))
-            ACTION.SET_ERROR_MESSAGE('MDI Haas run error:\n{}\n'.format(e))
+            LOG.error('MDIHaas CALL_MDI raised: {}'.format(e))
+            self._abort_queue()
 
-    ###########################################################################
-    # pyqtProperty interface for Qt Designer
-    ###########################################################################
+    def _on_periodic(self, w):
+        if not (self._running and self._awaiting):
+            return
+        self._wait_ticks += 1
+        if STATUS.is_interp_idle():
+            if self._saw_non_idle:
+                self._idle_streak += 1
+                if self._idle_streak >= 2:
+                    self._awaiting = False
+                    self._fire_next()
+            elif self._wait_ticks >= 5:
+                # safety: command finished between ticks without us seeing non-idle
+                self._awaiting = False
+                self._fire_next()
+        else:
+            self._saw_non_idle = True
+            self._idle_streak = 0
 
-    def set_auto_run(self, val):
-        self._auto_run = val
-    def get_auto_run(self):
-        return self._auto_run
-    def reset_auto_run(self):
-        self._auto_run = True
-    auto_run = pyqtProperty(bool, get_auto_run, set_auto_run, reset_auto_run)
+    def _on_error_abort(self, w, kind, text):
+        if self._running and kind in (linuxcnc.OPERATOR_ERROR, linuxcnc.NML_ERROR):
+            self._abort_queue()
 
-    def set_add_m2(self, val):
-        self._add_m2 = val
-    def get_add_m2(self):
-        return self._add_m2
-    def reset_add_m2(self):
-        self._add_m2 = True
-    add_m2_footer = pyqtProperty(bool, get_add_m2, set_add_m2, reset_add_m2)
+    def _abort_queue(self):
+        self._queue = []
+        self._running = False
+        self._awaiting = False
+        self._saw_non_idle = False
+        self._idle_streak = 0
+        self._wait_ticks = 0
+        self._clear_highlight()
+        self._update_buttons()
+
+    def _highlight(self, line):
+        self._clear_highlight()
+        self._marker_handle = self.editor.markerAdd(line, self.editor.CURRENT_MARKER_NUM)
+        self.editor.ensureLineVisible(line)
+
+    def _clear_highlight(self):
+        if self._marker_handle is not None:
+            self.editor.markerDeleteHandle(self._marker_handle)
+            self._marker_handle = None
 
 
 def main():

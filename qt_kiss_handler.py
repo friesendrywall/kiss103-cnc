@@ -20,7 +20,7 @@ from qtvcp.widgets.origin_offsetview import OriginOffsetView as ORIGIN_OFFSET
 from qtvcp.lib.keybindings import Keylookup
 from qtvcp.core import Status, Action
 from PyQt5.QtCore import QFileSystemWatcher
-from PyQt5.QtGui import QColor
+from PyQt5.QtGui import QColor, QIcon
 from qtvcp.core import Qhal
 from PyQt5.QtCore import QTimer
 QHAL = Qhal()
@@ -195,6 +195,8 @@ class HandlerClass:
         self.timer.timeout.connect(self.poll_hal_changes)
         self.timer.start(250)
         self.w.setWindowTitle("KISS-103")
+        icon_path = os.path.join(os.path.dirname(self.PATHS.XML), 'images', 'ACE_Icon.ico')
+        self.w.setWindowIcon(QIcon(icon_path))
 
     def poll_hal_changes(self):
         dj_dot = self.hal.getvalue('motion.analog-out-00')
@@ -458,10 +460,7 @@ class HandlerClass:
 
     def on_keycall_ABORT(self, event, state, shift, cntrl):
         if state:
-            if STATUS.stat.interp_state == linuxcnc.INTERP_IDLE:
-                self.w.close()
-            else:
-                self.cmnd.abort()
+            self.cmd.abort()
 
     def on_keycall_F12(self, event, state, shift, cntrl):
         if state:

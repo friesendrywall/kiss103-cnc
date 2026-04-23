@@ -674,6 +674,7 @@ EditorBase {
 LED {
     qproperty-color: #00dd44;
     qproperty-off_color: #1a1a1a;
+    qproperty-diameter: 20;
 }
 
 /** XYZ home LEDs - show green when home */

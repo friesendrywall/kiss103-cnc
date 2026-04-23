@@ -111,10 +111,10 @@ QLabel#slide_in,
 QLabel#slide_out,
 QLabel#wave_det,
 QLabel#service_key {
-    font: 6pt "Lato Heavy";
+    font: 10pt "Lato Heavy";
 }
 QLabel#lift_down {
-    font: 6pt "Lato Heavy";
+    font: 10pt "Lato Heavy";
 }
 
 DROLabel,
@@ -618,10 +618,16 @@ LED {
     qproperty-off_color: #1a1a1a;
 }
 
-/** Fault / limit / low-supply LEDs - show red when ON (alert) */
+/** XYZ home LEDs - show green when home */
 LED#ind_limit_x,
 LED#ind_limit_y,
-LED#ind_limit_z,
+LED#ind_limit_z {
+    qproperty-color: #00dd44;
+    qproperty-off_color: #1a1a1a;
+    qproperty-diameter: 15;
+}
+
+/** Fault / limit / low-supply LEDs - show red when ON (alert) */
 LED#ind_low_air,
 LED#ind_low_air_,
 LED#ind_low_solder,
@@ -630,6 +636,7 @@ LED#ind_low_flux,
 LED#ind_low_flux_ {
     qproperty-color: #cc2200;
     qproperty-off_color: #1a1a1a;
+    qproperty-diameter: 20;
 }
 
 /** Found indicator - keep green but explicit so it's consistent */

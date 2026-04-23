@@ -18,6 +18,7 @@ from qtvcp.widgets.stylesheeteditor import  StyleSheetEditor as SSE
 from qtvcp.widgets.tool_offsetview import ToolOffsetView as TOOL_OFFSET
 from qtvcp.widgets.origin_offsetview import OriginOffsetView as ORIGIN_OFFSET
 from qtvcp.lib.keybindings import Keylookup
+from qtvcp.lib.machine_log import MachineLogger
 from qtvcp.core import Status, Action
 from PyQt5.QtCore import QFileSystemWatcher
 from PyQt5.QtGui import QColor
@@ -62,6 +63,7 @@ class HandlerClass:
         self.hal = halcomp
         self.w = widgets
         self.PATHS = paths
+        self._machine_logger = MachineLogger()
         STATUS.emit('update-machine-log', "QT-Dragon started", None)
 
     ##########################################
@@ -75,6 +77,8 @@ class HandlerClass:
         KEYBIND.add_call('Key_F12', 'on_keycall_F12')
         self._last_tool = None
         STATUS.connect('periodic', self.on_tool_changed)
+        STATUS.connect('periodic', self._poll_errors)
+        STATUS.connect('error', self._on_error)
         STATUS.connect('state-estop', lambda w: self._set_estop_style(True))
         STATUS.connect('state-estop-reset', lambda w: self._set_estop_style(False))
         self.w.SETTINGS.currentChanged.connect(self.tab_changed)
@@ -155,6 +159,7 @@ class HandlerClass:
         self.timer = QTimer()
         self.timer.timeout.connect(self.poll_hal_changes)
         self.timer.start(250)
+        self.w.setWindowTitle("KISS-103")
 
     def poll_hal_changes(self):
         dj_dot = self.hal.getvalue('motion.analog-out-00')
@@ -285,6 +290,24 @@ class HandlerClass:
         tab_index = TOOL_TO_CAMERA_TAB.get(tool_number)
         if tab_index is not None:
             self.w.CAMERA.setCurrentIndex(tab_index)
+
+    def _poll_errors(self, w):
+        try:
+            e = STATUS.poll_error()
+        except Exception as ex:
+            LOG.error('Error channel read failed: {}'.format(ex))
+            return
+        if e:
+            kind, text = e
+            STATUS.emit('error', kind, text)
+
+    def _on_error(self, w, kind, text):
+        if kind in (linuxcnc.OPERATOR_ERROR, linuxcnc.NML_ERROR):
+            prefix = 'ERROR: '
+        else:
+            prefix = ''
+        STATUS.emit('update-machine-log', prefix + text, 'TIME')
+        self.w.statusbar.showMessage(prefix + text.splitlines()[0], 5000)
 
     def tab_changed(self, index):
         if self.w.SETTINGS.tabText(index) == 'TOOLS':

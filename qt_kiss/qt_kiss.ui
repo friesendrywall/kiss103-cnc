@@ -22,7 +22,7 @@
    </property>
    <layout class="QVBoxLayout" name="verticalLayout" stretch="7,0">
     <item>
-     <layout class="QHBoxLayout" name="layout_top" stretch="2,0,3">
+     <layout class="QHBoxLayout" name="layout_top" stretch="2,2,3">
       <property name="sizeConstraint">
        <enum>QLayout::SetMaximumSize</enum>
       </property>
@@ -1051,7 +1051,7 @@
          <attribute name="title">
           <string>Stat</string>
          </attribute>
-         <widget class="QWidget" name="">
+         <widget class="QWidget" name="layoutWidget">
           <property name="geometry">
            <rect>
             <x>157</x>
@@ -1823,7 +1823,7 @@
      </layout>
     </item>
     <item>
-     <layout class="QHBoxLayout" name="layout_bottom" stretch="1,2,3,5,5,3,3,3">
+     <layout class="QHBoxLayout" name="layout_bottom" stretch="2,3,5,5,0,3,3,3">
       <property name="leftMargin">
        <number>2</number>
       </property>
@@ -1836,130 +1836,6 @@
       <property name="bottomMargin">
        <number>2</number>
       </property>
-      <item>
-       <widget class="QGroupBox" name="groupBox_2">
-        <property name="title">
-         <string>Status</string>
-        </property>
-        <layout class="QGridLayout" name="gridLayout_4">
-         <item row="0" column="0">
-          <widget class="QLabel" name="motion_on">
-           <property name="font">
-            <font>
-             <pointsize>8</pointsize>
-            </font>
-           </property>
-           <property name="text">
-            <string>MOTION-PWR</string>
-           </property>
-           <property name="alignment">
-            <set>Qt::AlignCenter</set>
-           </property>
-          </widget>
-         </item>
-         <item row="0" column="1">
-          <widget class="LED" name="ind_motion_on">
-           <property name="diameter">
-            <number>20</number>
-           </property>
-          </widget>
-         </item>
-         <item row="1" column="0">
-          <widget class="QLabel" name="low_air">
-           <property name="font">
-            <font>
-             <pointsize>8</pointsize>
-            </font>
-           </property>
-           <property name="text">
-            <string>AIR</string>
-           </property>
-           <property name="alignment">
-            <set>Qt::AlignCenter</set>
-           </property>
-          </widget>
-         </item>
-         <item row="1" column="1">
-          <widget class="LED" name="ind_air_pressure">
-           <property name="diameter">
-            <number>20</number>
-           </property>
-          </widget>
-         </item>
-         <item row="2" column="0">
-          <widget class="QLabel" name="pump_on">
-           <property name="font">
-            <font>
-             <pointsize>8</pointsize>
-            </font>
-           </property>
-           <property name="text">
-            <string>PUMP-ON</string>
-           </property>
-           <property name="alignment">
-            <set>Qt::AlignCenter</set>
-           </property>
-          </widget>
-         </item>
-         <item row="2" column="1">
-          <widget class="LED" name="ind_pump_on">
-           <property name="font">
-            <font>
-             <pointsize>10</pointsize>
-            </font>
-           </property>
-           <property name="diameter">
-            <number>20</number>
-           </property>
-          </widget>
-         </item>
-         <item row="3" column="0">
-          <widget class="QLabel" name="low_solder">
-           <property name="font">
-            <font>
-             <pointsize>8</pointsize>
-            </font>
-           </property>
-           <property name="text">
-            <string>LOW-SOLDER</string>
-           </property>
-           <property name="alignment">
-            <set>Qt::AlignCenter</set>
-           </property>
-          </widget>
-         </item>
-         <item row="3" column="1">
-          <widget class="LED" name="ind_low_solder">
-           <property name="diameter">
-            <number>20</number>
-           </property>
-          </widget>
-         </item>
-         <item row="4" column="0">
-          <widget class="QLabel" name="low_flux">
-           <property name="font">
-            <font>
-             <pointsize>8</pointsize>
-            </font>
-           </property>
-           <property name="text">
-            <string>LOW-FLUX</string>
-           </property>
-           <property name="alignment">
-            <set>Qt::AlignCenter</set>
-           </property>
-          </widget>
-         </item>
-         <item row="4" column="1">
-          <widget class="LED" name="ind_low_flux">
-           <property name="diameter">
-            <number>20</number>
-           </property>
-          </widget>
-         </item>
-        </layout>
-       </widget>
-      </item>
       <item>
        <widget class="QGroupBox" name="MACHINECONTROLS">
         <property name="title">
@@ -4138,6 +4014,19 @@
          <item>
           <layout class="QHBoxLayout" name="horizontalLayout_20">
            <item>
+            <spacer name="horizontalSpacer_5">
+             <property name="orientation">
+              <enum>Qt::Horizontal</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>40</width>
+               <height>20</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
+           <item>
             <widget class="QLabel" name="label_16">
              <property name="font">
               <font>
@@ -4194,7 +4083,7 @@
              </property>
              <property name="sizeHint" stdset="0">
               <size>
-               <width>40</width>
+               <width>20</width>
                <height>20</height>
               </size>
              </property>
@@ -4798,6 +4687,130 @@
             </widget>
            </item>
           </layout>
+         </item>
+        </layout>
+       </widget>
+      </item>
+      <item>
+       <widget class="QGroupBox" name="groupBox_2">
+        <property name="title">
+         <string>Status</string>
+        </property>
+        <layout class="QGridLayout" name="gridLayout_4">
+         <item row="0" column="0">
+          <widget class="QLabel" name="motion_on">
+           <property name="font">
+            <font>
+             <pointsize>8</pointsize>
+            </font>
+           </property>
+           <property name="text">
+            <string>MOTION-PWR</string>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignCenter</set>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="1">
+          <widget class="LED" name="ind_motion_on">
+           <property name="diameter">
+            <number>20</number>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="0">
+          <widget class="QLabel" name="low_air">
+           <property name="font">
+            <font>
+             <pointsize>8</pointsize>
+            </font>
+           </property>
+           <property name="text">
+            <string>AIR</string>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignCenter</set>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="1">
+          <widget class="LED" name="ind_air_pressure">
+           <property name="diameter">
+            <number>20</number>
+           </property>
+          </widget>
+         </item>
+         <item row="2" column="0">
+          <widget class="QLabel" name="pump_on">
+           <property name="font">
+            <font>
+             <pointsize>8</pointsize>
+            </font>
+           </property>
+           <property name="text">
+            <string>PUMP-ON</string>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignCenter</set>
+           </property>
+          </widget>
+         </item>
+         <item row="2" column="1">
+          <widget class="LED" name="ind_pump_on">
+           <property name="font">
+            <font>
+             <pointsize>10</pointsize>
+            </font>
+           </property>
+           <property name="diameter">
+            <number>20</number>
+           </property>
+          </widget>
+         </item>
+         <item row="3" column="0">
+          <widget class="QLabel" name="low_solder">
+           <property name="font">
+            <font>
+             <pointsize>8</pointsize>
+            </font>
+           </property>
+           <property name="text">
+            <string>LOW-SOLDER</string>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignCenter</set>
+           </property>
+          </widget>
+         </item>
+         <item row="3" column="1">
+          <widget class="LED" name="ind_low_solder">
+           <property name="diameter">
+            <number>20</number>
+           </property>
+          </widget>
+         </item>
+         <item row="4" column="0">
+          <widget class="QLabel" name="low_flux">
+           <property name="font">
+            <font>
+             <pointsize>8</pointsize>
+            </font>
+           </property>
+           <property name="text">
+            <string>LOW-FLUX</string>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignCenter</set>
+           </property>
+          </widget>
+         </item>
+         <item row="4" column="1">
+          <widget class="LED" name="ind_low_flux">
+           <property name="diameter">
+            <number>20</number>
+           </property>
+          </widget>
          </item>
         </layout>
        </widget>

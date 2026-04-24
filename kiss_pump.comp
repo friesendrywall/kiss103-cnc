@@ -29,6 +29,8 @@ FUNCTION(_) {
     }
     if (pump_run && !stop) {
       target_velocity = pulses_per_rev * rpm / 60;
+    } else if (pump_run && stop) {
+      target_velocity = pulses_per_rev * rpm / 60 / 2;
     } else {
       target_velocity = 0;
     }
@@ -40,15 +42,19 @@ FUNCTION(_) {
         velocity = target_velocity;
       }
     } else if (velocity > target_velocity) {
-      float max_decel = (accel * pulses_per_rev / 60.0) * fperiod * 2;
+      float max_decel = (accel * pulses_per_rev / 60.0) * fperiod * 3;
       if (velocity - target_velocity > max_decel) {
         velocity -= max_decel;
       } else {
         velocity = target_velocity;
       }
     }
-    stopped = velocity == 0;
-    if (velocity == 0) {
+    if (stop) {
+      stopped = velocity == target_velocity;
+    } else {
+      stopped = velocity == 0;
+    }
+    if (velocity == 0 || velocity != target_velocity) {
       at_speed = 0;
     } else if (velocity == target_velocity) {
       at_speed = 1;

@@ -57,17 +57,18 @@ net home-y qt_kiss.ind_limit_y
 net max-home-z qt_kiss.ind_limit_z
 
 # indicators
-net in-n2-pressure   qt_kiss.ind_n2
-net in-air-pressure  qt_kiss.ind_air_pressure
-net in-motion-sw-on  qt_kiss.ind_motion_on
-net in-solder-low    qt_kiss.ind_low_solder
-net in-flux-low qt_kiss.ind_low_flux
+net in-n2-pressure    qt_kiss.ind_n2
+net in-air-pressure   qt_kiss.ind_air_pressure
+net in-motion-sw-on   qt_kiss.ind_motion_on
+net in-solder-low     qt_kiss.ind_low_solder
+net in-flux-low       qt_kiss.ind_low_flux
 net in-solder-pump-on qt_kiss.ind_pump_on 
-net in-lift-down qt_kiss.ind_lift_down
-net in-ph-retracted qt_kiss.ind_slide_in
-net in-ph-extended qt_kiss.ind_slide_out
-net in-wave-height qt_kiss.ind_wave_height 
-net in-service-sw qt_kiss.ind_service_key
+net in-lift-down      qt_kiss.ind_lift_down
+net in-ph-retracted   qt_kiss.ind_slide_in
+net in-ph-extended    qt_kiss.ind_slide_out
+net in-wave-height    qt_kiss.ind_wave_height 
+net in-service-sw     qt_kiss.ind_service_key
+net in-solder-at-temp qt_kiss.ind_solder_at_temp
 
 setp qt_kiss.ext-fid-is-square 0
 setp qt_kiss.ext-fid-size 0.05

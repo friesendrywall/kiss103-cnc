@@ -44,7 +44,7 @@ net out-flux      <= or2.flux-on.out
 loadrt kiss_pump
 addf kiss-pump.0 servo-thread
 setp kiss-pump.0.pulses-per-rev 200
-setp kiss-pump.0.accel 1500
+setp kiss-pump.0.accel 400
 net pump-at-speed kiss-pump.0.at-speed
 net pump-stopped  kiss-pump.0.stopped
 # Pump auto control

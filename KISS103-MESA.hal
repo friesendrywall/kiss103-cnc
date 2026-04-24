@@ -53,6 +53,8 @@ net out-n2-enable      => hm2_7i76e.0.7i76.0.0.output-07
 net out-camera-light-h => hm2_7i76e.0.7i76.0.0.output-11
 net out-camera-light-l => hm2_7i76e.0.7i76.0.0.output-12
 net out-camera-cover   => hm2_7i76e.0.7i76.0.0.output-13
+net out-flux-low       => hm2_7i76e.0.7i76.0.0.output-14
+net out-solder-low     => hm2_7i76e.0.7i76.0.0.output-15
 
 # inputs
 net home-x            <= hm2_7i76e.0.7i76.0.0.input-00
@@ -87,6 +89,15 @@ net heater-out-6 => hm2_7i76e.0.7i84.0.1.output-06
 net out-beep     => hm2_7i76e.0.7i84.0.1.output-15
 # inputs
 net in-heat1-amps => hm2_7i76e.0.7i84.0.1.input-08-not
+
+# indicator loopbacks
+loadrt dbounce names=dbounce.ind_flux,dbounce.ind_solder
+addf dbounce.ind_flux servo-thread
+addf dbounce.ind_solder servo-thread
+net in-flux-low    => dbounce.ind_flux.in
+net in-solder-low  => dbounce.ind_solder.in
+net out-flux-low   <= dbounce.ind_flux.out
+net out-solder-low <= dbounce.ind_solder.out
 
 # Globals
 net current-tool iocontrol.0.tool-number

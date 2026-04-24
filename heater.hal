@@ -12,12 +12,12 @@ addf or2.htr htr-thread
 addf kiss-heater.0 htr-thread
 setp kiss-heater.0.pwm-period 1.5
 setp kiss-heater.0.min-cycle 0.250
-setp kiss-heater.0.pidP 0.033
+setp kiss-heater.0.pidP 0.05
 setp kiss-heater.0.pidI 0.05
 setp kiss-heater.0.pidD 0.05
-setp kiss-heater.0.iMin -10
-setp kiss-heater.0.iMax 10
-setp kiss-heater.0.temp-allowance 3.0
+setp kiss-heater.0.iMin -5
+setp kiss-heater.0.iMax 5
+setp kiss-heater.0.temp-allowance 4.0
 setp kiss-heater.0.setpoint 50.0
 
 net preheater-temp kiss-heater.0.in-temperature

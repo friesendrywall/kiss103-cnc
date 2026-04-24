@@ -2,7 +2,7 @@
 o<fid_clear> sub
 (Clear WCS offsets)
 G52 X0 Y0
-G10 L2 P0 X0 Y0
+G10 L2 P0
 M500
 o<fid_clear> endsub
 M2

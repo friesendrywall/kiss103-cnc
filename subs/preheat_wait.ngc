@@ -1,0 +1,10 @@
+(Preheat wait)
+(params [max-delay])
+o<preheat_wait> sub
+G4 P0.5 (Wait for module to stabilize)
+M66 P3 L3 Q#1 (Ph-at-temp)
+O100 if [#5399 EQ 0]
+    (ABORT, Preheater timeout)
+O100 endif
+o<preheat_wait> endsub
+M2

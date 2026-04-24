@@ -1,0 +1,7 @@
+(Restart pump)
+o<pump_restart> sub
+M65 P4 (Restart pump)
+G4 P0.1
+M66 P4 L3 Q5
+o<pump_restart> endsub
+M2

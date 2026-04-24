@@ -1,0 +1,10 @@
+(dj_multi)
+(params [ena] 1 == on)
+o<dj_multi> sub
+o110 if [#1 EQ 0]
+    M65 P2
+o110 else
+    M64 P2
+o110 endif
+o<dj_multi> endsub
+M2

@@ -1,0 +1,9 @@
+(Check air status)
+(No params)
+o<check_air> sub
+M66 P0 L0 (AIR)
+O100 if [#5399 EQ 0]
+    (ABORT, Low air pressure)
+O100 endif
+o<check_air> endsub
+M2

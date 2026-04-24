@@ -1,0 +1,7 @@
+(Stop pump)
+o<pump_stop> sub
+M64 P4 (Stop pump)
+G4 P0.1
+M66 P5 L3 Q5
+o<pump_stop> endsub
+M2

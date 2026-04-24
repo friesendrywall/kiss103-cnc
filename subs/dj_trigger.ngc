@@ -1,0 +1,11 @@
+(dj_trigger)
+o<dj_trigger> sub
+o110 if [#<_dj_trigger> EQ 0]
+    M62 P1
+    #<_dj_trigger> = 1
+o110 else
+    M63 P1
+    #<_dj_trigger> = 0
+o110 endif
+o<dj_trigger> endsub
+M2

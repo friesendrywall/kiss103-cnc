@@ -1,0 +1,11 @@
+(fluxer)
+(params [ena] 1 == on)
+(Review when used, this is syncronized with movement)
+o<fluxer> sub
+o110 if [#1 EQ 0]
+    M63 P5
+o110 else
+    M62 P5
+o110 endif
+o<fluxer> endsub
+M2

@@ -1,0 +1,12 @@
+(dj_single)
+(params [ena] 1 == on)
+o<dj_single> sub
+o110 if [#1 EQ 0]
+    M65 P0
+    M65 P1
+    #<_dj_trigger> = 0
+o110 else
+    M64 P0
+o110 endif
+o<dj_single> endsub
+M2

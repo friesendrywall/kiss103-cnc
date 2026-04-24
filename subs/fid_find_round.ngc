@@ -1,0 +1,11 @@
+(fid_find_round)
+(params [fid-number] [oval-size] [search-size] [tolerance])
+o<fid_find_round> sub
+G4 P0.25
+M510 Q#1 D#2 P#3 E#4
+G4 P0.25
+o100 if [#<_fid_fail> GE 1.0];
+    (ABORT, Fiducial check failed);
+o100 endif;
+o<fid_find_round> endsub
+M2

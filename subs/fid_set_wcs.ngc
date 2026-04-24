@@ -1,0 +1,15 @@
+(fid_set_wcs)
+(params [fid-count])
+o<fid_set_wcs> sub
+M520 P#1 (Calculate Transform)
+o100 if [#<_fid_fail> GE 1.0];
+    (ABORT, Fiducial check failed);
+o100 endif;
+o110 if [#1 EQ 2]
+    G10 L2 P0 R[#<_pcb_rotation>]
+    (PRINT, PCB rotation = #<_pcb_rotation> degrees);
+o110 endif
+G52 X[#<_calc_x_offset>] Y[#<_calc_y_offset>];
+(PRINT, X correction = #<_calc_x_offset>  Y correction = #<_calc_y_offset>);
+o<fid_set_wcs> endsub
+M2

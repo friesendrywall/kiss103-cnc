@@ -1,0 +1,9 @@
+(Check N2 status)
+(No params)
+o<check_n2> sub
+M66 P1 L0 (N2)
+O100 if [#5399 EQ 0]
+    (ABORT, Low Nitrogen pressure)
+O100 endif
+o<check_n2> endsub
+M2

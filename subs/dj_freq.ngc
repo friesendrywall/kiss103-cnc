@@ -1,0 +1,6 @@
+(dj_freq)
+(Params [frequency])
+o<dj_freq> sub
+M68 E1 Q#1
+o<dj_freq> endsub
+M2

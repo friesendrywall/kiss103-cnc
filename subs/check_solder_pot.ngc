@@ -1,0 +1,13 @@
+(Check Solder pot temp status)
+o<check_solder_pot> sub
+M66 P2 L0 (Solder Temp)
+O100 if [#5399 EQ 0]
+    (ABORT, Solder pot temperate low)
+O100 endif
+
+M66 P2 L0 (Solder-low)
+O101 if [#5399 EQ 0]
+    (ABORT, Solder pot low)
+O101 endif
+o<check_solder_pot> endsub
+M2

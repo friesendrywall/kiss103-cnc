@@ -1,0 +1,6 @@
+(dj_dotsize)
+(Params [dot-size])
+o<dj_dotsize> sub
+M68 E0 Q#1
+o<dj_dotsize> endsub
+M2

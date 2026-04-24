@@ -7,7 +7,7 @@
 net in-air-pressure   motion.digital-in-00
 net in-n2-pressure    motion.digital-in-01
 net in-solder-at-temp motion.digital-in-02
-net ph-at-temp        motion.digital-in-03
+net heater-at-temp    motion.digital-in-03
 net pump-at-speed     motion.digital-in-04
 net pump-stopped      motion.digital-in-05
 net in-solder-low     motion.digital-in-06

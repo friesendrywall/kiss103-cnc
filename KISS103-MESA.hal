@@ -118,6 +118,12 @@ addf not.pgm servo-thread
 net program-is-active not.pgm.in
 net program-is-inactive not.pgm.out
 
+loadrt cycle_timer count=1
+addf cycle-timer.0 servo-thread
+net program-is-active => cycle-timer.0.cycle-on 
+net global-cycle-time-ms cycle-timer.0.cycle-time
+net global-last-cycle-ms cycle-timer.0.last-cycle-time
+
 #*******************
 #  AXIS X JOINT 0
 #*******************

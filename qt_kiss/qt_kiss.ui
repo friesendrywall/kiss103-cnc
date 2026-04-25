@@ -1796,6 +1796,12 @@
          <layout class="QHBoxLayout" name="horizontalLayout_10">
           <item>
            <widget class="CamView" name="camview_3">
+            <property name="maximumSize">
+             <size>
+              <width>16777215</width>
+              <height>16777215</height>
+             </size>
+            </property>
             <property name="camera_number" stdset="0">
              <number>2</number>
             </property>
@@ -4697,51 +4703,21 @@
          <string>Status</string>
         </property>
         <layout class="QGridLayout" name="gridLayout_4">
-         <item row="0" column="0" alignment="Qt::AlignRight">
-          <widget class="QLabel" name="motion_on">
-           <property name="font">
-            <font>
-             <pointsize>8</pointsize>
-            </font>
-           </property>
-           <property name="text">
-            <string>MOTION-PWR</string>
-           </property>
-           <property name="alignment">
-            <set>Qt::AlignCenter</set>
-           </property>
-          </widget>
-         </item>
-         <item row="0" column="1">
-          <widget class="LED" name="ind_motion_on">
-           <property name="diameter">
-            <number>20</number>
-           </property>
-          </widget>
-         </item>
-         <item row="1" column="0" alignment="Qt::AlignRight">
-          <widget class="QLabel" name="low_air">
-           <property name="font">
-            <font>
-             <pointsize>8</pointsize>
-            </font>
-           </property>
-           <property name="text">
-            <string>AIR</string>
-           </property>
-           <property name="alignment">
-            <set>Qt::AlignCenter</set>
-           </property>
-          </widget>
-         </item>
-         <item row="1" column="1">
+         <item row="3" column="1">
           <widget class="LED" name="ind_air_pressure">
            <property name="diameter">
             <number>20</number>
            </property>
           </widget>
          </item>
-         <item row="2" column="0" alignment="Qt::AlignRight">
+         <item row="2" column="1">
+          <widget class="LED" name="ind_motion_on">
+           <property name="diameter">
+            <number>20</number>
+           </property>
+          </widget>
+         </item>
+         <item row="4" column="0" alignment="Qt::AlignRight">
           <widget class="QLabel" name="pump_on">
            <property name="font">
             <font>
@@ -4756,19 +4732,44 @@
            </property>
           </widget>
          </item>
-         <item row="2" column="1">
-          <widget class="LED" name="ind_pump_on">
+         <item row="2" column="0" alignment="Qt::AlignRight">
+          <widget class="QLabel" name="motion_on">
            <property name="font">
             <font>
-             <pointsize>10</pointsize>
+             <pointsize>8</pointsize>
             </font>
            </property>
+           <property name="text">
+            <string>MOTION-PWR</string>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignCenter</set>
+           </property>
+          </widget>
+         </item>
+         <item row="5" column="1">
+          <widget class="LED" name="ind_low_solder">
            <property name="diameter">
             <number>20</number>
            </property>
           </widget>
          </item>
          <item row="3" column="0" alignment="Qt::AlignRight">
+          <widget class="QLabel" name="low_air">
+           <property name="font">
+            <font>
+             <pointsize>8</pointsize>
+            </font>
+           </property>
+           <property name="text">
+            <string>AIR</string>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignCenter</set>
+           </property>
+          </widget>
+         </item>
+         <item row="5" column="0" alignment="Qt::AlignRight">
           <widget class="QLabel" name="low_solder">
            <property name="font">
             <font>
@@ -4783,14 +4784,33 @@
            </property>
           </widget>
          </item>
-         <item row="3" column="1">
-          <widget class="LED" name="ind_low_solder">
+         <item row="0" column="0" colspan="2">
+          <widget class="HALLabel" name="label_cycle">
+           <property name="text">
+            <string>Cycle:</string>
+           </property>
+          </widget>
+         </item>
+         <item row="6" column="1">
+          <widget class="LED" name="ind_low_flux">
            <property name="diameter">
             <number>20</number>
            </property>
           </widget>
          </item>
-         <item row="4" column="0" alignment="Qt::AlignRight">
+         <item row="4" column="1">
+          <widget class="LED" name="ind_pump_on">
+           <property name="font">
+            <font>
+             <pointsize>10</pointsize>
+            </font>
+           </property>
+           <property name="diameter">
+            <number>20</number>
+           </property>
+          </widget>
+         </item>
+         <item row="6" column="0" alignment="Qt::AlignRight">
           <widget class="QLabel" name="low_flux">
            <property name="font">
             <font>
@@ -4805,10 +4825,10 @@
            </property>
           </widget>
          </item>
-         <item row="4" column="1">
-          <widget class="LED" name="ind_low_flux">
-           <property name="diameter">
-            <number>20</number>
+         <item row="1" column="0" colspan="2">
+          <widget class="HALLabel" name="label_last">
+           <property name="text">
+            <string>Last:</string>
            </property>
           </widget>
          </item>
@@ -4911,10 +4931,10 @@
               <number>0</number>
              </property>
              <property name="minimum">
-              <double>500.000000000000000</double>
+              <double>400.000000000000000</double>
              </property>
              <property name="maximum">
-              <double>1000.000000000000000</double>
+              <double>800.000000000000000</double>
              </property>
              <property name="singleStep">
               <double>10.000000000000000</double>
@@ -5568,6 +5588,11 @@
    <class>LED</class>
    <extends>QWidget</extends>
    <header>qtvcp.widgets.led_widget</header>
+  </customwidget>
+  <customwidget>
+   <class>HALLabel</class>
+   <extends>QLabel</extends>
+   <header>qtvcp.widgets.hal_label</header>
   </customwidget>
   <customwidget>
    <class>GCodeGraphics</class>

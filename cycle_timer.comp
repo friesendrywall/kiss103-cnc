@@ -1,0 +1,32 @@
+component cycle_timer "cycle timer";
+
+pin in  bit   cycle_on;
+pin out u32 cycle_time;
+pin out u32 last_cycle_time;
+
+variable uint accumulator;
+variable int active_cycle;
+option period no;
+function _;
+license "GPL";
+author "Erik Friesen";
+;;
+
+
+FUNCTION(_) {
+  if (cycle_on) {
+    accumulator += period;
+    active_cycle = 1;
+    while (accumulator > 1000000) {
+      cycle_time += 1;
+      accumulator -= 1000000;
+    }
+  } else {
+    if (active_cycle) {
+      active_cycle = 0;
+      last_cycle_time = cycle_time;
+    }
+    accumulator = 0;
+    cycle_time = 0;
+  }
+}

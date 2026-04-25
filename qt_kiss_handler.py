@@ -215,6 +215,13 @@ class HandlerClass:
         self.w.dj_dotsize.setValue(dj_dot)
         self.w.dj_dotsize.blockSignals(False)
 
+        cycle_ms = self.hal.getvalue('global-cycle-time-ms')
+        last_ms = self.hal.getvalue('global-last-cycle-ms')
+        cycle_sec = cycle_ms / 1000.0
+        last_sec = last_ms / 1000.0
+        self.w.label_cycle.setText('Cycle: %d:%04.1f' % (int(cycle_sec) // 60, cycle_sec % 60))
+        self.w.label_last.setText('Last: %d:%04.1f' % (int(last_sec) // 60, last_sec % 60))
+
     def on_ph_setpoint_changed(self, value):
         self.cmd.set_analog_output(3, float(value))
 

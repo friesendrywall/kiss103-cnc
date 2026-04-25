@@ -3,10 +3,12 @@ param rw float pulses_per_rev;
 
 pin in unsigned n2_delay;
 pin in float    accel; // rpm per second per second
+pin in float    decel;
 pin in bit      n2_signal;
 pin in bit      pump_run;
 pin in bit      stop;
 pin in float    rpm;
+pin in float    stop_rpm;
 
 pin out float velocity; // To stepgen
 pin out bit   at_speed;
@@ -30,7 +32,7 @@ FUNCTION(_) {
     if (pump_run && !stop) {
       target_velocity = pulses_per_rev * rpm / 60;
     } else if (pump_run && stop) {
-      target_velocity = pulses_per_rev * rpm / 60 / 2;
+      target_velocity = pulses_per_rev * stop_rpm / 60;
     } else {
       target_velocity = 0;
     }
@@ -42,7 +44,7 @@ FUNCTION(_) {
         velocity = target_velocity;
       }
     } else if (velocity > target_velocity) {
-      float max_decel = (accel * pulses_per_rev / 60.0) * fperiod * 3;
+      float max_decel = (decel * pulses_per_rev / 60.0) * fperiod;
       if (velocity - target_velocity > max_decel) {
         velocity -= max_decel;
       } else {

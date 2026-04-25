@@ -1,0 +1,7 @@
+(beep [length])
+o<beep> sub
+M64 P7
+G4 P#1
+M65 P7
+o<beep> endsub
+M2

@@ -45,6 +45,8 @@ loadrt kiss_pump
 addf kiss-pump.0 servo-thread
 setp kiss-pump.0.pulses-per-rev 200
 setp kiss-pump.0.accel 400
+setp kiss-pump.0.decel 800
+setp kiss-pump.0.stop-rpm 400
 net pump-at-speed kiss-pump.0.at-speed
 net pump-stopped  kiss-pump.0.stopped
 # Pump auto control

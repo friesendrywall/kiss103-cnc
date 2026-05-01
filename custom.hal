@@ -78,6 +78,20 @@ net current-tool-f comp.fl.in1
 net out-flux-lift comp.fl.equal
 
 
-# Cycle start
-net in-cycle-start halui.program.run
+# Cycle pause
 net in-cycle-pause halui.program.pause
+
+# Cycle start: route to run when idle, resume when paused
+loadrt and2 names=and.start.run,and.start.resume
+addf and.start.run    servo-thread
+addf and.start.resume servo-thread
+
+# Run path: start AND program is idle
+net in-cycle-start      => and.start.run.in0
+net program-is-inactive => and.start.run.in1
+net cmd-run             and.start.run.out => halui.program.run
+                                                                                                              
+# Resume path: start AND paused
+net in-cycle-start  => and.start.resume.in0                                                                 
+net pgm-paused      => and.start.resume.in1
+net cmd-resume      and.start.resume.out => halui.program.resume

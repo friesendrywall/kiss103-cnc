@@ -80,3 +80,4 @@ net out-flux-lift comp.fl.equal
 
 # Cycle start
 net in-cycle-start halui.program.run
+net in-cycle-pause halui.program.pause
